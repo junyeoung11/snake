@@ -1,4 +1,4 @@
-import pygame
+pip install pygameimport pygame
 import random
 import sys
 
