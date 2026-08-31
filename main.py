@@ -7,37 +7,21 @@ st.set_page_config(
     layout="centered"
 )
 
-# Streamlit 기본 여백 줄이기
 st.markdown("""
 <style>
-    .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        max-width: 950px;
-    }
-
-    header {
-        visibility: hidden;
-    }
+.block-container {
+    max-width: 1000px;
+    padding-top: 1rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    "<h1 style='text-align:center;'>🪱 지렁이 게임</h1>",
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    "<p style='text-align:center; font-size:18px;'>"
-    "WASD 또는 방향키로 움직이세요! 🎮"
-    "</p>",
-    unsafe_allow_html=True
-)
+st.title("🪱 지렁이 게임")
+st.caption("🎮 WASD 또는 방향키로 움직이세요!")
 
 components.html("""
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <style>
@@ -48,86 +32,55 @@ components.html("""
 
 body {
     margin: 0;
-    background: #102615;
-    overflow: hidden;
+    background: #163b1d;
     font-family: Arial, sans-serif;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow: hidden;
 }
 
-/* 전체 게임 공간 */
+/* 🌲 전체 숲 */
 
-#gameContainer {
-
+#container {
     width: 820px;
     height: 820px;
-
+    margin: auto;
     position: relative;
-
-    border-radius: 22px;
-
     overflow: hidden;
+    border-radius: 25px;
 
     background:
-        radial-gradient(circle at 10% 10%, #315f25 0%, transparent 20%),
-        radial-gradient(circle at 90% 20%, #244d22 0%, transparent 20%),
-        radial-gradient(circle at 20% 90%, #234d22 0%, transparent 20%),
-        #173a1d;
+        radial-gradient(circle at 10% 10%, #477c32, transparent 20%),
+        radial-gradient(circle at 90% 20%, #285d29, transparent 25%),
+        radial-gradient(circle at 20% 90%, #356f2e, transparent 25%),
+        #1d4b27;
 
     box-shadow:
-        0 0 30px rgba(0,0,0,0.8),
-        inset 0 0 50px rgba(0,0,0,0.5);
-
+        0 0 35px rgba(0,0,0,.8);
 }
 
 
-/* =========================
-   🌲 숲 배경
-========================= */
+/* 🌳 나무 */
 
 .tree {
-
     position: absolute;
-
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
 
     border-radius: 50%;
 
     background:
-        radial-gradient(circle at 35% 30%, #75b83f, #285f29 55%, #123b1c);
+        radial-gradient(circle at 35% 30%,
+        #82c94c,
+        #367a2e 55%,
+        #173e20);
 
     box-shadow:
-        0 10px 20px rgba(0,0,0,0.45);
+        0 10px 20px rgba(0,0,0,.5);
 
-}
-
-.tree::after {
-
-    content: "";
-
-    position: absolute;
-
-    width: 45px;
-    height: 70px;
-
-    background: #70431f;
-
-    left: 32px;
-    top: 75px;
-
-    border-radius: 20px;
-
-    z-index: -1;
-
+    z-index: 1;
 }
 
 
-/* =========================
-   🟩 게임 맵
-========================= */
+/* 🟩 게임 맵 */
 
 #game {
 
@@ -139,95 +92,63 @@ body {
     left: 70px;
     top: 70px;
 
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    border: 18px solid #244fa3;
+
     background:
 
         linear-gradient(
-            rgba(255,255,255,0.025) 1px,
+            90deg,
+            rgba(0,0,0,.08) 1px,
             transparent 1px
         ),
 
         linear-gradient(
-            90deg,
-            rgba(255,255,255,0.025) 1px,
+            rgba(0,0,0,.08) 1px,
             transparent 1px
         ),
 
-        radial-gradient(
-            circle,
-            rgba(90,170,55,0.35),
-            transparent 60%
-        ),
-
-        #3f7f2c;
+        #6aaa3b;
 
     background-size:
-        68px 68px,
-        68px 68px,
-        100% 100%,
-        100% 100%;
-
-    border:
-
-        6px solid #1d4b22;
-
-    border-radius: 12px;
+        34px 34px;
 
     box-shadow:
 
-        inset 0 0 30px rgba(0,0,0,0.35),
+        inset 0 0 30px rgba(0,0,0,.3),
 
-        0 0 20px rgba(0,0,0,0.5);
+        0 0 20px rgba(0,0,0,.5);
 
+    z-index: 5;
 }
 
 
-/* =========================
-   🌿 풀 장식
-========================= */
-
-.grass {
-
-    position: absolute;
-
-    color: #76b94a;
-
-    font-size: 22px;
-
-    pointer-events: none;
-
-}
-
-
-/* =========================
-   🍎 먹이
-========================= */
+/* 🍎 사과 */
 
 #food {
 
     position: absolute;
 
-    font-size: 38px;
+    width: 34px;
+    height: 34px;
 
-    width: 45px;
-    height: 45px;
+    font-size: 30px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
+    z-index: 10;
+
     filter:
-
-        drop-shadow(0 5px 5px rgba(0,0,0,0.5))
-
-        drop-shadow(0 0 8px #d6ff4b);
-
+        drop-shadow(0 4px 3px rgba(0,0,0,.4));
 }
 
 
-/* =========================
-   🪱 지렁이
-========================= */
+/* 🪱 몸통 */
 
 .segment {
 
@@ -236,34 +157,33 @@ body {
     width: 34px;
     height: 34px;
 
-    border-radius: 50%;
+    border-radius: 12px;
 
     background:
 
-        radial-gradient(
-            circle at 30% 25%,
-            #c8ff4c,
-            #82d824 40%,
-            #3c8f1c 75%
+        linear-gradient(
+            135deg,
+            #557fe5,
+            #254aa8
         );
 
-    border: 2px solid #286b19;
+    border:
+
+        2px solid #183782;
 
     box-shadow:
 
-        inset -5px -6px 8px rgba(0,0,0,0.25),
+        inset 4px 4px 8px rgba(255,255,255,.2),
 
-        inset 4px 4px 8px rgba(255,255,255,0.3),
+        inset -4px -4px 8px rgba(0,0,0,.25),
 
-        0 5px 8px rgba(0,0,0,0.35);
-
-    transform: translate(-50%, -50%);
+        0 4px 6px rgba(0,0,0,.3);
 
     transition:
 
-        left 0.08s linear,
+        left .12s ease,
 
-        top 0.08s linear;
+        top .12s ease;
 
 }
 
@@ -272,10 +192,12 @@ body {
 
 .head {
 
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
 
-    z-index: 10;
+    border-radius: 50%;
+
+    z-index: 20;
 
 }
 
@@ -286,45 +208,38 @@ body {
 
     position: absolute;
 
-    width: 13px;
-    height: 16px;
+    width: 14px;
+    height: 17px;
 
     background: white;
 
     border-radius: 50%;
 
-    top: 7px;
-
-    box-shadow:
-        0 2px 2px rgba(0,0,0,0.2);
+    top: 6px;
 
 }
+
 
 .eye.left {
-
-    left: 7px;
-
+    left: 6px;
 }
+
 
 .eye.right {
-
-    right: 7px;
-
+    right: 6px;
 }
 
-
-/* 눈동자 */
 
 .pupil {
 
-    width: 6px;
-    height: 7px;
+    position: absolute;
+
+    width: 7px;
+    height: 8px;
 
     background: #111;
 
     border-radius: 50%;
-
-    position: absolute;
 
     left: 4px;
     top: 6px;
@@ -332,78 +247,71 @@ body {
 }
 
 
-/* =========================
-   🏆 점수판
-========================= */
+/* 🏆 점수 */
 
 #scoreBox {
 
     position: absolute;
 
-    top: 25px;
-    left: 25px;
+    top: 20px;
+    left: 20px;
 
-    z-index: 30;
+    z-index: 50;
+
+    color: white;
 
     background:
-
-        rgba(5,20,8,0.88);
-
-    border:
-
-        2px solid rgba(110,200,70,0.4);
+        rgba(0,0,0,.8);
 
     border-radius: 15px;
 
-    padding: 14px 22px;
-
-    color: white;
+    padding: 12px 20px;
 
     font-size: 22px;
 
     font-weight: bold;
 
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.5);
-
 }
 
 
-/* ❤️ 최고점수 */
+/* 💥 충돌 효과 */
 
-#bestBox {
+#crash {
 
     position: absolute;
 
-    top: 25px;
-    right: 25px;
+    font-size: 75px;
 
-    z-index: 30;
+    display: none;
 
-    background:
+    z-index: 100;
 
-        rgba(5,20,8,0.88);
-
-    border:
-
-        2px solid rgba(255,220,60,0.4);
-
-    border-radius: 15px;
-
-    padding: 14px 22px;
-
-    color: white;
-
-    font-size: 20px;
-
-    font-weight: bold;
+    animation: crash .6s ease;
 
 }
 
 
-/* =========================
-   💀 게임오버
-========================= */
+@keyframes crash {
+
+    0% {
+        transform: scale(.2) rotate(0deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.5) rotate(20deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1) rotate(-10deg);
+        opacity: 1;
+    }
+
+}
+
+
+/* 💀 게임오버 */
 
 #gameOver {
 
@@ -413,175 +321,97 @@ body {
     top: 50%;
 
     transform:
-
         translate(-50%, -50%);
 
     width: 400px;
 
     padding: 30px;
 
-    text-align: center;
-
-    color: white;
-
     background:
-
-        rgba(0,0,0,0.82);
+        rgba(0,0,0,.82);
 
     border:
-
-        2px solid #85d94b;
+        2px solid #547ee0;
 
     border-radius: 20px;
 
-    z-index: 100;
+    color: white;
+
+    text-align: center;
 
     display: none;
 
-    box-shadow:
-        0 0 40px rgba(0,0,0,0.8);
+    z-index: 200;
 
 }
 
 
 #gameOver h1 {
-
-    color: #ffdf4f;
-
-    margin-top: 0;
-
+    color: #ff5d50;
 }
 
-
-#gameOver p {
-
-    font-size: 22px;
-
-}
-
-
-/* =========================
-   🎮 조작법
-========================= */
-
-#controls {
-
-    position: absolute;
-
-    bottom: 15px;
-
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    z-index: 50;
-
-    color: white;
-
-    background:
-
-        rgba(0,0,0,0.75);
-
-    padding:
-
-        10px 25px;
-
-    border-radius: 15px;
-
-    font-size: 17px;
-
-    white-space: nowrap;
-
-}
 
 </style>
-
 </head>
 
 
 <body>
 
-<div id="gameContainer">
-
+<div id="container">
 
     <!-- 🌲 나무 -->
 
-    <div class="tree" style="left:-25px; top:10px;"></div>
-    <div class="tree" style="left:80px; top:-40px;"></div>
-    <div class="tree" style="left:220px; top:-30px;"></div>
-    <div class="tree" style="left:400px; top:-35px;"></div>
-    <div class="tree" style="left:600px; top:-20px;"></div>
-    <div class="tree" style="right:-35px; top:100px;"></div>
-    <div class="tree" style="right:-40px; top:300px;"></div>
-    <div class="tree" style="right:-30px; bottom:80px;"></div>
-    <div class="tree" style="left:-40px; bottom:100px;"></div>
-    <div class="tree" style="left:100px; bottom:-45px;"></div>
-    <div class="tree" style="left:300px; bottom:-50px;"></div>
-    <div class="tree" style="left:520px; bottom:-45px;"></div>
+    <div class="tree" style="left:-30px;top:-30px;"></div>
+    <div class="tree" style="left:120px;top:-50px;"></div>
+    <div class="tree" style="left:300px;top:-50px;"></div>
+    <div class="tree" style="left:500px;top:-50px;"></div>
+    <div class="tree" style="right:-30px;top:-20px;"></div>
+
+    <div class="tree" style="left:-60px;top:200px;"></div>
+    <div class="tree" style="right:-60px;top:180px;"></div>
+
+    <div class="tree" style="left:-60px;bottom:100px;"></div>
+    <div class="tree" style="right:-60px;bottom:100px;"></div>
+
+    <div class="tree" style="left:100px;bottom:-60px;"></div>
+    <div class="tree" style="left:300px;bottom:-60px;"></div>
+    <div class="tree" style="left:500px;bottom:-60px;"></div>
 
 
-    <!-- 🏆 점수 -->
+    <!-- 🏆 -->
 
     <div id="scoreBox">
         🏆 점수: <span id="score">0</span>
     </div>
 
 
-    <!-- ❤️ 최고점수 -->
-
-    <div id="bestBox">
-        ❤️ 최고: <span id="best">0</span>
-    </div>
-
-
-    <!-- 🟩 맵 -->
+    <!-- 🟩 게임 -->
 
     <div id="game">
 
-
-        <!-- 🌿 장식 -->
-
-        <div class="grass" style="left:80px;top:100px;">🌿</div>
-        <div class="grass" style="left:500px;top:120px;">☘️</div>
-        <div class="grass" style="left:180px;top:430px;">🌱</div>
-        <div class="grass" style="left:530px;top:500px;">☘️</div>
-        <div class="grass" style="left:300px;top:200px;">🌿</div>
-
-
-        <!-- 🍎 먹이 -->
-
+        <!-- 🍎 사과 -->
         <div id="food">🍎</div>
 
+        <!-- 💥 충돌 -->
+        <div id="crash">💥</div>
 
     </div>
 
 
-    <!-- 💀 게임오버 -->
+    <!-- 💀 -->
 
     <div id="gameOver">
 
         <h1>💀 게임 오버!</h1>
 
-        <p>
+        <h2>
             최종 점수:
             <span id="finalScore">0</span>
-        </p>
+        </h2>
 
-        <p style="font-size:17px;color:#baff7a;">
-            R 키를 눌러 다시 시작!
-        </p>
+        <p>R 키를 눌러 다시 시작하세요!</p>
 
     </div>
-
-
-    <!-- 🎮 조작법 -->
-
-    <div id="controls">
-
-        ⌨️ WASD 또는 방향키로 이동
-
-    </div>
-
 
 </div>
 
@@ -593,13 +423,17 @@ body {
    ⚙️ 설정
 ========================= */
 
-const game = document.getElementById("game");
+const game =
+    document.getElementById("game");
 
-const foodElement = document.getElementById("food");
+const foodElement =
+    document.getElementById("food");
 
-const scoreElement = document.getElementById("score");
+const crashElement =
+    document.getElementById("crash");
 
-const bestElement = document.getElementById("best");
+const scoreElement =
+    document.getElementById("score");
 
 const gameOverElement =
     document.getElementById("gameOver");
@@ -608,30 +442,34 @@ const finalScoreElement =
     document.getElementById("finalScore");
 
 
-const MAP_SIZE = 680;
+const GRID = 34;
+
+/* 벽 두께 제외 실제 맵 */
+
+const MAP = 646;
 
 
 /* =========================
-   🪱 게임 데이터
+   🎮 변수
 ========================= */
 
 let snake = [];
 
-let direction = { x: 1, y: 0 };
+let direction =
+    {x: 1, y: 0};
 
-let nextDirection = { x: 1, y: 0 };
+let nextDirection =
+    {x: 1, y: 0};
 
-let food = { x: 450, y: 200 };
+let food;
 
 let score = 0;
-
-let bestScore = 0;
 
 let gameOver = false;
 
 
 /* =========================
-   🪱 지렁이 생성
+   🪱 생성
 ========================= */
 
 function createSnake() {
@@ -644,7 +482,7 @@ function createSnake() {
     snake = [];
 
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 4; i++) {
 
         const element =
             document.createElement("div");
@@ -656,9 +494,6 @@ function createSnake() {
         if (i === 0) {
 
             element.classList.add("head");
-
-
-            /* 👀 눈 */
 
             element.innerHTML = `
 
@@ -680,9 +515,9 @@ function createSnake() {
 
         snake.push({
 
-            x: 260 - i * 28,
+            x: 272 - i * GRID,
 
-            y: 350,
+            y: 272,
 
             element: element
 
@@ -694,7 +529,7 @@ function createSnake() {
 
 
 /* =========================
-   🍎 먹이 위치
+   🍎 사과 생성
 ========================= */
 
 function createFood() {
@@ -706,35 +541,43 @@ function createFood() {
 
         food = {
 
-            x: 40 + Math.random() * (MAP_SIZE - 80),
+            x:
+                Math.floor(
+                    Math.random() * 18
+                ) * GRID,
 
-            y: 40 + Math.random() * (MAP_SIZE - 80)
+            y:
+                Math.floor(
+                    Math.random() * 18
+                ) * GRID
 
         };
 
 
-        valid = !snake.some(part => {
-
-            const dx = part.x - food.x;
-
-            const dy = part.y - food.y;
-
-            return Math.sqrt(dx*dx + dy*dy) < 50;
-
-        });
+        valid = !snake.some(part =>
+            part.x === food.x &&
+            part.y === food.y
+        );
 
     }
+
+
+    foodElement.style.left =
+        food.x + "px";
+
+    foodElement.style.top =
+        food.y + "px";
 
 }
 
 
 /* =========================
-   🎨 화면 업데이트
+   🎨 그리기
 ========================= */
 
 function render() {
 
-    snake.forEach((part, index) => {
+    snake.forEach(part => {
 
         part.element.style.left =
             part.x + "px";
@@ -742,215 +585,237 @@ function render() {
         part.element.style.top =
             part.y + "px";
 
-
-        /* 머리 회전 */
-
-        if (index === 0) {
-
-            let angle =
-                Math.atan2(
-                    direction.y,
-                    direction.x
-                ) * 180 / Math.PI;
-
-
-            part.element.style.transform =
-                `translate(-50%, -50%) rotate(${angle}deg)`;
-
-        }
-
     });
 
 
-    foodElement.style.left =
-        (food.x - 22) + "px";
-
-    foodElement.style.top =
-        (food.y - 22) + "px";
-
-
-    scoreElement.textContent = score;
-
-    bestElement.textContent = bestScore;
+    scoreElement.textContent =
+        score;
 
 }
 
 
 /* =========================
-   🎮 부드러운 움직임
+   ⌨️ 키보드
 ========================= */
 
-function update() {
+document.addEventListener(
+    "keydown",
+
+    function(event) {
+
+        const key =
+            event.key.toLowerCase();
+
+
+        if (
+            ["w","a","s","d",
+            "arrowup","arrowdown",
+            "arrowleft","arrowright"]
+            .includes(key)
+        ) {
+
+            event.preventDefault();
+
+        }
+
+
+        if (
+            (key === "w" ||
+            key === "arrowup")
+
+            && direction.y !== 1
+        ) {
+
+            nextDirection =
+                {x:0,y:-1};
+
+        }
+
+
+        if (
+            (key === "s" ||
+            key === "arrowdown")
+
+            && direction.y !== -1
+        ) {
+
+            nextDirection =
+                {x:0,y:1};
+
+        }
+
+
+        if (
+            (key === "a" ||
+            key === "arrowleft")
+
+            && direction.x !== 1
+        ) {
+
+            nextDirection =
+                {x:-1,y:0};
+
+        }
+
+
+        if (
+            (key === "d" ||
+            key === "arrowright")
+
+            && direction.x !== -1
+        ) {
+
+            nextDirection =
+                {x:1,y:0};
+
+        }
+
+
+        if (
+            key === "r" &&
+            gameOver
+        ) {
+
+            restart();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   🪱 한 칸 이동
+========================= */
+
+function move() {
 
     if (gameOver) return;
 
 
-    direction = nextDirection;
+    direction =
+        nextDirection;
 
-
-    /* 머리 이동 */
 
     const head = snake[0];
 
-    const SPEED = 2.8;
 
+    const newHead = {
 
-    head.x += direction.x * SPEED;
+        x:
+            head.x +
+            direction.x * GRID,
 
-    head.y += direction.y * SPEED;
+        y:
+            head.y +
+            direction.y * GRID
+
+    };
 
 
     /* 💥 벽 충돌 */
 
     if (
 
-        head.x < 20 ||
+        newHead.x < 0 ||
 
-        head.x > MAP_SIZE - 20 ||
+        newHead.x >= MAP ||
 
-        head.y < 20 ||
+        newHead.y < 0 ||
 
-        head.y > MAP_SIZE - 20
+        newHead.y >= MAP
 
     ) {
 
-        endGame();
+        crash(
+            head.x,
+            head.y
+        );
 
         return;
 
     }
 
 
-    /* 🪱 몸통이 부드럽게 따라오기 */
+    /* 💥 자기 몸 충돌 */
 
-    for (let i = 1; i < snake.length; i++) {
+    if (
 
-        const previous = snake[i - 1];
+        snake.some(
+            part =>
 
-        const current = snake[i];
+            part.x === newHead.x &&
+            part.y === newHead.y
+        )
 
+    ) {
 
-        const dx =
-            previous.x - current.x;
+        crash(
+            newHead.x,
+            newHead.y
+        );
 
-        const dy =
-            previous.y - current.y;
-
-
-        const distance =
-            Math.sqrt(dx * dx + dy * dy);
-
-
-        const targetDistance = 28;
-
-
-        if (distance > targetDistance) {
-
-            const moveDistance =
-                (distance - targetDistance) * 0.35;
-
-
-            current.x +=
-                (dx / distance) * moveDistance;
-
-            current.y +=
-                (dy / distance) * moveDistance;
-
-        }
+        return;
 
     }
 
 
-    /* 🍎 먹었는지 확인 */
+    /* 머리 이동 */
 
-    const foodDistance =
-
-        Math.sqrt(
-
-            (head.x - food.x) *
-            (head.x - food.x)
-
-            +
-
-            (head.y - food.y) *
-            (head.y - food.y)
-
-        );
+    const tail =
+        snake.pop();
 
 
-    if (foodDistance < 32) {
+    tail.x =
+        newHead.x;
+
+    tail.y =
+        newHead.y;
+
+
+    snake.unshift(tail);
+
+
+    /* 🍎 사과 먹기 */
+
+    if (
+
+        newHead.x === food.x &&
+        newHead.y === food.y
+
+    ) {
 
         score++;
 
 
-        if (score > bestScore) {
+        /* 몸 하나 추가 */
 
-            bestScore = score;
-
-        }
-
-
-        /* 몸 길어짐 */
-
-        const tail =
+        const last =
             snake[snake.length - 1];
 
 
-        const newSegment =
+        const element =
             document.createElement("div");
 
 
-        newSegment.classList.add("segment");
+        element.classList.add("segment");
 
 
-        game.appendChild(newSegment);
+        game.appendChild(element);
 
 
         snake.push({
 
-            x: tail.x,
-
-            y: tail.y,
-
-            element: newSegment
+            x:last.x,
+            y:last.y,
+            element:element
 
         });
 
 
+        /* 새 사과 1개 */
+
         createFood();
-
-    }
-
-
-    /* 자기 몸 충돌 */
-
-    for (let i = 5; i < snake.length; i++) {
-
-        const part = snake[i];
-
-
-        const distance =
-
-            Math.sqrt(
-
-                (head.x - part.x) *
-                (head.x - part.x)
-
-                +
-
-                (head.y - part.y) *
-                (head.y - part.y)
-
-            );
-
-
-        if (distance < 20) {
-
-            endGame();
-
-            return;
-
-        }
 
     }
 
@@ -961,18 +826,34 @@ function update() {
 
 
 /* =========================
-   💀 게임 종료
+   💥 콰당
 ========================= */
 
-function endGame() {
+function crash(x, y) {
 
     gameOver = true;
 
-    finalScoreElement.textContent =
-        score;
 
-    gameOverElement.style.display =
+    crashElement.style.left =
+        (x - 20) + "px";
+
+    crashElement.style.top =
+        (y - 20) + "px";
+
+
+    crashElement.style.display =
         "block";
+
+
+    setTimeout(() => {
+
+        finalScoreElement.textContent =
+            score;
+
+        gameOverElement.style.display =
+            "block";
+
+    }, 500);
 
 }
 
@@ -981,16 +862,21 @@ function endGame() {
    🔄 재시작
 ========================= */
 
-function restartGame() {
+function restart() {
 
     score = 0;
 
     gameOver = false;
 
-    direction = { x: 1, y: 0 };
+    direction =
+        {x:1,y:0};
 
-    nextDirection = { x: 1, y: 0 };
+    nextDirection =
+        {x:1,y:0};
 
+
+    crashElement.style.display =
+        "none";
 
     gameOverElement.style.display =
         "none";
@@ -1006,128 +892,6 @@ function restartGame() {
 
 
 /* =========================
-   ⌨️ 키보드 조작
-========================= */
-
-document.addEventListener(
-    "keydown",
-
-    function(event) {
-
-        const key =
-            event.key.toLowerCase();
-
-
-        if (
-
-            [
-
-                "arrowup",
-                "arrowdown",
-                "arrowleft",
-                "arrowright",
-                "w",
-                "a",
-                "s",
-                "d"
-
-            ].includes(key)
-
-        ) {
-
-            event.preventDefault();
-
-        }
-
-
-        /* 위 */
-
-        if (
-
-            (key === "w" ||
-            key === "arrowup")
-
-            && direction.y !== 1
-
-        ) {
-
-            nextDirection =
-                { x: 0, y: -1 };
-
-        }
-
-
-        /* 아래 */
-
-        if (
-
-            (key === "s" ||
-            key === "arrowdown")
-
-            && direction.y !== -1
-
-        ) {
-
-            nextDirection =
-                { x: 0, y: 1 };
-
-        }
-
-
-        /* 왼쪽 */
-
-        if (
-
-            (key === "a" ||
-            key === "arrowleft")
-
-            && direction.x !== 1
-
-        ) {
-
-            nextDirection =
-                { x: -1, y: 0 };
-
-        }
-
-
-        /* 오른쪽 */
-
-        if (
-
-            (key === "d" ||
-            key === "arrowright")
-
-            && direction.x !== -1
-
-        ) {
-
-            nextDirection =
-                { x: 1, y: 0 };
-
-        }
-
-
-        /* R 재시작 */
-
-        if (
-
-            key === "r"
-
-            && gameOver
-
-        ) {
-
-            restartGame();
-
-        }
-
-    }
-
-);
-
-
-/* =========================
    🚀 시작
 ========================= */
 
@@ -1138,12 +902,13 @@ createFood();
 render();
 
 
-/* 60FPS */
+/* ⏱️ 이동 속도 */
 
 setInterval(
-    update,
-    1000 / 60
+    move,
+    170
 );
+
 
 </script>
 
