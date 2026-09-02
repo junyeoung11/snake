@@ -1,5 +1,3 @@
-
-```python
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -11,10 +9,10 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-header {visibility: hidden;}
+header {visibility:hidden;}
 .block-container {
-    padding-top: 1rem;
-    max-width: 950px;
+    padding-top:1rem;
+    max-width:950px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -22,51 +20,42 @@ header {visibility: hidden;}
 components.html("""
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
 <meta charset="UTF-8">
 
 <style>
 * {
-    box-sizing: border-box;
+    box-sizing:border-box;
 }
 
 body {
-    margin: 0;
-    background: #193d22;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
+    margin:0;
+    background:#193d22;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
 }
 
-/* =========================
-   전체 숲
-========================= */
-
 #container {
-    width: 780px;
-    height: 780px;
-    margin: auto;
-    position: relative;
-    overflow: hidden;
-    border-radius: 25px;
+    width:780px;
+    height:780px;
+    margin:auto;
+    position:relative;
+    overflow:hidden;
+    border-radius:25px;
 
     background:
-        radial-gradient(circle at 10% 10%, #6ca64c, transparent 20%),
-        radial-gradient(circle at 90% 15%, #396f32, transparent 22%),
-        radial-gradient(circle at 15% 90%, #4a8238, transparent 25%),
-        radial-gradient(circle at 90% 90%, #315f2e, transparent 25%),
+        radial-gradient(circle at 10% 10%,#6ca64c,transparent 20%),
+        radial-gradient(circle at 90% 15%,#396f32,transparent 22%),
+        radial-gradient(circle at 15% 90%,#4a8238,transparent 25%),
+        radial-gradient(circle at 90% 90%,#315f2e,transparent 25%),
         #24542b;
 }
 
-/* =========================
-   나무
-========================= */
-
 .tree {
-    position: absolute;
-    width: 115px;
-    height: 115px;
-    border-radius: 50%;
+    position:absolute;
+    width:115px;
+    height:115px;
+    border-radius:50%;
 
     background:
         radial-gradient(
@@ -81,20 +70,16 @@ body {
         0 10px 15px rgba(0,0,0,.45);
 }
 
-/* =========================
-   게임판
-========================= */
-
 #game {
-    position: absolute;
-    width: 648px;
-    height: 648px;
-    left: 66px;
-    top: 66px;
-    overflow: hidden;
+    position:absolute;
+    width:648px;
+    height:648px;
+    left:66px;
+    top:66px;
+    overflow:hidden;
 
-    border: 18px solid #254da5;
-    border-radius: 20px;
+    border:18px solid #254da5;
+    border-radius:20px;
 
     background:
         linear-gradient(
@@ -108,278 +93,200 @@ body {
         ),
         #9dcc4a;
 
-    background-size: 34px 34px;
+    background-size:34px 34px;
 
     box-shadow:
         inset 0 0 30px rgba(0,0,0,.22),
         0 10px 20px rgba(0,0,0,.45);
 }
 
-/* =========================
-   점수
-========================= */
+/* 점수 */
+
+#scoreBox,
+#highScoreBox {
+    position:absolute;
+    top:18px;
+    z-index:100;
+
+    background:rgba(0,0,0,.78);
+    color:white;
+
+    padding:11px 18px;
+    border-radius:15px;
+
+    font-size:20px;
+    font-weight:bold;
+}
 
 #scoreBox {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    z-index: 100;
-
-    background: rgba(0,0,0,.78);
-    color: white;
-
-    padding: 11px 18px;
-    border-radius: 15px;
-
-    font-size: 20px;
-    font-weight: bold;
+    left:18px;
 }
-
-/* =========================
-   최고기록
-========================= */
 
 #highScoreBox {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    z-index: 100;
-
-    background: rgba(0,0,0,.78);
-    color: white;
-
-    padding: 11px 18px;
-    border-radius: 15px;
-
-    font-size: 20px;
-    font-weight: bold;
+    right:18px;
 }
 
-/* =========================
-   사과
-========================= */
+/* 사과 */
 
 #food {
-    position: absolute;
-    width: 34px;
-    height: 34px;
+    position:absolute;
+    width:34px;
+    height:34px;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-    font-size: 31px;
-    z-index: 40;
+    font-size:31px;
+    z-index:40;
 
-    animation: applePulse 1s ease-in-out infinite;
-    transform-origin: center;
+    animation:applePulse 1s ease-in-out infinite;
+    transform-origin:center;
 
-    filter:
-        drop-shadow(0 3px 3px rgba(0,0,0,.35));
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));
 }
 
 @keyframes applePulse {
-    0% {
-        transform: scale(.72);
-    }
-
-    50% {
-        transform: scale(1.15);
-    }
-
-    100% {
-        transform: scale(.72);
-    }
+    0% {transform:scale(.72);}
+    50% {transform:scale(1.15);}
+    100% {transform:scale(.72);}
 }
 
-/* =========================
-   뱀 SVG
-========================= */
+/* 뱀 */
 
 #snakeSVG {
-    position: absolute;
-    width: 648px;
-    height: 648px;
-
-    left: 0;
-    top: 0;
-
-    overflow: visible;
-    pointer-events: none;
+    position:absolute;
+    width:648px;
+    height:648px;
+    left:0;
+    top:0;
+    overflow:visible;
+    pointer-events:none;
 }
-
-/* 몸 그림자 */
 
 #snakeShadow {
-    fill: none;
-    stroke: #17336e;
-    stroke-width: 42;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: .35;
+    fill:none;
+    stroke:#17336e;
+    stroke-width:42;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    opacity:.35;
 }
-
-/* 몸 */
 
 #snakeBody {
-    fill: none;
-    stroke: #315fc9;
-    stroke-width: 36;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    fill:none;
+    stroke:#315fc9;
+    stroke-width:36;
+    stroke-linecap:round;
+    stroke-linejoin:round;
 }
-
-/* 몸 하이라이트 */
 
 #snakeLight {
-    fill: none;
-    stroke: #739cff;
-    stroke-width: 6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: .45;
+    fill:none;
+    stroke:#739cff;
+    stroke-width:6;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    opacity:.45;
 }
 
-/* =========================
-   충돌
-========================= */
+/* 충돌 */
 
 #crash {
-    position: absolute;
-    display: none;
-
-    font-size: 78px;
-    z-index: 200;
-
-    transform: translate(-50%, -50%);
+    position:absolute;
+    display:none;
+    font-size:78px;
+    z-index:200;
+    transform:translate(-50%,-50%);
 }
 
 .shake {
-    animation: shake .45s;
+    animation:shake .45s;
 }
 
 @keyframes shake {
-    0%, 100% {
-        transform: translate(0,0);
-    }
-
-    20% {
-        transform: translate(-10px,5px);
-    }
-
-    40% {
-        transform: translate(10px,-5px);
-    }
-
-    60% {
-        transform: translate(-8px,4px);
-    }
-
-    80% {
-        transform: translate(8px,-3px);
-    }
+    0%,100% {transform:translate(0,0);}
+    20% {transform:translate(-10px,5px);}
+    40% {transform:translate(10px,-5px);}
+    60% {transform:translate(-8px,4px);}
+    80% {transform:translate(8px,-3px);}
 }
 
-/* =========================
-   공통 오버레이
-========================= */
+/* 오버레이 */
 
 .overlay {
-    position: absolute;
-    left: 50%;
-    top: 50%;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
 
-    transform: translate(-50%, -50%);
+    width:430px;
+    padding:35px 30px;
 
-    width: 430px;
-    padding: 35px 30px;
+    text-align:center;
 
-    text-align: center;
+    border-radius:25px;
+    background:rgba(0,0,0,.92);
 
-    border-radius: 25px;
-    background: rgba(0,0,0,.90);
+    color:white;
+    z-index:500;
 
-    color: white;
-    z-index: 500;
+    display:none;
 
-    display: none;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.5);
+    box-shadow:0 15px 40px rgba(0,0,0,.5);
 }
 
 .overlay h1 {
-    margin: 0 0 30px 0;
-    font-size: 58px;
-    font-weight: 900;
+    margin:0 0 30px;
+    font-size:64px;
+    font-weight:900;
 }
 
-/* =========================
-   버튼
-========================= */
-
 .menuButton {
-    width: 270px;
-    height: 62px;
+    display:block;
 
-    margin: 10px auto;
+    width:270px;
+    height:62px;
 
-    border: none;
-    border-radius: 16px;
+    margin:10px auto;
 
-    font-size: 23px;
-    font-weight: bold;
+    border:none;
+    border-radius:16px;
 
-    cursor: pointer;
+    font-size:23px;
+    font-weight:bold;
 
-    transition:
-        transform .12s ease,
-        filter .12s ease;
+    cursor:pointer;
+
+    transition:.12s;
 }
 
 .menuButton:hover {
-    transform: scale(1.04);
-    filter: brightness(1.12);
+    transform:scale(1.04);
+    filter:brightness(1.12);
 }
 
 .menuButton:active {
-    transform: scale(.97);
+    transform:scale(.97);
 }
 
 #continueButton {
-    background: #4f8cff;
-    color: white;
+    background:#4f8cff;
+    color:white;
 }
 
 #restartButton {
-    background: #48b96b;
-    color: white;
+    background:#48b96b;
+    color:white;
 }
-
-/* =========================
-   일시정지
-========================= */
-
-#pauseOverlay {
-    backdrop-filter: blur(5px);
-}
-
-#pauseOverlay h1 {
-    font-size: 64px;
-}
-
-/* =========================
-   게임오버
-========================= */
 
 #gameOver h1 {
-    color: #ff6257;
+    color:#ff6257;
 }
 
 #gameOver h2 {
-    font-size: 28px;
+    font-size:28px;
 }
-
 </style>
 </head>
 
@@ -388,7 +295,6 @@ body {
 <div id="container">
 
     <!-- 나무 -->
-
     <div class="tree" style="left:-45px;top:-40px;"></div>
     <div class="tree" style="left:110px;top:-50px;"></div>
     <div class="tree" style="left:280px;top:-50px;"></div>
@@ -410,13 +316,11 @@ body {
 
 
     <!-- 점수 -->
-
     <div id="scoreBox">
         🏆 점수: <span id="score">0</span>
     </div>
 
     <!-- 최고기록 -->
-
     <div id="highScoreBox">
         👑 최고기록: <span id="highScore">0</span>
     </div>
@@ -424,27 +328,15 @@ body {
 
     <div id="game">
 
-        <!-- 사과 -->
-
         <div id="food">🍎</div>
-
-
-        <!-- 뱀 -->
 
         <svg id="snakeSVG" viewBox="0 0 648 648">
 
             <path id="snakeShadow"></path>
-
             <path id="snakeBody"></path>
-
             <path id="snakeLight"></path>
 
-
-            <!-- 사진 같은 뱀 얼굴 -->
-
             <g id="headGroup">
-
-                <!-- 머리 뒤쪽 그림자 -->
 
                 <ellipse
                     cx="0"
@@ -452,43 +344,34 @@ body {
                     rx="27"
                     ry="23"
                     fill="#17336e"
-                    opacity=".35"
-                ></ellipse>
-
-
-                <!-- 둥근 파란 머리 -->
+                    opacity=".35">
+                </ellipse>
 
                 <path
                     d="
-                        M -18 -20
-                        Q 5 -25 20 -14
-                        Q 33 0 20 14
-                        Q 5 25 -18 20
-                        Q -28 10 -28 0
-                        Q -28 -10 -18 -20
+                    M -18 -20
+                    Q 5 -25 20 -14
+                    Q 33 0 20 14
+                    Q 5 25 -18 20
+                    Q -28 10 -28 0
+                    Q -28 -10 -18 -20
                     "
                     fill="#315fc9"
                     stroke="#244a9f"
-                    stroke-width="3"
-                ></path>
-
-
-                <!-- 머리 밝은 부분 -->
+                    stroke-width="3">
+                </path>
 
                 <path
                     d="
-                        M -17 -16
-                        Q -2 -22 10 -14
+                    M -17 -16
+                    Q -2 -22 10 -14
                     "
                     fill="none"
                     stroke="#6f98ff"
                     stroke-width="6"
                     stroke-linecap="round"
-                    opacity=".45"
-                ></path>
-
-
-                <!-- 흰 눈 -->
+                    opacity=".45">
+                </path>
 
                 <circle
                     cx="4"
@@ -496,8 +379,8 @@ body {
                     r="10"
                     fill="#f8fbff"
                     stroke="#31528e"
-                    stroke-width="2"
-                ></circle>
+                    stroke-width="2">
+                </circle>
 
                 <circle
                     cx="4"
@@ -505,70 +388,53 @@ body {
                     r="10"
                     fill="#f8fbff"
                     stroke="#31528e"
-                    stroke-width="2"
-                ></circle>
-
-
-                <!-- 눈동자 -->
+                    stroke-width="2">
+                </circle>
 
                 <circle
                     cx="7"
                     cy="-17"
                     r="4.5"
-                    fill="#18234b"
-                ></circle>
+                    fill="#18234b">
+                </circle>
 
                 <circle
                     cx="7"
                     cy="17"
                     r="4.5"
-                    fill="#18234b"
-                ></circle>
-
-
-                <!-- 눈 반짝임 -->
+                    fill="#18234b">
+                </circle>
 
                 <circle
                     cx="8"
                     cy="-19"
                     r="1.5"
-                    fill="white"
-                ></circle>
+                    fill="white">
+                </circle>
 
                 <circle
                     cx="8"
                     cy="15"
                     r="1.5"
-                    fill="white"
-                ></circle>
-
-
-                <!-- 작은 입 -->
+                    fill="white">
+                </circle>
 
                 <path
-                    d="
-                        M 16 -4
-                        Q 21 0 16 4
-                    "
+                    d="M 16 -4 Q 21 0 16 4"
                     fill="none"
                     stroke="#173778"
                     stroke-width="2.5"
-                    stroke-linecap="round"
-                ></path>
+                    stroke-linecap="round">
+                </path>
 
             </g>
-
         </svg>
 
-
         <div id="crash">💥</div>
-
     </div>
 
 
-    <!-- =========================
-         일시정지 화면
-    ========================== -->
+    <!-- 일시정지 -->
 
     <div id="pauseOverlay" class="overlay">
 
@@ -576,76 +442,60 @@ body {
 
         <button
             id="continueButton"
-            class="menuButton"
-            onclick="resumeGame()"
-        >
+            class="menuButton">
             ▶️ 계속하기
         </button>
 
         <button
             id="restartButton"
-            class="menuButton"
-            onclick="restart()"
-        >
+            class="menuButton">
             🔄 다시하기
         </button>
 
     </div>
 
 
-    <!-- =========================
-         게임오버
-    ========================== -->
+    <!-- 게임오버 -->
 
     <div id="gameOver" class="overlay">
 
         <h1>💥 콰당!</h1>
 
         <h2>
-            점수: <span id="finalScore">0</span>
+            점수:
+            <span id="finalScore">0</span>
         </h2>
 
         <h2>
-            👑 최고기록: <span id="gameOverHighScore">0</span>
+            👑 최고기록:
+            <span id="gameOverHighScore">0</span>
         </h2>
 
         <button
+            id="gameOverRestart"
             class="menuButton"
-            id="restartGameOverButton"
-            onclick="restart()"
-        >
+            style="background:#48b96b;color:white;">
             🔄 다시하기
         </button>
 
-        <p>또는 R 키를 눌러 다시 시작</p>
+        <p>R 키를 눌러 다시 시작</p>
 
     </div>
-
 
 </div>
 
 
 <script>
 
-/* =========================
-   설정
-========================= */
-
 const GRID = 34;
 const COLS = 18;
 const ROWS = 18;
 
 /*
-    한 칸 이동 시간.
-    기존 160ms보다 짧게 해서
-    애니메이션이 자연스럽게 이어지도록 함.
+    게임 한 칸 이동 시간
 */
 const MOVE_TIME = 160;
 
-
-/* =========================
-   요소
-========================= */
 
 const game =
     document.getElementById("game");
@@ -686,18 +536,29 @@ const snakeLight =
 const headGroup =
     document.getElementById("headGroup");
 
+const continueButton =
+    document.getElementById("continueButton");
 
-/* =========================
-   게임 변수
-========================= */
+const restartButton =
+    document.getElementById("restartButton");
+
+const gameOverRestart =
+    document.getElementById("gameOverRestart");
+
 
 let snake = [];
 
 let previousSnake = [];
 
-let direction = {x: 1, y: 0};
+let direction = {
+    x:1,
+    y:0
+};
 
-let nextDirection = {x: 1, y: 0};
+let nextDirection = {
+    x:1,
+    y:0
+};
 
 let food;
 
@@ -707,7 +568,7 @@ let dead = false;
 
 let paused = false;
 
-let animationStart = 0;
+let lastMoveTime = performance.now();
 
 let animationFrame = null;
 
@@ -717,34 +578,38 @@ let animationFrame = null;
 ========================= */
 
 let highScore =
-    Number(localStorage.getItem("wormHighScore") || 0);
+    Number(
+        localStorage.getItem("wormHighScore") || 0
+    );
 
-highScoreElement.textContent = highScore;
+highScoreElement.textContent =
+    highScore;
 
 
 /* =========================
-   시작 뱀
+   뱀 초기화
 ========================= */
 
 function resetSnake() {
 
     snake = [
-        {x: 8, y: 9},
-        {x: 7, y: 9},
-        {x: 6, y: 9},
-        {x: 5, y: 9},
-        {x: 4, y: 9}
+        {x:8,y:9},
+        {x:7,y:9},
+        {x:6,y:9},
+        {x:5,y:9},
+        {x:4,y:9}
     ];
 
-    previousSnake = snake.map(part => ({
-        x: part.x,
-        y: part.y
-    }));
+    previousSnake =
+        snake.map(part => ({
+            x:part.x,
+            y:part.y
+        }));
 }
 
 
 /* =========================
-   사과 생성
+   사과
 ========================= */
 
 function createFood() {
@@ -754,49 +619,58 @@ function createFood() {
     while (!valid) {
 
         food = {
-            x: Math.floor(Math.random() * COLS),
-            y: Math.floor(Math.random() * ROWS)
+            x:Math.floor(Math.random() * COLS),
+            y:Math.floor(Math.random() * ROWS)
         };
 
-        valid = !snake.some(part =>
-            part.x === food.x &&
-            part.y === food.y
-        );
+        valid =
+            !snake.some(part =>
+                part.x === food.x &&
+                part.y === food.y
+            );
     }
 }
 
 
 /* =========================
-   좌표 보간
+   보간
 ========================= */
 
-function lerp(a, b, t) {
-    return a + (b - a) * t;
+function lerp(a,b,t) {
+    return a + (b-a) * t;
 }
 
 
-/*
-    이전 칸 → 현재 칸 사이를
-    부드럽게 연결해서 그림.
-*/
+/* =========================
+   현재 뱀 위치
+========================= */
+
 function getAnimatedSnake(progress) {
 
-    return snake.map((part, index) => {
+    return snake.map((part,index) => {
 
         const oldPart =
             previousSnake[index] || part;
 
         return {
-            x: lerp(oldPart.x, part.x, progress),
-            y: lerp(oldPart.y, part.y, progress)
-        };
+            x:lerp(
+                oldPart.x,
+                part.x,
+                progress
+            ),
 
+            y:lerp(
+                oldPart.y,
+                part.y,
+                progress
+            )
+        };
     });
 }
 
 
 /* =========================
-   부드러운 몸통
+   몸통 경로
 ========================= */
 
 function createPath(animatedSnake) {
@@ -805,28 +679,34 @@ function createPath(animatedSnake) {
         [...animatedSnake]
         .reverse()
         .map(part => ({
-            x: part.x * GRID + GRID / 2,
-            y: part.y * GRID + GRID / 2
+            x:part.x * GRID + GRID / 2,
+            y:part.y * GRID + GRID / 2
         }));
 
 
-    if (points.length < 2) return "";
+    if (points.length < 2) {
+        return "";
+    }
 
 
     let path =
         `M ${points[0].x} ${points[0].y}`;
 
 
-    for (let i = 1; i < points.length - 1; i++) {
+    for (
+        let i = 1;
+        i < points.length - 1;
+        i++
+    ) {
 
         const a = points[i];
-        const b = points[i + 1];
+        const b = points[i+1];
 
         const midX =
-            (a.x + b.x) / 2;
+            (a.x+b.x)/2;
 
         const midY =
-            (a.y + b.y) / 2;
+            (a.y+b.y)/2;
 
         path +=
             ` Q ${a.x} ${a.y} ${midX} ${midY}`;
@@ -834,7 +714,7 @@ function createPath(animatedSnake) {
 
 
     const last =
-        points[points.length - 1];
+        points[points.length-1];
 
     path +=
         ` L ${last.x} ${last.y}`;
@@ -850,25 +730,22 @@ function createPath(animatedSnake) {
 function getAngle() {
 
     if (direction.x === 1) return 0;
-
     if (direction.y === 1) return 90;
-
     if (direction.x === -1) return 180;
-
     if (direction.y === -1) return -90;
 
+    return 0;
 }
 
 
 /* =========================
-   화면 렌더링
+   렌더
 ========================= */
 
 function render(progress = 1) {
 
     const animatedSnake =
         getAnimatedSnake(progress);
-
 
     const path =
         createPath(animatedSnake);
@@ -890,8 +767,6 @@ function render(progress = 1) {
     );
 
 
-    /* 머리 */
-
     const head =
         animatedSnake[0];
 
@@ -909,16 +784,12 @@ function render(progress = 1) {
     );
 
 
-    /* 사과 */
-
     foodElement.style.left =
         food.x * GRID + "px";
 
     foodElement.style.top =
         food.y * GRID + "px";
 
-
-    /* 점수 */
 
     scoreElement.textContent =
         score;
@@ -934,52 +805,48 @@ function render(progress = 1) {
 
 function animate(time) {
 
-    if (dead) return;
-
-    if (paused) return;
-
-    if (!animationStart) {
-        animationStart = time;
+    if (dead || paused) {
+        return;
     }
 
 
-    let progress =
-        (time - animationStart) / MOVE_TIME;
+    const progress =
+        Math.min(
+            (time - lastMoveTime) / MOVE_TIME,
+            1
+        );
 
 
     /*
-        부드러운 가속 → 감속
+        부드러운 가속 / 감속
     */
 
-    progress =
-        Math.min(progress, 1);
-
     const eased =
-        progress < .5
+        progress < 0.5
         ? 2 * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        : 1 - Math.pow(
+            -2 * progress + 2,
+            2
+        ) / 2;
 
 
     render(eased);
 
 
-    if (progress < 1) {
-
-        animationFrame =
-            requestAnimationFrame(animate);
-
-    }
-
+    animationFrame =
+        requestAnimationFrame(animate);
 }
 
 
 /* =========================
-   이동
+   한 칸 이동
 ========================= */
 
 function move() {
 
-    if (dead || paused) return;
+    if (dead || paused) {
+        return;
+    }
 
 
     direction =
@@ -991,8 +858,8 @@ function move() {
 
 
     const newHead = {
-        x: head.x + direction.x,
-        y: head.y + direction.y
+        x:head.x + direction.x,
+        y:head.y + direction.y
     };
 
 
@@ -1027,22 +894,20 @@ function move() {
 
 
     /*
-        이동하기 직전 위치 저장.
-        이 값을 이용해서 다음 칸까지
-        부드럽게 움직인다.
+        이동 전 위치 저장
     */
 
     previousSnake =
         snake.map(part => ({
-            x: part.x,
-            y: part.y
+            x:part.x,
+            y:part.y
         }));
 
 
     snake.unshift(newHead);
 
 
-    /* 🍎 먹음 */
+    /* 사과 */
 
     if (
         newHead.x === food.x &&
@@ -1051,9 +916,11 @@ function move() {
 
         score++;
 
+
         if (score > highScore) {
 
-            highScore = score;
+            highScore =
+                score;
 
             localStorage.setItem(
                 "wormHighScore",
@@ -1061,31 +928,25 @@ function move() {
             );
         }
 
+
         createFood();
 
-    }
-
-    else {
+    } else {
 
         snake.pop();
-
     }
 
 
-    animationStart = 0;
+    lastMoveTime =
+        performance.now();
 
-    if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-    }
 
-    animationFrame =
-        requestAnimationFrame(animate);
-
+    render(0);
 }
 
 
 /* =========================
-   💥 충돌
+   충돌
 ========================= */
 
 function crash(position) {
@@ -1095,12 +956,14 @@ function crash(position) {
 
     crashElement.style.left =
         position.x * GRID +
-        GRID / 2 + "px";
+        GRID / 2 +
+        "px";
 
 
     crashElement.style.top =
         position.y * GRID +
-        GRID / 2 + "px";
+        GRID / 2 +
+        "px";
 
 
     crashElement.style.display =
@@ -1114,6 +977,7 @@ function crash(position) {
 
         game.classList.remove("shake");
 
+
         finalScoreElement.textContent =
             score;
 
@@ -1123,8 +987,7 @@ function crash(position) {
         gameOverElement.style.display =
             "block";
 
-    }, 500);
-
+    },500);
 }
 
 
@@ -1134,17 +997,42 @@ function crash(position) {
 
 function pauseGame() {
 
-    if (dead) return;
+    if (dead || paused) {
+        return;
+    }
+
+
+    /*
+        현재 화면 위치를 그대로
+        유지한 뒤 정지
+    */
+
+    const now =
+        performance.now();
+
+    const progress =
+        Math.min(
+            (now - lastMoveTime) / MOVE_TIME,
+            1
+        );
+
+    const eased =
+        progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(
+            -2 * progress + 2,
+            2
+        ) / 2;
+
+    render(eased);
+
 
     paused = true;
+
 
     pauseOverlay.style.display =
         "block";
 
-    /*
-        현재 보이는 위치에서 멈추도록
-        애니메이션 프레임을 정지.
-    */
 
     if (animationFrame) {
 
@@ -1163,20 +1051,26 @@ function pauseGame() {
 
 function resumeGame() {
 
-    if (dead) return;
+    if (dead) {
+        return;
+    }
+
 
     paused = false;
+
 
     pauseOverlay.style.display =
         "none";
 
+
     /*
-        멈춘 위치에서 자연스럽게
-        다음 이동으로 이어짐.
+        다음 이동까지의 시간이
+        갑자기 길어지지 않도록 초기화
     */
 
-    animationStart =
-        performance.now() - MOVE_TIME;
+    lastMoveTime =
+        performance.now();
+
 
     animationFrame =
         requestAnimationFrame(animate);
@@ -1184,7 +1078,7 @@ function resumeGame() {
 
 
 /* =========================
-   재시작
+   다시하기
 ========================= */
 
 function restart() {
@@ -1195,11 +1089,16 @@ function restart() {
 
     paused = false;
 
-    direction =
-        {x: 1, y: 0};
 
-    nextDirection =
-        {x: 1, y: 0};
+    direction = {
+        x:1,
+        y:0
+    };
+
+    nextDirection = {
+        x:1,
+        y:0
+    };
 
 
     crashElement.style.display =
@@ -1216,11 +1115,45 @@ function restart() {
 
     createFood();
 
-    animationStart = 0;
+
+    lastMoveTime =
+        performance.now();
+
 
     render(1);
 
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(animate);
 }
+
+
+/* =========================
+   버튼
+========================= */
+
+continueButton.addEventListener(
+    "click",
+    resumeGame
+);
+
+restartButton.addEventListener(
+    "click",
+    restart
+);
+
+gameOverRestart.addEventListener(
+    "click",
+    restart
+);
 
 
 /* =========================
@@ -1229,39 +1162,33 @@ function restart() {
 
 document.addEventListener(
     "keydown",
-    e => {
+    function(e) {
 
         const key =
             e.key.toLowerCase();
 
 
-        /*
-            ESC = 일시정지 / 계속하기
-        */
+        /* ESC */
 
         if (key === "escape") {
 
             e.preventDefault();
 
-            if (dead) return;
+            if (dead) {
+                return;
+            }
 
             if (paused) {
-
                 resumeGame();
-
             } else {
-
                 pauseGame();
-
             }
 
             return;
         }
 
 
-        /*
-            게임오버 상태에서 R
-        */
+        /* 게임오버 R */
 
         if (
             key === "r" &&
@@ -1274,33 +1201,14 @@ document.addEventListener(
         }
 
 
-        /*
-            일시정지 중에는 방향키 무시
-        */
+        /* 일시정지 중 방향키 차단 */
 
-        if (paused) return;
-
-
-        /*
-            방향키 / WASD
-        */
-
-        if (
-            [
-                "w",
-                "a",
-                "s",
-                "d",
-                "arrowup",
-                "arrowdown",
-                "arrowleft",
-                "arrowright"
-            ].includes(key)
-        ) {
-
-            e.preventDefault();
+        if (paused) {
+            return;
         }
 
+
+        /* 위 */
 
         if (
             (key === "w" ||
@@ -1308,10 +1216,14 @@ document.addEventListener(
             direction.y !== 1
         ) {
 
-            nextDirection =
-                {x: 0, y: -1};
+            nextDirection = {
+                x:0,
+                y:-1
+            };
         }
 
+
+        /* 아래 */
 
         if (
             (key === "s" ||
@@ -1319,10 +1231,14 @@ document.addEventListener(
             direction.y !== -1
         ) {
 
-            nextDirection =
-                {x: 0, y: 1};
+            nextDirection = {
+                x:0,
+                y:1
+            };
         }
 
+
+        /* 왼쪽 */
 
         if (
             (key === "a" ||
@@ -1330,10 +1246,14 @@ document.addEventListener(
             direction.x !== 1
         ) {
 
-            nextDirection =
-                {x: -1, y: 0};
+            nextDirection = {
+                x:-1,
+                y:0
+            };
         }
 
+
+        /* 오른쪽 */
 
         if (
             (key === "d" ||
@@ -1341,8 +1261,10 @@ document.addEventListener(
             direction.x !== -1
         ) {
 
-            nextDirection =
-                {x: 1, y: 0};
+            nextDirection = {
+                x:1,
+                y:0
+            };
         }
 
     }
@@ -1359,11 +1281,12 @@ createFood();
 
 render(1);
 
+animationFrame =
+    requestAnimationFrame(animate);
+
 
 /*
-    게임 이동 타이머.
-    실제 뱀의 판정은 여전히
-    정확히 한 칸씩 이루어진다.
+    정확히 한 칸씩 판정
 */
 
 setInterval(
@@ -1376,4 +1299,3 @@ setInterval(
 </body>
 </html>
 """, height=820)
-```
