@@ -17,7 +17,7 @@ header {visibility:hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-components.html("""
+components.html(r"""
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -42,6 +42,7 @@ body {
     position:relative;
     overflow:hidden;
     border-radius:25px;
+
     background:
         radial-gradient(circle at 10% 10%,#6ca64c,transparent 20%),
         radial-gradient(circle at 90% 15%,#396f32,transparent 22%),
@@ -55,6 +56,7 @@ body {
     width:115px;
     height:115px;
     border-radius:50%;
+
     background:
         radial-gradient(
             circle at 30% 25%,
@@ -62,6 +64,7 @@ body {
             #55943b 48%,
             #1d5128 80%
         );
+
     box-shadow:
         inset -10px -12px 20px rgba(0,0,0,.28),
         0 10px 15px rgba(0,0,0,.45);
@@ -74,6 +77,7 @@ body {
     left:66px;
     top:66px;
     overflow:hidden;
+
     border:18px solid #254da5;
     border-radius:20px;
 
@@ -96,7 +100,10 @@ body {
         0 10px 20px rgba(0,0,0,.45);
 }
 
-/* 점수 */
+
+/* =========================
+   점수
+========================= */
 
 #scoreBox,
 #highScoreBox {
@@ -123,10 +130,47 @@ body {
 }
 
 
-/* 사과 */
+/* =========================
+   질주 UI
+========================= */
+
+#dashBox {
+    position:absolute;
+
+    left:50%;
+    top:18px;
+
+    transform:translateX(-50%);
+
+    z-index:110;
+
+    background:rgba(0,0,0,.78);
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:15px;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    white-space:nowrap;
+}
+
+#dashStatus {
+    color:#6eff91;
+}
+
+
+/* =========================
+   사과
+========================= */
 
 #food {
     position:absolute;
+
     width:34px;
     height:34px;
 
@@ -135,15 +179,20 @@ body {
     align-items:center;
 
     font-size:31px;
+
     z-index:40;
 
     animation:applePulse 1s ease-in-out infinite;
+
     transform-origin:center;
 
-    filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));
+    filter:drop-shadow(
+        0 3px 3px rgba(0,0,0,.35)
+    );
 }
 
 @keyframes applePulse {
+
     0% {
         transform:scale(.72);
     }
@@ -158,52 +207,71 @@ body {
 }
 
 
-/* 뱀 */
+/* =========================
+   뱀
+========================= */
 
 #snakeSVG {
     position:absolute;
+
     width:648px;
     height:648px;
+
     left:0;
     top:0;
 
     overflow:visible;
+
     pointer-events:none;
+
+    z-index:30;
 }
 
 #snakeShadow {
     fill:none;
+
     stroke:#17336e;
+
     stroke-width:42;
+
     stroke-linecap:round;
     stroke-linejoin:round;
+
     opacity:.35;
 }
 
 #snakeBody {
     fill:none;
+
     stroke:#315fc9;
+
     stroke-width:36;
+
     stroke-linecap:round;
     stroke-linejoin:round;
 }
 
 #snakeLight {
     fill:none;
+
     stroke:#739cff;
+
     stroke-width:6;
+
     stroke-linecap:round;
     stroke-linejoin:round;
+
     opacity:.45;
 }
 
 
 /* =========================
-   얼굴
+   머리
 ========================= */
 
 #headGroup {
-    transition:transform .04s linear;
+    transition:
+        transform .04s linear;
 }
 
 
@@ -211,67 +279,149 @@ body {
 
 #mouthClosed {
     fill:none;
+
     stroke:#102b63;
+
     stroke-width:3;
+
     stroke-linecap:round;
 }
 
 
-/* =========================
-   벌어진 입
-========================= */
+/* 벌어진 입 */
 
 #mouthOpenGroup {
     display:none;
 }
 
-
-/* 입 안 */
-
 #openMouth {
-    fill:#111111;
+    fill:#111;
+
     stroke:#081535;
+
     stroke-width:2;
 }
 
-
-/* 혀 */
-
 #tongue {
     fill:#ff4b55;
+
     stroke:#b51f2c;
+
     stroke-width:1.5;
 }
 
-
-/* 이빨 */
-
 .tooth {
     fill:white;
+
     stroke:#cfd7e5;
+
     stroke-width:1;
 }
 
 
-/* 입 벌어지는 애니메이션 */
+/* =========================
+   질주 바람 효과
+========================= */
 
-.mouthOpenAnimation {
-    animation:mouthOpen .18s ease-out;
+#windLayer {
+    display:none;
 }
 
-@keyframes mouthOpen {
+.wind {
+    fill:none;
+
+    stroke:white;
+
+    stroke-width:4;
+
+    stroke-linecap:round;
+
+    opacity:0;
+}
+
+.dashActive #windLayer {
+    display:block;
+}
+
+.dashActive .wind1 {
+    animation:windMove .28s infinite;
+}
+
+.dashActive .wind2 {
+    animation:windMove .38s infinite .08s;
+}
+
+.dashActive .wind3 {
+    animation:windMove .32s infinite .15s;
+}
+
+.dashActive .wind4 {
+    animation:windMove .42s infinite .05s;
+}
+
+@keyframes windMove {
+
+    0% {
+        opacity:0;
+
+        transform:
+            translateX(18px)
+            scaleX(.4);
+    }
+
+    30% {
+        opacity:.8;
+    }
+
+    100% {
+        opacity:0;
+
+        transform:
+            translateX(-35px)
+            scaleX(1.3);
+    }
+}
+
+
+/* 질주 잔상 */
+
+#dashTrail {
+    display:none;
+
+    fill:none;
+
+    stroke:#b7d6ff;
+
+    stroke-width:9;
+
+    stroke-linecap:round;
+
+    opacity:.4;
+
+    stroke-dasharray:15 15;
+}
+
+.dashing #dashTrail {
+    display:block;
+
+    animation:
+        trailMove .25s linear infinite;
+}
+
+@keyframes trailMove {
+
     from {
-        transform:scaleY(.5);
+        stroke-dashoffset:0;
     }
 
     to {
-        transform:scaleY(1);
+        stroke-dashoffset:-30;
     }
 }
 
 
 /* =========================
-   충돌 💥
+   충돌
 ========================= */
 
 #crash {
@@ -283,16 +433,20 @@ body {
 
     z-index:300;
 
-    transform:translate(-50%,-50%);
+    transform:
+        translate(-50%,-50%);
 
-    filter:drop-shadow(
-        0 4px 4px rgba(0,0,0,.5)
-    );
+    filter:
+        drop-shadow(
+            0 4px 4px rgba(0,0,0,.5)
+        );
 
-    animation:crashPop .45s ease-out;
+    animation:
+        crashPop .45s ease-out;
 }
 
 @keyframes crashPop {
+
     0% {
         transform:
             translate(-50%,-50%)
@@ -320,6 +474,7 @@ body {
 }
 
 @keyframes shake {
+
     0%,100% {
         transform:translate(0,0);
     }
@@ -352,7 +507,8 @@ body {
     left:50%;
     top:50%;
 
-    transform:translate(-50%,-50%);
+    transform:
+        translate(-50%,-50%);
 
     width:430px;
 
@@ -405,6 +561,7 @@ body {
 
 .menuButton:hover {
     transform:scale(1.04);
+
     filter:brightness(1.12);
 }
 
@@ -414,12 +571,14 @@ body {
 
 #continueButton {
     background:#4f8cff;
+
     color:white;
 }
 
 #restartButton,
 #gameOverRestart {
     background:#48b96b;
+
     color:white;
 }
 
@@ -430,6 +589,41 @@ body {
 #gameOver h2 {
     font-size:28px;
 }
+
+
+/* 질주 시작 화면 효과 */
+
+#game.dashFlash::after {
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            circle,
+            transparent 45%,
+            rgba(255,255,255,.15)
+        );
+
+    animation:
+        dashFlash .18s;
+}
+
+@keyframes dashFlash {
+
+    from {
+        opacity:1;
+    }
+
+    to {
+        opacity:0;
+    }
+}
+
 </style>
 </head>
 
@@ -466,13 +660,28 @@ body {
         <span id="score">0</span>
     </div>
 
+
+    <!-- 최고기록 -->
+
     <div id="highScoreBox">
         👑 최고기록:
         <span id="highScore">0</span>
     </div>
 
 
+    <!-- 질주 상태 -->
+
+    <div id="dashBox">
+        ⚡ 질주:
+        <span id="dashStatus">
+            준비
+        </span>
+    </div>
+
+
     <div id="game">
+
+        <!-- 사과 -->
 
         <div id="food">🍎</div>
 
@@ -482,18 +691,62 @@ body {
             viewBox="0 0 648 648"
         >
 
-            <path id="snakeShadow"></path>
-            <path id="snakeBody"></path>
-            <path id="snakeLight"></path>
+            <!-- 몸통 -->
+
+            <path
+                id="snakeShadow">
+            </path>
+
+            <path
+                id="snakeBody">
+            </path>
+
+            <path
+                id="snakeLight">
+            </path>
 
 
-            <!-- =====================
-                 머리
-            ====================== -->
+            <!-- 질주 잔상 -->
+
+            <path
+                id="dashTrail">
+            </path>
+
+
+            <!-- 바람 효과 -->
+
+            <g id="windLayer">
+
+                <path
+                    class="wind wind1"
+                    d="M 0 -12
+                       Q -30 -20 -55 -12">
+                </path>
+
+                <path
+                    class="wind wind2"
+                    d="M 0 0
+                       Q -38 -5 -68 5">
+                </path>
+
+                <path
+                    class="wind wind3"
+                    d="M 0 12
+                       Q -30 20 -58 14">
+                </path>
+
+                <path
+                    class="wind wind4"
+                    d="M -5 22
+                       Q -35 28 -50 25">
+                </path>
+
+            </g>
+
+
+            <!-- 머리 -->
 
             <g id="headGroup">
-
-                <!-- 머리 그림자 -->
 
                 <ellipse
                     cx="0"
@@ -504,8 +757,6 @@ body {
                     opacity=".35">
                 </ellipse>
 
-
-                <!-- 얼굴 -->
 
                 <path
                     d="
@@ -522,8 +773,6 @@ body {
                     stroke-width="3">
                 </path>
 
-
-                <!-- 얼굴 빛 -->
 
                 <path
                     d="
@@ -590,9 +839,7 @@ body {
                 </circle>
 
 
-                <!-- =====================
-                     닫힌 입
-                ====================== -->
+                <!-- 닫힌 입 -->
 
                 <path
                     id="mouthClosed"
@@ -600,7 +847,8 @@ body {
                     M 16 -5
                     Q 23 0 16 5
                     "
-                ></path>
+                >
+                </path>
 
 
                 <!-- =====================
@@ -609,8 +857,6 @@ body {
 
                 <g id="mouthOpenGroup">
 
-                    <!-- 입 -->
-
                     <path
                         id="openMouth"
                         d="
@@ -618,11 +864,9 @@ body {
                         Q 25 -9 27 0
                         Q 25 9 12 8
                         Q 17 0 12 -8
-                        "
-                    ></path>
+                        ">
+                    </path>
 
-
-                    <!-- 혀 -->
 
                     <path
                         id="tongue"
@@ -631,11 +875,9 @@ body {
                         Q 21 0 25 3
                         Q 21 10 16 6
                         Z
-                        "
-                    ></path>
+                        ">
+                    </path>
 
-
-                    <!-- 위 이빨 -->
 
                     <path
                         class="tooth"
@@ -644,8 +886,9 @@ body {
                         L 19 -2
                         L 22 -7
                         Z
-                        "
-                    ></path>
+                        ">
+                    </path>
+
 
                     <path
                         class="tooth"
@@ -654,11 +897,9 @@ body {
                         L 25 -2
                         L 27 -6
                         Z
-                        "
-                    ></path>
+                        ">
+                    </path>
 
-
-                    <!-- 아래 이빨 -->
 
                     <path
                         class="tooth"
@@ -667,8 +908,8 @@ body {
                         L 20 3
                         L 22 8
                         Z
-                        "
-                    ></path>
+                        ">
+                    </path>
 
                 </g>
 
@@ -677,9 +918,11 @@ body {
         </svg>
 
 
-        <!-- 죽는 순간 💥 -->
+        <!-- 죽는 순간 -->
 
-        <div id="crash">💥</div>
+        <div id="crash">
+            💥
+        </div>
 
     </div>
 
@@ -740,9 +983,12 @@ body {
             🔄 다시하기
         </button>
 
-        <p>R 키를 눌러 다시 시작</p>
+        <p>
+            R 키를 눌러 다시 시작
+        </p>
 
     </div>
+
 
 </div>
 
@@ -759,11 +1005,39 @@ const COLS = 18;
 
 const ROWS = 18;
 
-const MOVE_TIME = 160;
+
+/*
+   일반 이동 속도
+*/
+
+const NORMAL_MOVE_TIME = 160;
+
+
+/*
+   질주 이동 속도
+
+   숫자가 작을수록 빠름
+*/
+
+const DASH_MOVE_TIME = 65;
+
+
+/*
+   질주 지속시간
+*/
+
+const DASH_DURATION = 2000;
+
+
+/*
+   질주 쿨타임
+*/
+
+const DASH_COOLDOWN = 10000;
 
 
 /* =========================
-   HTML 요소
+   요소
 ========================= */
 
 const game =
@@ -777,6 +1051,9 @@ const scoreElement =
 
 const highScoreElement =
     document.getElementById("highScore");
+
+const dashStatus =
+    document.getElementById("dashStatus");
 
 const finalScoreElement =
     document.getElementById("finalScore");
@@ -814,6 +1091,11 @@ const snakeShadow =
 const snakeLight =
     document.getElementById(
         "snakeLight"
+    );
+
+const dashTrail =
+    document.getElementById(
+        "dashTrail"
     );
 
 const headGroup =
@@ -876,6 +1158,44 @@ let dead = false;
 
 let paused = false;
 
+
+/* =========================
+   질주 변수
+========================= */
+
+let dashing = false;
+
+let dashEndTime = 0;
+
+let lastDashTime = -Infinity;
+
+
+/*
+   LShift를 누르고 있는 동안
+   한 번만 발동시키기 위한 변수
+*/
+
+let shiftHeld = false;
+
+
+/* =========================
+   이동 시간
+========================= */
+
+function getMoveTime() {
+
+    if (dashing) {
+        return DASH_MOVE_TIME;
+    }
+
+    return NORMAL_MOVE_TIME;
+}
+
+
+/* =========================
+   애니메이션 시간
+========================= */
+
 let lastMoveTime =
     performance.now();
 
@@ -930,6 +1250,7 @@ function createFood() {
     while (!valid) {
 
         food = {
+
             x:
                 Math.floor(
                     Math.random() * COLS
@@ -952,7 +1273,7 @@ function createFood() {
 
 
 /* =========================
-   사과와 머리 거리
+   사과 거리
 ========================= */
 
 function foodDistance() {
@@ -960,6 +1281,7 @@ function foodDistance() {
     const head = snake[0];
 
     return Math.max(
+
         Math.abs(
             head.x - food.x
         ),
@@ -972,7 +1294,7 @@ function foodDistance() {
 
 
 /* =========================
-   입 상태 업데이트
+   입 업데이트
 ========================= */
 
 function updateMouth() {
@@ -986,11 +1308,6 @@ function updateMouth() {
         foodDistance();
 
 
-    /*
-       2칸 이내:
-       입 크게 벌림
-    */
-
     if (distance <= 2) {
 
         mouthClosed.style.display =
@@ -998,16 +1315,6 @@ function updateMouth() {
 
         mouthOpenGroup.style.display =
             "block";
-
-        mouthOpenGroup.classList.remove(
-            "mouthOpenAnimation"
-        );
-
-        void mouthOpenGroup.offsetWidth;
-
-        mouthOpenGroup.classList.add(
-            "mouthOpenAnimation"
-        );
 
     } else {
 
@@ -1102,6 +1409,7 @@ function createPath(animatedSnake) {
         const b =
             points[i+1];
 
+
         const midX =
             (a.x+b.x)/2;
 
@@ -1149,6 +1457,36 @@ function getAngle() {
 
 
 /* =========================
+   질주 바람 방향
+========================= */
+
+function updateWindDirection() {
+
+    /*
+       바람은 머리 뒤에서
+       앞으로 흐르는 느낌을 줌
+    */
+
+    let angle =
+        getAngle();
+
+
+    document
+        .getElementById(
+            "windLayer"
+        )
+        .setAttribute(
+            "transform",
+            `translate(
+                ${snake[0].x * GRID + GRID/2}
+                ${snake[0].y * GRID + GRID/2}
+            )
+            rotate(${angle})`
+        );
+}
+
+
+/* =========================
    화면 그리기
 ========================= */
 
@@ -1175,6 +1513,17 @@ function render(progress=1) {
     );
 
     snakeLight.setAttribute(
+        "d",
+        path
+    );
+
+
+    /*
+       질주 잔상은 몸통 경로를
+       살짝 뒤로 표시
+    */
+
+    dashTrail.setAttribute(
         "d",
         path
     );
@@ -1214,11 +1563,84 @@ function render(progress=1) {
 
 
     updateMouth();
+
+    updateWindDirection();
 }
 
 
 /* =========================
-   부드러운 움직임
+   질주 UI
+========================= */
+
+function updateDashUI() {
+
+    const now =
+        performance.now();
+
+
+    if (dashing) {
+
+        const remaining =
+            Math.max(
+                0,
+                dashEndTime - now
+            );
+
+
+        dashStatus.textContent =
+            "🔥 질주 " +
+            (remaining / 1000)
+                .toFixed(1) +
+            "초";
+
+
+        dashStatus.style.color =
+            "#ffcc4d";
+
+
+        return;
+    }
+
+
+    const elapsed =
+        now - lastDashTime;
+
+
+    if (
+        lastDashTime === -Infinity ||
+        elapsed >= DASH_COOLDOWN
+    ) {
+
+        dashStatus.textContent =
+            "준비 ⚡";
+
+        dashStatus.style.color =
+            "#6eff91";
+
+    } else {
+
+        const remaining =
+            Math.ceil(
+                (
+                    DASH_COOLDOWN -
+                    elapsed
+                ) / 1000
+            );
+
+
+        dashStatus.textContent =
+            "쿨타임 " +
+            remaining +
+            "초";
+
+        dashStatus.style.color =
+            "#ff7777";
+    }
+}
+
+
+/* =========================
+   애니메이션
 ========================= */
 
 function animate(time) {
@@ -1228,10 +1650,27 @@ function animate(time) {
     }
 
 
+    /*
+       질주 종료 체크
+    */
+
+    if (
+        dashing &&
+        time >= dashEndTime
+    ) {
+
+        stopDash();
+    }
+
+
+    const moveTime =
+        getMoveTime();
+
+
     const progress =
         Math.min(
             (time-lastMoveTime) /
-            MOVE_TIME,
+            moveTime,
             1
         );
 
@@ -1249,6 +1688,8 @@ function animate(time) {
 
 
     render(eased);
+
+    updateDashUI();
 
 
     animationFrame =
@@ -1289,13 +1730,18 @@ function move() {
     };
 
 
-    /* 벽 충돌 */
+    /* 벽 */
 
     if (
+
         newHead.x < 0 ||
+
         newHead.x >= COLS ||
+
         newHead.y < 0 ||
+
         newHead.y >= ROWS
+
     ) {
 
         crash(head);
@@ -1304,7 +1750,7 @@ function move() {
     }
 
 
-    /* 몸 충돌 */
+    /* 몸 */
 
     if (
         snake.some(part =>
@@ -1331,11 +1777,14 @@ function move() {
     );
 
 
-    /* 사과 먹음 */
+    /* 사과 */
 
     if (
+
         newHead.x === food.x &&
+
         newHead.y === food.y
+
     ) {
 
         score++;
@@ -1370,6 +1819,113 @@ function move() {
 
 
 /* =========================
+   질주 시작
+========================= */
+
+function startDash() {
+
+    if (dead || paused) {
+        return;
+    }
+
+
+    const now =
+        performance.now();
+
+
+    /*
+       쿨타임 검사
+    */
+
+    if (
+        now - lastDashTime <
+        DASH_COOLDOWN
+    ) {
+
+        return;
+    }
+
+
+    dashing = true;
+
+    lastDashTime =
+        now;
+
+    dashEndTime =
+        now + DASH_DURATION;
+
+
+    /*
+       화면 효과
+    */
+
+    game.classList.add(
+        "dashing"
+    );
+
+    game.classList.add(
+        "dashActive"
+    );
+
+    game.classList.add(
+        "dashFlash"
+    );
+
+
+    setTimeout(() => {
+
+        game.classList.remove(
+            "dashFlash"
+        );
+
+    },180);
+
+
+    /*
+       질주 중에는 이동 간격이
+       즉시 짧아지도록 기준 시간 갱신
+    */
+
+    lastMoveTime =
+        now;
+
+
+    updateDashUI();
+}
+
+
+/* =========================
+   질주 종료
+========================= */
+
+function stopDash() {
+
+    if (!dashing) {
+        return;
+    }
+
+
+    dashing = false;
+
+
+    game.classList.remove(
+        "dashing"
+    );
+
+    game.classList.remove(
+        "dashActive"
+    );
+
+
+    lastMoveTime =
+        performance.now();
+
+
+    updateDashUI();
+}
+
+
+/* =========================
    충돌
 ========================= */
 
@@ -1378,7 +1934,8 @@ function crash(position) {
     dead = true;
 
 
-    /* 입은 닫기 */
+    stopDash();
+
 
     mouthClosed.style.display =
         "block";
@@ -1388,8 +1945,7 @@ function crash(position) {
 
 
     /*
-       게임 화면에서는
-       YOU DIE가 아니라 💥
+       게임 화면에는 💥
     */
 
     crashElement.textContent =
@@ -1456,8 +2012,13 @@ function pauseGame() {
 
     const progress =
         Math.min(
-            (now-lastMoveTime) /
-            MOVE_TIME,
+
+            (
+                now -
+                lastMoveTime
+            ) /
+            getMoveTime(),
+
             1
         );
 
@@ -1501,6 +2062,11 @@ function resumeGame() {
         "none";
 
 
+    /*
+       일시정지 중 시간이 흘렀어도
+       질주 시간이 이상해지지 않게 함
+    */
+
     lastMoveTime =
         performance.now();
 
@@ -1523,6 +2089,10 @@ function restart() {
     dead = false;
 
     paused = false;
+
+    dashing = false;
+
+    lastDashTime = -Infinity;
 
 
     direction = {
@@ -1549,6 +2119,15 @@ function restart() {
         "none";
 
 
+    game.classList.remove(
+        "dashing"
+    );
+
+    game.classList.remove(
+        "dashActive"
+    );
+
+
     resetSnake();
 
     createFood();
@@ -1559,6 +2138,9 @@ function restart() {
 
 
     render(1);
+
+
+    updateDashUI();
 
 
     if (animationFrame) {
@@ -1610,7 +2192,37 @@ document.addEventListener(
             e.key.toLowerCase();
 
 
-        /* ESC */
+        /* =====================
+           LShift
+        ====================== */
+
+        if (
+            e.code === "ShiftLeft"
+        ) {
+
+            e.preventDefault();
+
+
+            /*
+               키를 계속 누르고 있어도
+               한 번만 발동
+            */
+
+            if (!shiftHeld) {
+
+                shiftHeld = true;
+
+                startDash();
+            }
+
+
+            return;
+        }
+
+
+        /* =====================
+           ESC
+        ====================== */
 
         if (key === "escape") {
 
@@ -1636,7 +2248,9 @@ document.addEventListener(
         }
 
 
-        /* 게임오버 R */
+        /* =====================
+           R
+        ====================== */
 
         if (
             key === "r" &&
@@ -1654,14 +2268,21 @@ document.addEventListener(
         }
 
 
-        /* 위 */
+        /* =====================
+           위
+        ====================== */
 
         if (
+
             (
                 key === "w" ||
                 key === "arrowup"
-            ) &&
+            )
+
+            &&
+
             direction.y !== 1
+
         ) {
 
             nextDirection = {
@@ -1671,14 +2292,21 @@ document.addEventListener(
         }
 
 
-        /* 아래 */
+        /* =====================
+           아래
+        ====================== */
 
         if (
+
             (
                 key === "s" ||
                 key === "arrowdown"
-            ) &&
+            )
+
+            &&
+
             direction.y !== -1
+
         ) {
 
             nextDirection = {
@@ -1688,14 +2316,21 @@ document.addEventListener(
         }
 
 
-        /* 왼쪽 */
+        /* =====================
+           왼쪽
+        ====================== */
 
         if (
+
             (
                 key === "a" ||
                 key === "arrowleft"
-            ) &&
+            )
+
+            &&
+
             direction.x !== 1
+
         ) {
 
             nextDirection = {
@@ -1705,14 +2340,21 @@ document.addEventListener(
         }
 
 
-        /* 오른쪽 */
+        /* =====================
+           오른쪽
+        ====================== */
 
         if (
+
             (
                 key === "d" ||
                 key === "arrowright"
-            ) &&
+            )
+
+            &&
+
             direction.x !== -1
+
         ) {
 
             nextDirection = {
@@ -1726,7 +2368,26 @@ document.addEventListener(
 
 
 /* =========================
-   게임 시작
+   Shift 키 떼기
+========================= */
+
+document.addEventListener(
+    "keyup",
+    function(e) {
+
+        if (
+            e.code === "ShiftLeft"
+        ) {
+
+            shiftHeld = false;
+        }
+
+    }
+);
+
+
+/* =========================
+   시작
 ========================= */
 
 resetSnake();
@@ -1735,6 +2396,8 @@ createFood();
 
 render(1);
 
+updateDashUI();
+
 
 animationFrame =
     requestAnimationFrame(
@@ -1742,9 +2405,40 @@ animationFrame =
     );
 
 
+/*
+   일반 이동 루프
+
+   질주 중에도 이 함수는
+   더 빠른 속도로 이동하도록
+   자체적으로 체크함
+*/
+
 setInterval(
-    move,
-    MOVE_TIME
+    function() {
+
+        if (dead || paused) {
+            return;
+        }
+
+
+        const now =
+            performance.now();
+
+
+        const interval =
+            getMoveTime();
+
+
+        if (
+            now - lastMoveTime >=
+            interval
+        ) {
+
+            move();
+        }
+
+    },
+    15
 );
 
 </script>
