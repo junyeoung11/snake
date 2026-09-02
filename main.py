@@ -270,8 +270,7 @@ body {
 ========================= */
 
 #headGroup {
-    transition:
-        transform .04s linear;
+    transition:transform .04s linear;
 }
 
 
@@ -320,7 +319,7 @@ body {
 
 
 /* =========================
-   질주 바람 효과
+   질주 바람
 ========================= */
 
 #windLayer {
@@ -383,7 +382,9 @@ body {
 }
 
 
-/* 질주 잔상 */
+/* =========================
+   질주 잔상
+========================= */
 
 #dashTrail {
     display:none;
@@ -498,7 +499,7 @@ body {
 
 
 /* =========================
-   오버레이
+   일시정지 / 게임오버
 ========================= */
 
 .overlay {
@@ -561,7 +562,6 @@ body {
 
 .menuButton:hover {
     transform:scale(1.04);
-
     filter:brightness(1.12);
 }
 
@@ -571,14 +571,12 @@ body {
 
 #continueButton {
     background:#4f8cff;
-
     color:white;
 }
 
 #restartButton,
 #gameOverRestart {
     background:#48b96b;
-
     color:white;
 }
 
@@ -591,7 +589,9 @@ body {
 }
 
 
-/* 질주 시작 화면 효과 */
+/* =========================
+   질주 시작 효과
+========================= */
 
 #game.dashFlash::after {
     content:"";
@@ -631,7 +631,7 @@ body {
 
 <div id="container">
 
-    <!-- 주변 나무 -->
+    <!-- 나무 -->
 
     <div class="tree" style="left:-45px;top:-40px;"></div>
     <div class="tree" style="left:110px;top:-50px;"></div>
@@ -673,9 +673,7 @@ body {
 
     <div id="dashBox">
         ⚡ 질주:
-        <span id="dashStatus">
-            준비
-        </span>
+        <span id="dashStatus">준비</span>
     </div>
 
 
@@ -691,54 +689,40 @@ body {
             viewBox="0 0 648 648"
         >
 
-            <!-- 몸통 -->
+            <path id="snakeShadow"></path>
 
-            <path
-                id="snakeShadow">
-            </path>
+            <path id="snakeBody"></path>
 
-            <path
-                id="snakeBody">
-            </path>
-
-            <path
-                id="snakeLight">
-            </path>
+            <path id="snakeLight"></path>
 
 
             <!-- 질주 잔상 -->
 
-            <path
-                id="dashTrail">
-            </path>
+            <path id="dashTrail"></path>
 
 
-            <!-- 바람 효과 -->
+            <!-- 바람 -->
 
             <g id="windLayer">
 
                 <path
                     class="wind wind1"
-                    d="M 0 -12
-                       Q -30 -20 -55 -12">
+                    d="M 0 -12 Q -30 -20 -55 -12">
                 </path>
 
                 <path
                     class="wind wind2"
-                    d="M 0 0
-                       Q -38 -5 -68 5">
+                    d="M 0 0 Q -38 -5 -68 5">
                 </path>
 
                 <path
                     class="wind wind3"
-                    d="M 0 12
-                       Q -30 20 -58 14">
+                    d="M 0 12 Q -30 20 -58 14">
                 </path>
 
                 <path
                     class="wind wind4"
-                    d="M -5 22
-                       Q -35 28 -50 25">
+                    d="M -5 22 Q -35 28 -50 25">
                 </path>
 
             </g>
@@ -775,11 +759,7 @@ body {
 
 
                 <path
-                    d="
-                    M -17 -17
-                    Q -2 -23 10 -15
-                    "
-
+                    d="M -17 -17 Q -2 -23 10 -15"
                     fill="none"
                     stroke="#6f98ff"
                     stroke-width="6"
@@ -843,17 +823,11 @@ body {
 
                 <path
                     id="mouthClosed"
-                    d="
-                    M 16 -5
-                    Q 23 0 16 5
-                    "
-                >
+                    d="M 16 -5 Q 23 0 16 5">
                 </path>
 
 
-                <!-- =====================
-                     크게 벌어진 입
-                ====================== -->
+                <!-- 벌어진 입 -->
 
                 <g id="mouthOpenGroup">
 
@@ -881,34 +855,17 @@ body {
 
                     <path
                         class="tooth"
-                        d="
-                        M 16 -7
-                        L 19 -2
-                        L 22 -7
-                        Z
-                        ">
+                        d="M 16 -7 L 19 -2 L 22 -7 Z">
                     </path>
-
 
                     <path
                         class="tooth"
-                        d="
-                        M 22 -7
-                        L 25 -2
-                        L 27 -6
-                        Z
-                        ">
+                        d="M 22 -7 L 25 -2 L 27 -6 Z">
                     </path>
-
 
                     <path
                         class="tooth"
-                        d="
-                        M 17 7
-                        L 20 3
-                        L 22 8
-                        Z
-                        ">
+                        d="M 17 7 L 20 3 L 22 8 Z">
                     </path>
 
                 </g>
@@ -918,11 +875,9 @@ body {
         </svg>
 
 
-        <!-- 죽는 순간 -->
+        <!-- 충돌 -->
 
-        <div id="crash">
-            💥
-        </div>
+        <div id="crash">💥</div>
 
     </div>
 
@@ -983,12 +938,9 @@ body {
             🔄 다시하기
         </button>
 
-        <p>
-            R 키를 눌러 다시 시작
-        </p>
+        <p>R 키를 눌러 다시 시작</p>
 
     </div>
-
 
 </div>
 
@@ -996,7 +948,7 @@ body {
 <script>
 
 /* =========================
-   기본 설정
+   게임 설정
 ========================= */
 
 const GRID = 34;
@@ -1006,32 +958,22 @@ const COLS = 18;
 const ROWS = 18;
 
 
-/*
-   일반 이동 속도
-*/
+/* 일반 속도 */
 
 const NORMAL_MOVE_TIME = 160;
 
 
-/*
-   질주 이동 속도
-
-   숫자가 작을수록 빠름
-*/
+/* 질주 속도 */
 
 const DASH_MOVE_TIME = 65;
 
 
-/*
-   질주 지속시간
-*/
+/* 최대 질주 시간 */
 
 const DASH_DURATION = 2000;
 
 
-/*
-   질주 쿨타임
-*/
+/* 쿨타임 */
 
 const DASH_COOLDOWN = 10000;
 
@@ -1165,14 +1107,23 @@ let paused = false;
 
 let dashing = false;
 
+
+/*
+   질주가 끝나는 시간
+*/
+
 let dashEndTime = 0;
+
+
+/*
+   마지막으로 질주를 시작한 시간
+*/
 
 let lastDashTime = -Infinity;
 
 
 /*
-   LShift를 누르고 있는 동안
-   한 번만 발동시키기 위한 변수
+   LShift가 현재 눌려 있는지
 */
 
 let shiftHeld = false;
@@ -1193,7 +1144,7 @@ function getMoveTime() {
 
 
 /* =========================
-   애니메이션 시간
+   애니메이션
 ========================= */
 
 let lastMoveTime =
@@ -1203,7 +1154,7 @@ let animationFrame = null;
 
 
 /* =========================
-   최고 기록
+   최고기록
 ========================= */
 
 let highScore =
@@ -1294,7 +1245,7 @@ function foodDistance() {
 
 
 /* =========================
-   입 업데이트
+   입
 ========================= */
 
 function updateMouth() {
@@ -1304,11 +1255,7 @@ function updateMouth() {
     }
 
 
-    const distance =
-        foodDistance();
-
-
-    if (distance <= 2) {
+    if (foodDistance() <= 2) {
 
         mouthClosed.style.display =
             "none";
@@ -1457,36 +1404,6 @@ function getAngle() {
 
 
 /* =========================
-   질주 바람 방향
-========================= */
-
-function updateWindDirection() {
-
-    /*
-       바람은 머리 뒤에서
-       앞으로 흐르는 느낌을 줌
-    */
-
-    let angle =
-        getAngle();
-
-
-    document
-        .getElementById(
-            "windLayer"
-        )
-        .setAttribute(
-            "transform",
-            `translate(
-                ${snake[0].x * GRID + GRID/2}
-                ${snake[0].y * GRID + GRID/2}
-            )
-            rotate(${angle})`
-        );
-}
-
-
-/* =========================
    화면 그리기
 ========================= */
 
@@ -1517,11 +1434,6 @@ function render(progress=1) {
         path
     );
 
-
-    /*
-       질주 잔상은 몸통 경로를
-       살짝 뒤로 표시
-    */
 
     dashTrail.setAttribute(
         "d",
@@ -1563,8 +1475,6 @@ function render(progress=1) {
 
 
     updateMouth();
-
-    updateWindDirection();
 }
 
 
@@ -1589,14 +1499,14 @@ function updateDashUI() {
 
         dashStatus.textContent =
             "🔥 질주 " +
-            (remaining / 1000)
-                .toFixed(1) +
+            (
+                remaining / 1000
+            ).toFixed(1) +
             "초";
 
 
         dashStatus.style.color =
             "#ffcc4d";
-
 
         return;
     }
@@ -1651,7 +1561,8 @@ function animate(time) {
 
 
     /*
-       질주 종료 체크
+       2초가 지나면
+       자동으로 질주 종료
     */
 
     if (
@@ -1669,8 +1580,10 @@ function animate(time) {
 
     const progress =
         Math.min(
-            (time-lastMoveTime) /
-            moveTime,
+            (
+                time -
+                lastMoveTime
+            ) / moveTime,
             1
         );
 
@@ -1730,7 +1643,7 @@ function move() {
     };
 
 
-    /* 벽 */
+    /* 벽 충돌 */
 
     if (
 
@@ -1750,7 +1663,7 @@ function move() {
     }
 
 
-    /* 몸 */
+    /* 몸 충돌 */
 
     if (
         snake.some(part =>
@@ -1824,7 +1737,11 @@ function move() {
 
 function startDash() {
 
-    if (dead || paused) {
+    if (
+        dead ||
+        paused ||
+        dashing
+    ) {
         return;
     }
 
@@ -1848,16 +1765,14 @@ function startDash() {
 
     dashing = true;
 
+
     lastDashTime =
         now;
+
 
     dashEndTime =
         now + DASH_DURATION;
 
-
-    /*
-       화면 효과
-    */
 
     game.classList.add(
         "dashing"
@@ -1880,11 +1795,6 @@ function startDash() {
 
     },180);
 
-
-    /*
-       질주 중에는 이동 간격이
-       즉시 짧아지도록 기준 시간 갱신
-    */
 
     lastMoveTime =
         now;
@@ -1943,10 +1853,6 @@ function crash(position) {
     mouthOpenGroup.style.display =
         "none";
 
-
-    /*
-       게임 화면에는 💥
-    */
 
     crashElement.textContent =
         "💥";
@@ -2063,9 +1969,31 @@ function resumeGame() {
 
 
     /*
-       일시정지 중 시간이 흘렀어도
-       질주 시간이 이상해지지 않게 함
+       일시정지 중에는
+       질주 시간이 지나지 않도록
+       다시 기준점을 잡음
     */
+
+    if (dashing) {
+
+        /*
+           일시정지 상태에서
+           Shift가 눌려 있었다면
+           남은 질주 시간을 유지
+        */
+
+        const remaining =
+            Math.max(
+                0,
+                dashEndTime -
+                performance.now()
+            );
+
+        dashEndTime =
+            performance.now() +
+            remaining;
+    }
+
 
     lastMoveTime =
         performance.now();
@@ -2091,6 +2019,8 @@ function restart() {
     paused = false;
 
     dashing = false;
+
+    shiftHeld = false;
 
     lastDashTime = -Infinity;
 
@@ -2139,7 +2069,6 @@ function restart() {
 
     render(1);
 
-
     updateDashUI();
 
 
@@ -2167,12 +2096,10 @@ continueButton.addEventListener(
     resumeGame
 );
 
-
 restartButton.addEventListener(
     "click",
     restart
 );
-
 
 gameOverRestart.addEventListener(
     "click",
@@ -2193,7 +2120,7 @@ document.addEventListener(
 
 
         /* =====================
-           LShift
+           LSHIFT 누름
         ====================== */
 
         if (
@@ -2204,8 +2131,8 @@ document.addEventListener(
 
 
             /*
-               키를 계속 누르고 있어도
-               한 번만 발동
+               이미 누르고 있다면
+               다시 발동하지 않음
             */
 
             if (!shiftHeld) {
@@ -2269,7 +2196,7 @@ document.addEventListener(
 
 
         /* =====================
-           위
+           방향키
         ====================== */
 
         if (
@@ -2292,10 +2219,6 @@ document.addEventListener(
         }
 
 
-        /* =====================
-           아래
-        ====================== */
-
         if (
 
             (
@@ -2316,10 +2239,6 @@ document.addEventListener(
         }
 
 
-        /* =====================
-           왼쪽
-        ====================== */
-
         if (
 
             (
@@ -2339,10 +2258,6 @@ document.addEventListener(
             };
         }
 
-
-        /* =====================
-           오른쪽
-        ====================== */
 
         if (
 
@@ -2368,7 +2283,7 @@ document.addEventListener(
 
 
 /* =========================
-   Shift 키 떼기
+   LShift 떼기
 ========================= */
 
 document.addEventListener(
@@ -2380,8 +2295,40 @@ document.addEventListener(
         ) {
 
             shiftHeld = false;
+
+
+            /*
+               핵심:
+               Shift를 떼는 순간
+               질주 즉시 종료
+            */
+
+            if (dashing) {
+
+                stopDash();
+            }
         }
 
+    }
+);
+
+
+/* =========================
+   창을 벗어나도
+   Shift가 풀리도록 처리
+========================= */
+
+window.addEventListener(
+    "blur",
+    function() {
+
+        shiftHeld = false;
+
+
+        if (dashing) {
+
+            stopDash();
+        }
     }
 );
 
@@ -2406,11 +2353,7 @@ animationFrame =
 
 
 /*
-   일반 이동 루프
-
-   질주 중에도 이 함수는
-   더 빠른 속도로 이동하도록
-   자체적으로 체크함
+   15ms마다 이동 체크
 */
 
 setInterval(
