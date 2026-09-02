@@ -42,7 +42,6 @@ body {
     position:relative;
     overflow:hidden;
     border-radius:25px;
-
     background:
         radial-gradient(circle at 10% 10%,#6ca64c,transparent 20%),
         radial-gradient(circle at 90% 15%,#396f32,transparent 22%),
@@ -56,7 +55,6 @@ body {
     width:115px;
     height:115px;
     border-radius:50%;
-
     background:
         radial-gradient(
             circle at 30% 25%,
@@ -64,7 +62,6 @@ body {
             #55943b 48%,
             #1d5128 80%
         );
-
     box-shadow:
         inset -10px -12px 20px rgba(0,0,0,.28),
         0 10px 15px rgba(0,0,0,.45);
@@ -77,7 +74,6 @@ body {
     left:66px;
     top:66px;
     overflow:hidden;
-
     border:18px solid #254da5;
     border-radius:20px;
 
@@ -99,6 +95,8 @@ body {
         inset 0 0 30px rgba(0,0,0,.22),
         0 10px 20px rgba(0,0,0,.45);
 }
+
+/* 점수 */
 
 #scoreBox,
 #highScoreBox {
@@ -124,6 +122,9 @@ body {
     right:18px;
 }
 
+
+/* 사과 */
+
 #food {
     position:absolute;
     width:34px;
@@ -143,10 +144,21 @@ body {
 }
 
 @keyframes applePulse {
-    0% {transform:scale(.72);}
-    50% {transform:scale(1.15);}
-    100% {transform:scale(.72);}
+    0% {
+        transform:scale(.72);
+    }
+
+    50% {
+        transform:scale(1.15);
+    }
+
+    100% {
+        transform:scale(.72);
+    }
 }
+
+
+/* 뱀 */
 
 #snakeSVG {
     position:absolute;
@@ -154,6 +166,7 @@ body {
     height:648px;
     left:0;
     top:0;
+
     overflow:visible;
     pointer-events:none;
 }
@@ -184,44 +197,122 @@ body {
     opacity:.45;
 }
 
+
 /* =========================
-   뱀 얼굴
+   얼굴
 ========================= */
 
 #headGroup {
-    transition:transform .03s linear;
+    transition:transform .04s linear;
 }
 
-#mouthClosed,
-#mouthOpen {
+
+/* 닫힌 입 */
+
+#mouthClosed {
     fill:none;
-    stroke:#173778;
-    stroke-width:2.8;
+    stroke:#102b63;
+    stroke-width:3;
     stroke-linecap:round;
 }
 
-#mouthOpen {
+
+/* =========================
+   벌어진 입
+========================= */
+
+#mouthOpenGroup {
     display:none;
 }
 
+
+/* 입 안 */
+
+#openMouth {
+    fill:#111111;
+    stroke:#081535;
+    stroke-width:2;
+}
+
+
+/* 혀 */
+
+#tongue {
+    fill:#ff4b55;
+    stroke:#b51f2c;
+    stroke-width:1.5;
+}
+
+
+/* 이빨 */
+
+.tooth {
+    fill:white;
+    stroke:#cfd7e5;
+    stroke-width:1;
+}
+
+
+/* 입 벌어지는 애니메이션 */
+
+.mouthOpenAnimation {
+    animation:mouthOpen .18s ease-out;
+}
+
+@keyframes mouthOpen {
+    from {
+        transform:scaleY(.5);
+    }
+
+    to {
+        transform:scaleY(1);
+    }
+}
+
+
+/* =========================
+   충돌 💥
+========================= */
+
 #crash {
     position:absolute;
+
     display:none;
 
-    font-size:65px;
-    font-weight:900;
+    font-size:78px;
 
-    color:white;
-
-    z-index:200;
+    z-index:300;
 
     transform:translate(-50%,-50%);
 
-    text-shadow:
-        4px 4px 0 #111,
-        -2px -2px 0 #111,
-        2px -2px 0 #111,
-        -2px 2px 0 #111;
+    filter:drop-shadow(
+        0 4px 4px rgba(0,0,0,.5)
+    );
+
+    animation:crashPop .45s ease-out;
+}
+
+@keyframes crashPop {
+    0% {
+        transform:
+            translate(-50%,-50%)
+            scale(.2)
+            rotate(-20deg);
+    }
+
+    60% {
+        transform:
+            translate(-50%,-50%)
+            scale(1.25)
+            rotate(8deg);
+    }
+
+    100% {
+        transform:
+            translate(-50%,-50%)
+            scale(1)
+            rotate(0deg);
+    }
 }
 
 .shake {
@@ -249,6 +340,7 @@ body {
         transform:translate(8px,-3px);
     }
 }
+
 
 /* =========================
    오버레이
@@ -345,7 +437,8 @@ body {
 
 <div id="container">
 
-    <!-- 나무 -->
+    <!-- 주변 나무 -->
+
     <div class="tree" style="left:-45px;top:-40px;"></div>
     <div class="tree" style="left:110px;top:-50px;"></div>
     <div class="tree" style="left:280px;top:-50px;"></div>
@@ -367,13 +460,15 @@ body {
 
 
     <!-- 점수 -->
+
     <div id="scoreBox">
-        🏆 점수: <span id="score">0</span>
+        🏆 점수:
+        <span id="score">0</span>
     </div>
 
-    <!-- 최고기록 -->
     <div id="highScoreBox">
-        👑 최고기록: <span id="highScore">0</span>
+        👑 최고기록:
+        <span id="highScore">0</span>
     </div>
 
 
@@ -382,52 +477,65 @@ body {
         <div id="food">🍎</div>
 
 
-        <svg id="snakeSVG" viewBox="0 0 648 648">
+        <svg
+            id="snakeSVG"
+            viewBox="0 0 648 648"
+        >
 
             <path id="snakeShadow"></path>
             <path id="snakeBody"></path>
             <path id="snakeLight"></path>
 
 
-            <!-- 뱀 머리 -->
+            <!-- =====================
+                 머리
+            ====================== -->
 
             <g id="headGroup">
 
+                <!-- 머리 그림자 -->
+
                 <ellipse
                     cx="0"
-                    cy="3"
-                    rx="27"
-                    ry="23"
+                    cy="4"
+                    rx="28"
+                    ry="24"
                     fill="#17336e"
                     opacity=".35">
                 </ellipse>
 
 
+                <!-- 얼굴 -->
+
                 <path
                     d="
-                    M -18 -20
-                    Q 5 -25 20 -14
-                    Q 33 0 20 14
-                    Q 5 25 -18 20
-                    Q -28 10 -28 0
-                    Q -28 -10 -18 -20
+                    M -18 -21
+                    Q 4 -28 21 -15
+                    Q 34 0 21 15
+                    Q 4 28 -18 21
+                    Q -30 11 -30 0
+                    Q -30 -11 -18 -21
                     "
+
                     fill="#315fc9"
                     stroke="#244a9f"
                     stroke-width="3">
                 </path>
 
 
+                <!-- 얼굴 빛 -->
+
                 <path
                     d="
-                    M -17 -16
-                    Q -2 -22 10 -14
+                    M -17 -17
+                    Q -2 -23 10 -15
                     "
+
                     fill="none"
                     stroke="#6f98ff"
                     stroke-width="6"
                     stroke-linecap="round"
-                    opacity=".45">
+                    opacity=".5">
                 </path>
 
 
@@ -482,60 +590,136 @@ body {
                 </circle>
 
 
-                <!-- 닫힌 입 -->
+                <!-- =====================
+                     닫힌 입
+                ====================== -->
 
                 <path
                     id="mouthClosed"
-                    d="M 16 -4 Q 21 0 16 4">
-                </path>
-
-
-                <!-- 벌어진 입 -->
-
-                <path
-                    id="mouthOpen"
                     d="
-                    M 14 -5
-                    Q 23 -3 21 2
-                    Q 19 8 13 6
+                    M 16 -5
+                    Q 23 0 16 5
                     "
-                    fill="#111">
-                </path>
+                ></path>
+
+
+                <!-- =====================
+                     크게 벌어진 입
+                ====================== -->
+
+                <g id="mouthOpenGroup">
+
+                    <!-- 입 -->
+
+                    <path
+                        id="openMouth"
+                        d="
+                        M 12 -8
+                        Q 25 -9 27 0
+                        Q 25 9 12 8
+                        Q 17 0 12 -8
+                        "
+                    ></path>
+
+
+                    <!-- 혀 -->
+
+                    <path
+                        id="tongue"
+                        d="
+                        M 16 3
+                        Q 21 0 25 3
+                        Q 21 10 16 6
+                        Z
+                        "
+                    ></path>
+
+
+                    <!-- 위 이빨 -->
+
+                    <path
+                        class="tooth"
+                        d="
+                        M 16 -7
+                        L 19 -2
+                        L 22 -7
+                        Z
+                        "
+                    ></path>
+
+                    <path
+                        class="tooth"
+                        d="
+                        M 22 -7
+                        L 25 -2
+                        L 27 -6
+                        Z
+                        "
+                    ></path>
+
+
+                    <!-- 아래 이빨 -->
+
+                    <path
+                        class="tooth"
+                        d="
+                        M 17 7
+                        L 20 3
+                        L 22 8
+                        Z
+                        "
+                    ></path>
+
+                </g>
 
             </g>
 
         </svg>
 
 
-        <div id="crash">YOU DIE</div>
+        <!-- 죽는 순간 💥 -->
+
+        <div id="crash">💥</div>
 
     </div>
 
 
-    <!-- 일시정지 -->
+    <!-- =====================
+         일시정지
+    ====================== -->
 
-    <div id="pauseOverlay" class="overlay">
+    <div
+        id="pauseOverlay"
+        class="overlay"
+    >
 
         <h1>일시정지</h1>
 
         <button
             id="continueButton"
-            class="menuButton">
+            class="menuButton"
+        >
             ▶️ 계속하기
         </button>
 
         <button
             id="restartButton"
-            class="menuButton">
+            class="menuButton"
+        >
             🔄 다시하기
         </button>
 
     </div>
 
 
-    <!-- 게임오버 -->
+    <!-- =====================
+         게임오버
+    ====================== -->
 
-    <div id="gameOver" class="overlay">
+    <div
+        id="gameOver"
+        class="overlay"
+    >
 
         <h1>YOU DIE</h1>
 
@@ -551,7 +735,8 @@ body {
 
         <button
             id="gameOverRestart"
-            class="menuButton">
+            class="menuButton"
+        >
             🔄 다시하기
         </button>
 
@@ -564,15 +749,21 @@ body {
 
 <script>
 
+/* =========================
+   기본 설정
+========================= */
+
 const GRID = 34;
+
 const COLS = 18;
+
 const ROWS = 18;
 
 const MOVE_TIME = 160;
 
 
 /* =========================
-   요소
+   HTML 요소
 ========================= */
 
 const game =
@@ -591,47 +782,73 @@ const finalScoreElement =
     document.getElementById("finalScore");
 
 const gameOverHighScoreElement =
-    document.getElementById("gameOverHighScore");
+    document.getElementById(
+        "gameOverHighScore"
+    );
 
 const gameOverElement =
-    document.getElementById("gameOver");
+    document.getElementById(
+        "gameOver"
+    );
 
 const pauseOverlay =
-    document.getElementById("pauseOverlay");
+    document.getElementById(
+        "pauseOverlay"
+    );
 
 const crashElement =
-    document.getElementById("crash");
+    document.getElementById(
+        "crash"
+    );
 
 const snakeBody =
-    document.getElementById("snakeBody");
+    document.getElementById(
+        "snakeBody"
+    );
 
 const snakeShadow =
-    document.getElementById("snakeShadow");
+    document.getElementById(
+        "snakeShadow"
+    );
 
 const snakeLight =
-    document.getElementById("snakeLight");
+    document.getElementById(
+        "snakeLight"
+    );
 
 const headGroup =
-    document.getElementById("headGroup");
+    document.getElementById(
+        "headGroup"
+    );
 
 const mouthClosed =
-    document.getElementById("mouthClosed");
+    document.getElementById(
+        "mouthClosed"
+    );
 
-const mouthOpen =
-    document.getElementById("mouthOpen");
+const mouthOpenGroup =
+    document.getElementById(
+        "mouthOpenGroup"
+    );
 
 const continueButton =
-    document.getElementById("continueButton");
+    document.getElementById(
+        "continueButton"
+    );
 
 const restartButton =
-    document.getElementById("restartButton");
+    document.getElementById(
+        "restartButton"
+    );
 
 const gameOverRestart =
-    document.getElementById("gameOverRestart");
+    document.getElementById(
+        "gameOverRestart"
+    );
 
 
 /* =========================
-   변수
+   게임 변수
 ========================= */
 
 let snake = [];
@@ -648,7 +865,10 @@ let nextDirection = {
     y:0
 };
 
-let food;
+let food = {
+    x:10,
+    y:9
+};
 
 let score = 0;
 
@@ -663,7 +883,7 @@ let animationFrame = null;
 
 
 /* =========================
-   최고기록
+   최고 기록
 ========================= */
 
 let highScore =
@@ -710,14 +930,17 @@ function createFood() {
     while (!valid) {
 
         food = {
-            x:Math.floor(
-                Math.random() * COLS
-            ),
+            x:
+                Math.floor(
+                    Math.random() * COLS
+                ),
 
-            y:Math.floor(
-                Math.random() * ROWS
-            )
+            y:
+                Math.floor(
+                    Math.random() * ROWS
+                )
         };
+
 
         valid =
             !snake.some(part =>
@@ -729,39 +952,43 @@ function createFood() {
 
 
 /* =========================
-   거리 계산
+   사과와 머리 거리
 ========================= */
 
 function foodDistance() {
 
     const head = snake[0];
 
-    /*
-        격자 기준 거리.
-        예:
-        바로 옆 = 1칸
-        대각선 = 1칸
-        두 칸 떨어짐 = 2칸
-    */
-
     return Math.max(
-        Math.abs(head.x - food.x),
-        Math.abs(head.y - food.y)
+        Math.abs(
+            head.x - food.x
+        ),
+
+        Math.abs(
+            head.y - food.y
+        )
     );
 }
 
 
 /* =========================
-   입 벌리기
+   입 상태 업데이트
 ========================= */
 
 function updateMouth() {
 
+    if (dead) {
+        return;
+    }
+
+
     const distance =
         foodDistance();
 
+
     /*
-        사과와 2칸 이내면 입을 벌림
+       2칸 이내:
+       입 크게 벌림
     */
 
     if (distance <= 2) {
@@ -769,15 +996,25 @@ function updateMouth() {
         mouthClosed.style.display =
             "none";
 
-        mouthOpen.style.display =
+        mouthOpenGroup.style.display =
             "block";
+
+        mouthOpenGroup.classList.remove(
+            "mouthOpenAnimation"
+        );
+
+        void mouthOpenGroup.offsetWidth;
+
+        mouthOpenGroup.classList.add(
+            "mouthOpenAnimation"
+        );
 
     } else {
 
         mouthClosed.style.display =
             "block";
 
-        mouthOpen.style.display =
+        mouthOpenGroup.style.display =
             "none";
     }
 }
@@ -788,6 +1025,7 @@ function updateMouth() {
 ========================= */
 
 function lerp(a,b,t) {
+
     return a + (b-a) * t;
 }
 
@@ -802,17 +1040,20 @@ function getAnimatedSnake(progress) {
                 part;
 
             return {
-                x:lerp(
-                    oldPart.x,
-                    part.x,
-                    progress
-                ),
 
-                y:lerp(
-                    oldPart.y,
-                    part.y,
-                    progress
-                )
+                x:
+                    lerp(
+                        oldPart.x,
+                        part.x,
+                        progress
+                    ),
+
+                y:
+                    lerp(
+                        oldPart.y,
+                        part.y,
+                        progress
+                    )
             };
         }
     );
@@ -820,7 +1061,7 @@ function getAnimatedSnake(progress) {
 
 
 /* =========================
-   몸통
+   몸통 경로
 ========================= */
 
 function createPath(animatedSnake) {
@@ -829,6 +1070,7 @@ function createPath(animatedSnake) {
         [...animatedSnake]
         .reverse()
         .map(part => ({
+
             x:
                 part.x * GRID +
                 GRID / 2,
@@ -866,6 +1108,7 @@ function createPath(animatedSnake) {
         const midY =
             (a.y+b.y)/2;
 
+
         path +=
             ` Q ${a.x} ${a.y} ${midX} ${midY}`;
     }
@@ -874,8 +1117,10 @@ function createPath(animatedSnake) {
     const last =
         points[points.length-1];
 
+
     path +=
         ` L ${last.x} ${last.y}`;
+
 
     return path;
 }
@@ -904,7 +1149,7 @@ function getAngle() {
 
 
 /* =========================
-   렌더
+   화면 그리기
 ========================= */
 
 function render(progress=1) {
@@ -914,7 +1159,9 @@ function render(progress=1) {
 
 
     const path =
-        createPath(animatedSnake);
+        createPath(
+            animatedSnake
+        );
 
 
     snakeBody.setAttribute(
@@ -971,7 +1218,7 @@ function render(progress=1) {
 
 
 /* =========================
-   애니메이션
+   부드러운 움직임
 ========================= */
 
 function animate(time) {
@@ -991,11 +1238,14 @@ function animate(time) {
 
     const eased =
         progress < .5
+
         ? 2 * progress * progress
-        : 1 - Math.pow(
-            -2 * progress + 2,
-            2
-        ) / 2;
+
+        : 1 -
+          Math.pow(
+              -2 * progress + 2,
+              2
+          ) / 2;
 
 
     render(eased);
@@ -1028,15 +1278,18 @@ function move() {
 
 
     const newHead = {
+
         x:
-            head.x + direction.x,
+            head.x +
+            direction.x,
 
         y:
-            head.y + direction.y
+            head.y +
+            direction.y
     };
 
 
-    /* 벽 */
+    /* 벽 충돌 */
 
     if (
         newHead.x < 0 ||
@@ -1051,7 +1304,7 @@ function move() {
     }
 
 
-    /* 몸 */
+    /* 몸 충돌 */
 
     if (
         snake.some(part =>
@@ -1073,10 +1326,12 @@ function move() {
         }));
 
 
-    snake.unshift(newHead);
+    snake.unshift(
+        newHead
+    );
 
 
-    /* 사과 */
+    /* 사과 먹음 */
 
     if (
         newHead.x === food.x &&
@@ -1115,12 +1370,30 @@ function move() {
 
 
 /* =========================
-   YOU DIE
+   충돌
 ========================= */
 
 function crash(position) {
 
     dead = true;
+
+
+    /* 입은 닫기 */
+
+    mouthClosed.style.display =
+        "block";
+
+    mouthOpenGroup.style.display =
+        "none";
+
+
+    /*
+       게임 화면에서는
+       YOU DIE가 아니라 💥
+    */
+
+    crashElement.textContent =
+        "💥";
 
 
     crashElement.style.left =
@@ -1139,7 +1412,9 @@ function crash(position) {
         "block";
 
 
-    game.classList.add("shake");
+    game.classList.add(
+        "shake"
+    );
 
 
     setTimeout(() => {
@@ -1152,8 +1427,10 @@ function crash(position) {
         finalScoreElement.textContent =
             score;
 
+
         gameOverHighScoreElement.textContent =
             highScore;
+
 
         gameOverElement.style.display =
             "block";
@@ -1185,16 +1462,7 @@ function pauseGame() {
         );
 
 
-    const eased =
-        progress < .5
-        ? 2 * progress * progress
-        : 1 - Math.pow(
-            -2 * progress + 2,
-            2
-        ) / 2;
-
-
-    render(eased);
+    render(progress);
 
 
     paused = true;
@@ -1262,6 +1530,7 @@ function restart() {
         y:0
     };
 
+
     nextDirection = {
         x:1,
         y:0
@@ -1316,10 +1585,12 @@ continueButton.addEventListener(
     resumeGame
 );
 
+
 restartButton.addEventListener(
     "click",
     restart
 );
+
 
 gameOverRestart.addEventListener(
     "click",
@@ -1365,7 +1636,7 @@ document.addEventListener(
         }
 
 
-        /* R */
+        /* 게임오버 R */
 
         if (
             key === "r" &&
@@ -1378,8 +1649,6 @@ document.addEventListener(
         }
 
 
-        /* 일시정지 중 */
-
         if (paused) {
             return;
         }
@@ -1388,8 +1657,10 @@ document.addEventListener(
         /* 위 */
 
         if (
-            (key === "w" ||
-             key === "arrowup") &&
+            (
+                key === "w" ||
+                key === "arrowup"
+            ) &&
             direction.y !== 1
         ) {
 
@@ -1403,8 +1674,10 @@ document.addEventListener(
         /* 아래 */
 
         if (
-            (key === "s" ||
-             key === "arrowdown") &&
+            (
+                key === "s" ||
+                key === "arrowdown"
+            ) &&
             direction.y !== -1
         ) {
 
@@ -1418,8 +1691,10 @@ document.addEventListener(
         /* 왼쪽 */
 
         if (
-            (key === "a" ||
-             key === "arrowleft") &&
+            (
+                key === "a" ||
+                key === "arrowleft"
+            ) &&
             direction.x !== 1
         ) {
 
@@ -1433,8 +1708,10 @@ document.addEventListener(
         /* 오른쪽 */
 
         if (
-            (key === "d" ||
-             key === "arrowright") &&
+            (
+                key === "d" ||
+                key === "arrowright"
+            ) &&
             direction.x !== -1
         ) {
 
@@ -1449,7 +1726,7 @@ document.addEventListener(
 
 
 /* =========================
-   시작
+   게임 시작
 ========================= */
 
 resetSnake();
@@ -1457,6 +1734,7 @@ resetSnake();
 createFood();
 
 render(1);
+
 
 animationFrame =
     requestAnimationFrame(
