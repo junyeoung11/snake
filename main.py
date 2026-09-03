@@ -1,217 +1,2596 @@
-from pathlib import Path
-import re, ast
+import streamlit as st
+import streamlit.components.v1 as components
 
-# Rebuild the Streamlit entry point so the HTML/CSS is unambiguously
-# contained inside a Python triple-quoted string.
-out = Path("/mnt/data/main.py")
+st.set_page_config(
+    page_title="WORM QUEST",
+    page_icon="🪱",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-html = r'''<!DOCTYPE html>
+GAME = r"""
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#102615;font-family:Arial,"Noto Sans KR",sans-serif;color:#fff}
-button{font-family:inherit;cursor:pointer;border:0}
-#app{width:820px;height:880px;margin:auto;position:relative;overflow:hidden;border-radius:28px;background:radial-gradient(circle at 5% 5%,#6e9f45 0 6%,transparent 18%),radial-gradient(circle at 95% 10%,#3f7535 0 8%,transparent 20%),radial-gradient(circle at 5% 92%,#477e38 0 8%,transparent 20%),radial-gradient(circle at 94% 90%,#315e31 0 9%,transparent 22%),#214d2b}
-.screen{position:absolute;inset:0;display:none}.screen.active{display:block}
-.tree{position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#a5d95d,#5d963e 48%,#214c28 85%);box-shadow:inset -12px -15px 20px #0005,0 10px 18px #0006}
-#main{padding-top:58px;text-align:center}
-.logo{font-size:62px;font-weight:1000;text-shadow:0 5px #17321e}
-.subtitle{color:#bfd3bf;margin-top:5px}
-.preview{font-size:125px;margin:30px auto 12px;animation:float 1.5s ease-in-out infinite}
-@keyframes float{50%{transform:translateY(-12px) rotate(3deg)}}
-.stats{display:flex;justify-content:center;gap:12px;margin:10px 0 25px}
-.stat{background:#0006;border:1px solid #fff2;padding:12px 25px;border-radius:14px;font-weight:900}.coin{color:#ffd84d}
-.mainBtn{width:390px;height:62px;margin:8px;border-radius:15px;color:#fff;font-size:21px;font-weight:900}.start{background:#315fc9;box-shadow:0 5px #1d3b7e}.shop{background:#744dc4;box-shadow:0 5px #4b3081}
-#shop{padding:25px 35px}.top{display:flex;align-items:center;justify-content:space-between}.back{background:#354139;color:#fff;padding:11px 18px;border-radius:10px;font-weight:900}.title{font-size:40px;font-weight:1000}.shopCoin{color:#ffd84d;font-size:20px;font-weight:900}.section{font-size:23px;font-weight:900;margin:18px 0 10px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.item{background:#0005;border:1px solid #fff2;border-radius:15px;padding:12px;text-align:center}.emoji{font-size:48px;height:62px;display:flex;align-items:center;justify-content:center}.name{font-weight:900}.price{color:#ffd84d;margin:6px}.item button{width:100%;height:36px;border-radius:8px;background:#315fc9;color:#fff;font-weight:900}.item button.owned{background:#39784b}.item button.equipped{background:#a87927}
-#gameScreen{padding-top:4px}.header{height:58px;display:flex;justify-content:space-between;align-items:center;padding:0 25px;font-weight:900}.high{color:#ffd84d}
-#gameArea{width:680px;height:680px;margin:auto;position:relative}
-#board{position:absolute;inset:0;border:16px solid #254da5;border-radius:23px;overflow:hidden;background:radial-gradient(circle at 12% 16%,#77a94c 0 3px,transparent 4px),radial-gradient(circle at 27% 72%,#245d31 0 5px,transparent 6px),radial-gradient(circle at 72% 25%,#8bb64d 0 4px,transparent 5px),radial-gradient(circle at 88% 80%,#245d31 0 5px,transparent 6px),linear-gradient(135deg,#3f7934,#72a544 35%,#396e32 70%,#568d38);background-size:120px 140px,170px 180px,150px 160px,200px 190px,100% 100%;box-shadow:inset 0 0 45px #0004,0 12px 25px #0007}
-.hud{position:absolute;z-index:50;background:#000c;padding:8px 13px;border-radius:11px;font-weight:900}.score{left:14px;top:12px}.highbox{right:14px;top:12px;color:#ffd84d}.dash{left:50%;top:12px;transform:translateX(-50%);font-size:14px}.ready{color:#6eff91}.cool{color:#ff7777}
-#quest{position:absolute;right:14px;bottom:14px;z-index:50;width:190px;background:#000c;border:1px solid #fff2;border-radius:11px;padding:9px 11px;font-size:12px}.qtitle{color:#ffd84d;font-weight:900;margin-bottom:4px}.qreward{color:#ffd84d;margin-top:3px}
-#food{position:absolute;z-index:40;font-size:31px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;animation:pulse .65s ease-in-out infinite}
-@keyframes pulse{50%{transform:scale(1.14)}}
-#svg{position:absolute;inset:0;width:648px;height:648px;z-index:30;overflow:visible;pointer-events:none}
-.path{fill:none;stroke-width:36;stroke-linecap:round;stroke-linejoin:round}.shadow{stroke:#18386f55;stroke-width:46}.light{stroke:#fff5;stroke-width:5}.trail{stroke:#dcecff88;stroke-width:8;stroke-dasharray:13 13}
-#head{transform-origin:center;transform-box:fill-box}.eye{fill:#fff}.pupil{fill:#172044}
-#closed{fill:none;stroke:#112c64;stroke-width:3;stroke-linecap:round}#open{display:none}.mouth{fill:#101010;stroke:#071535;stroke-width:2}.tongue{fill:#ff4b55}.tooth{fill:#fff}
-.dashing .trail{animation:trail .2s linear infinite}@keyframes trail{to{stroke-dashoffset:-26px}}
-.wind{display:none;fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round}.dashing .wind{display:block}.w1{animation:wind .3s infinite}.w2{animation:wind .36s .08s infinite}.w3{animation:wind .42s .15s infinite}
-@keyframes wind{0%{opacity:0;transform:translateX(30px)}30%{opacity:.8}100%{opacity:0;transform:translateX(-40px)}}
-#crash{display:none;position:absolute;z-index:200;font-size:82px;transform:translate(-50%,-50%);animation:pop .45s}
-@keyframes pop{50%{transform:translate(-50%,-50%) scale(1.25)}}
-.shake{animation:shake .4s}@keyframes shake{20%{transform:translate(-8px,4px)}40%{transform:translate(8px,-4px)}60%{transform:translate(-6px,3px)}80%{transform:translate(6px,-3px)}}
-.overlay{position:absolute;inset:0;z-index:300;background:#000d;display:none;align-items:center;justify-content:center}.card{width:440px;background:#111a13;border:2px solid #3e5041;border-radius:24px;padding:38px;text-align:center;box-shadow:0 20px 50px #000a}.card h1{font-size:62px;margin:0 0 25px;font-weight:1000}.ob{display:block;width:280px;height:58px;margin:11px auto;border-radius:13px;color:#fff;font-size:20px;font-weight:900}.continue{background:#315fc9}.restart{background:#3d8b51}.home{background:#444c45}.die{color:#ff4545}
-#notice{display:none;position:absolute;z-index:500;left:50%;bottom:18px;transform:translateX(-50%);background:#152119;border:2px solid #47604b;border-radius:11px;padding:11px 18px;font-weight:900}
+*{
+    box-sizing:border-box;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+    background:#0b120d;
+    color:white;
+    font-family:Arial,"Noto Sans KR",sans-serif;
+    overflow:hidden;
+}
+
+button{
+    font-family:inherit;
+    cursor:pointer;
+    border:0;
+}
+
+#app{
+    width:760px;
+    min-height:850px;
+    margin:auto;
+    position:relative;
+}
+
+.screen{
+    display:none;
+    width:100%;
+    min-height:850px;
+}
+
+.screen.active{
+    display:block;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+#mainScreen{
+    text-align:center;
+    padding-top:55px;
+}
+
+.logo{
+    font-size:72px;
+    font-weight:1000;
+    letter-spacing:-4px;
+    text-shadow:0 5px 0 #182219;
+}
+
+.logoSub{
+    margin-top:-4px;
+    color:#91a695;
+    font-size:18px;
+}
+
+.mainWorm{
+    margin:35px auto 15px;
+    width:180px;
+    height:180px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:125px;
+    filter:drop-shadow(0 12px 10px rgba(0,0,0,.4));
+    animation:floatWorm 1.8s ease-in-out infinite;
+}
+
+@keyframes floatWorm{
+    0%,100%{transform:translateY(0) rotate(-3deg)}
+    50%{transform:translateY(-10px) rotate(3deg)}
+}
+
+.mainStats{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin:20px 0 30px;
+}
+
+.mainStat{
+    min-width:155px;
+    padding:13px 22px;
+    border:2px solid #304b35;
+    border-radius:15px;
+    background:#152119;
+    font-size:19px;
+    font-weight:800;
+}
+
+.coin{
+    color:#ffd84d;
+}
+
+.high{
+    color:#8bb7ff;
+}
+
+.mainButton{
+    width:360px;
+    height:65px;
+    margin:8px;
+    border-radius:15px;
+    color:white;
+    font-size:21px;
+    font-weight:900;
+    transition:.15s;
+}
+
+.mainButton:hover{
+    transform:scale(1.025);
+}
+
+.startButton{
+    background:#315fc9;
+    box-shadow:0 5px 0 #1e3d82;
+}
+
+.shopOpen{
+    background:#744cc0;
+    box-shadow:0 5px 0 #4b3180;
+}
+
+/* =========================
+   SHOP
+========================= */
+
+#shopScreen{
+    padding:25px 35px;
+}
+
+.pageTop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
+}
+
+.back{
+    background:#29352c;
+    color:white;
+    padding:11px 18px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.pageTitle{
+    font-size:43px;
+    font-weight:1000;
+}
+
+.shopCoin{
+    color:#ffd84d;
+    font-size:20px;
+    font-weight:900;
+}
+
+.sectionTitle{
+    font-size:25px;
+    font-weight:900;
+    margin:22px 0 12px;
+}
+
+.shopGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.shopItem{
+    background:#152119;
+    border:2px solid #304b35;
+    border-radius:15px;
+    padding:14px;
+    text-align:center;
+}
+
+.shopEmoji{
+    height:75px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:55px;
+}
+
+.shopName{
+    font-size:16px;
+    font-weight:900;
+    margin:4px 0;
+}
+
+.shopDesc{
+    font-size:12px;
+    color:#9aaa9e;
+    min-height:28px;
+}
+
+.shopPrice{
+    color:#ffd84d;
+    font-weight:bold;
+    margin:8px;
+}
+
+.shopBtn{
+    width:100%;
+    height:38px;
+    border-radius:8px;
+    background:#315fc9;
+    color:white;
+    font-weight:bold;
+}
+
+.shopBtn.owned{
+    background:#347548;
+}
+
+.shopBtn.equipped{
+    background:#c28727;
+}
+
+/* =========================
+   GAME
+========================= */
+
+#gameScreen{
+    min-height:850px;
+}
+
+.gameHeader{
+    width:720px;
+    margin:auto;
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+}
+
+.scoreBox{
+    font-size:19px;
+    font-weight:900;
+}
+
+.bestBox{
+    color:#ffd84d;
+    font-size:18px;
+    font-weight:900;
+}
+
+#gameWrapper{
+    position:relative;
+    width:680px;
+    height:680px;
+    margin:auto;
+}
+
+#board{
+    position:absolute;
+    left:20px;
+    top:15px;
+    width:640px;
+    height:640px;
+    border:10px solid #214e9c;
+    border-radius:20px;
+    overflow:hidden;
+    background:
+        linear-gradient(rgba(255,255,255,.045) 2px,transparent 2px),
+        linear-gradient(90deg,rgba(255,255,255,.045) 2px,transparent 2px),
+        #75b93d;
+    background-size:35px 35px;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.45),
+        inset 0 0 20px rgba(0,0,0,.2);
+}
+
+#snakeSvg{
+    position:absolute;
+    inset:0;
+    width:620px;
+    height:620px;
+    overflow:visible;
+}
+
+#snakeBody{
+    fill:none;
+    stroke:#315fc9;
+    stroke-width:28;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+#snakeHighlight{
+    fill:none;
+    stroke:#9ab9ff;
+    stroke-width:5;
+    stroke-linecap:round;
+    opacity:.8;
+}
+
+#head{
+    fill:#315fc9;
+}
+
+.eye{
+    fill:white;
+}
+
+.pupil{
+    fill:#111;
+}
+
+#normalMouth{
+    fill:none;
+    stroke:#111;
+    stroke-width:4;
+}
+
+#openMouth{
+    display:none;
+}
+
+#apple{
+    position:absolute;
+    z-index:20;
+    width:35px;
+    height:35px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    animation:applePulse .65s infinite;
+}
+
+@keyframes applePulse{
+    0%,100%{transform:scale(.85)}
+    50%{transform:scale(1.13)}
+}
+
+/* QUEST */
+
+#questBox{
+    position:absolute;
+    z-index:100;
+    right:20px;
+    top:18px;
+    width:190px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(0,0,0,.78);
+    border:1px solid rgba(255,255,255,.15);
+    font-size:12px;
+}
+
+.questTitle{
+    color:#ffd84d;
+    font-weight:900;
+    font-size:14px;
+    margin-bottom:5px;
+}
+
+.questReward{
+    color:#ffd84d;
+    margin-top:4px;
+}
+
+/* SKILL */
+
+#skillBox{
+    position:absolute;
+    z-index:100;
+    left:20px;
+    top:18px;
+    padding:9px 12px;
+    border-radius:12px;
+    background:rgba(0,0,0,.78);
+    font-size:12px;
+}
+
+.skillReady{
+    color:#68e985;
+    font-weight:bold;
+}
+
+.skillCool{
+    color:#ffd84d;
+    font-weight:bold;
+}
+
+/* WIND */
+
+.wind{
+    position:absolute;
+    z-index:150;
+    height:4px;
+    border-radius:4px;
+    background:white;
+    opacity:0;
+    pointer-events:none;
+}
+
+.wind.active{
+    animation:slash .25s linear infinite;
+}
+
+@keyframes slash{
+    0%{
+        opacity:0;
+        transform:translateX(-40px) rotate(-15deg);
+    }
+    25%{
+        opacity:.9;
+    }
+    100%{
+        opacity:0;
+        transform:translateX(80px) rotate(-15deg);
+    }
+}
+
+/* PAUSE / DEATH */
+
+.overlay{
+    display:none;
+    position:absolute;
+    z-index:500;
+    inset:0;
+    background:rgba(0,0,0,.82);
+    justify-content:center;
+    align-items:center;
+}
+
+.overlay.active{
+    display:flex;
+}
+
+.overlayCard{
+    width:450px;
+    padding:38px;
+    border-radius:25px;
+    background:#101711;
+    border:2px solid #3b4e3e;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.7);
+}
+
+.overlayCard h1{
+    margin:0 0 30px;
+    font-size:65px;
+    font-weight:1000;
+}
+
+.pauseBtn,
+.deathBtn{
+    display:block;
+    width:290px;
+    height:55px;
+    margin:11px auto;
+    border-radius:12px;
+    color:white;
+    font-size:18px;
+    font-weight:900;
+}
+
+.continueBtn{
+    background:#315fc9;
+}
+
+.restartBtn{
+    background:#38834c;
+}
+
+.mainBackBtn{
+    background:#39423b;
+}
+
+.deathTitle{
+    color:#ff4545;
+}
+
+#boom{
+    display:none;
+    position:absolute;
+    z-index:450;
+    font-size:80px;
+    pointer-events:none;
+    animation:boom .55s ease-out;
+}
+
+@keyframes boom{
+    0%{transform:scale(.3);opacity:0}
+    40%{transform:scale(1.25);opacity:1}
+    100%{transform:scale(1);opacity:1}
+}
+
+#notification{
+    position:fixed;
+    z-index:1000;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%);
+    padding:13px 24px;
+    border-radius:12px;
+    background:#1c291e;
+    border:2px solid #49624c;
+    font-weight:900;
+    display:none;
+}
+
+@media(max-width:780px){
+    #app{
+        transform:scale(.9);
+        transform-origin:top center;
+    }
+}
 </style>
 </head>
+
 <body>
+
 <div id="app">
-<div class="tree" style="left:-55px;top:-50px"></div><div class="tree" style="left:150px;top:-65px"></div><div class="tree" style="left:360px;top:-55px"></div><div class="tree" style="right:-55px;top:-45px"></div><div class="tree" style="right:-65px;top:220px"></div><div class="tree" style="left:-65px;top:470px"></div>
 
-<section id="main" class="screen active">
-<div class="logo">🪱 WORM QUEST</div><div class="subtitle">숲속에서 살아남아라</div>
-<div class="preview" id="preview">🪱</div>
-<div class="stats"><div class="stat">🪙 <span id="mainCoins">0</span></div><div class="stat">🏆 <span id="mainHigh">0</span></div></div>
-<button class="mainBtn start" onclick="startGame()">🎮 게임 시작하기</button><br>
-<button class="mainBtn shop" onclick="openShop()">🛒 상점</button>
+<!-- ================= MAIN ================= -->
+
+<section id="mainScreen" class="screen active">
+
+    <div class="logo">🪱 WORM QUEST</div>
+    <div class="logoSub">먹고 · 성장하고 · 질주하라</div>
+
+    <div class="mainWorm" id="mainWorm">🪱</div>
+
+    <div class="mainStats">
+
+        <div class="mainStat">
+            🪙 <span id="mainCoins">0</span>
+        </div>
+
+        <div class="mainStat">
+            🏆 <span id="mainHigh">0</span>
+        </div>
+
+    </div>
+
+    <button
+        class="mainButton startButton"
+        onclick="startGame()">
+        🎮 게임 시작하기
+    </button>
+
+    <br>
+
+    <button
+        class="mainButton shopOpen"
+        onclick="openShop()">
+        🛒 상점
+    </button>
+
 </section>
 
-<section id="shop" class="screen">
-<div class="top"><button class="back" onclick="show('main')">← 메인으로</button><div class="title">🛒 상점</div><div class="shopCoin">🪙 <span id="shopCoins">0</span></div></div>
-<div class="section">🪱 지렁이 외형</div><div id="wormGrid" class="grid"></div>
-<div class="section">⚡ 스킬 변경</div><div id="skillGrid" class="grid"></div>
+
+<!-- ================= SHOP ================= -->
+
+<section id="shopScreen" class="screen">
+
+    <div class="pageTop">
+
+        <button
+            class="back"
+            onclick="showScreen('mainScreen')">
+            ← 메인으로
+        </button>
+
+        <div class="pageTitle">🛒 상점</div>
+
+        <div class="shopCoin">
+            🪙 <span id="shopCoins">0</span>
+        </div>
+
+    </div>
+
+    <div class="sectionTitle">🪱 지렁이 외형</div>
+
+    <div
+        class="shopGrid"
+        id="wormShop">
+    </div>
+
+    <div class="sectionTitle">⚡ 스킬 변경</div>
+
+    <div
+        class="shopGrid"
+        id="skillShop">
+    </div>
+
 </section>
+
+
+<!-- ================= GAME ================= -->
 
 <section id="gameScreen" class="screen">
-<div class="header"><div>🍎 점수: <span id="hScore">0</span>　🪙 <span id="gCoins">0</span></div><div class="high">🏆 최고기록: <span id="hHigh">0</span></div></div>
-<div id="gameArea">
-<div id="board">
-<div class="hud score">🍎 <span id="score">0</span></div>
-<div class="hud highbox">🏆 <span id="high">0</span></div>
-<div class="hud dash">⚡ 질주: <span id="dashStatus" class="ready">준비</span></div>
-<div id="quest"><div class="qtitle">📜 QUEST</div><div id="qtext">-</div><div class="qreward">🪙 보상: <span id="qreward">0</span></div></div>
-<div id="food">🍎</div>
-<svg id="svg" viewBox="0 0 648 648">
-<path id="shadow" class="path shadow"></path><path id="body" class="path"></path><path id="light" class="path light"></path><path id="trail" class="path trail"></path>
-<g class="wind"><path class="w1" d="M5 20 Q-30 5 -65 15"></path><path class="w2" d="M0 0 Q-40 -10 -80 0"></path><path class="w3" d="M5 -20 Q-30 -5 -65 -15"></path></g>
-<g id="head">
-<path d="M-18-21Q4-28 21-15Q34 0 21 15Q4 28-18 21Q-30 11-30 0Q-30-11-18-21Z" id="headFill" fill="#315fc9" stroke="#244a9f" stroke-width="3"></path>
-<circle class="eye" cx="4" cy="-18" r="10"></circle><circle class="eye" cx="4" cy="18" r="10"></circle><circle class="pupil" cx="7" cy="-17" r="4.5"></circle><circle class="pupil" cx="7" cy="17" r="4.5"></circle>
-<path id="closed" d="M16-5Q23 0 16 5"></path>
-<g id="open"><path class="mouth" d="M12-9Q25-12 29 0Q25 12 12 9Q17 0 12-9Z"></path><path class="tongue" d="M15 3Q21 0 26 4Q22 12 16 7Z"></path><path class="tooth" d="M16-8L20-2L23-8Z"></path><path class="tooth" d="M22-8L25-2L28-7Z"></path></g>
-</g></svg>
-<div id="crash">💥</div>
-<div id="pause" class="overlay"><div class="card"><h1>일시정지</h1><button class="ob continue" onclick="resumeGame()">▶️ 계속하기</button><button class="ob restart" onclick="restart()">🔄 다시하기</button></div></div>
-<div id="over" class="overlay"><div class="card"><h1 class="die">YOU DIE</h1><h2>점수: <span id="final">0</span></h2><h2>🏆 최고기록: <span id="finalHigh">0</span></h2><button class="ob restart" onclick="restart()">🔄 다시하기</button><button class="ob home" onclick="home()">🏠 메인으로</button></div></div>
-</div></div>
+
+    <div class="gameHeader">
+
+        <div class="scoreBox">
+            점수:
+            <span id="score">0</span>
+            &nbsp;&nbsp;
+            🪙 <span id="gameCoins">0</span>
+        </div>
+
+        <div class="bestBox">
+            🏆 최고기록:
+            <span id="gameHigh">0</span>
+        </div>
+
+    </div>
+
+    <div id="gameWrapper">
+
+        <div id="board">
+
+            <div id="skillBox">
+                ⚡ <span id="skillName">질주</span>
+                <br>
+                <span
+                    id="skillStatus"
+                    class="skillReady">
+                    READY
+                </span>
+            </div>
+
+            <div id="questBox">
+                <div class="questTitle">📜 QUEST</div>
+
+                <div id="questText">
+                    사과 먹기 0/5
+                </div>
+
+                <div class="questReward">
+                    🪙 보상:
+                    <span id="questReward">80</span>
+                </div>
+            </div>
+
+            <div id="apple">🍎</div>
+
+            <svg id="snakeSvg"
+                 viewBox="0 0 620 620">
+
+                <path id="snakeBody"></path>
+                <path id="snakeHighlight"></path>
+
+                <g id="headGroup">
+
+                    <circle
+                        id="head"
+                        cx="0"
+                        cy="0"
+                        r="18">
+                    </circle>
+
+                    <circle
+                        class="eye"
+                        cx="7"
+                        cy="-11"
+                        r="7">
+                    </circle>
+
+                    <circle
+                        class="eye"
+                        cx="7"
+                        cy="11"
+                        r="7">
+                    </circle>
+
+                    <circle
+                        class="pupil"
+                        cx="9"
+                        cy="-11"
+                        r="3">
+                    </circle>
+
+                    <circle
+                        class="pupil"
+                        cx="9"
+                        cy="11"
+                        r="3">
+                    </circle>
+
+                    <path
+                        id="normalMouth"
+                        d="M12,-4 Q20,0 12,4">
+                    </path>
+
+                    <g id="openMouth">
+
+                        <ellipse
+                            cx="15"
+                            cy="0"
+                            rx="11"
+                            ry="9"
+                            fill="#111">
+                        </ellipse>
+
+                        <path
+                            d="M8,3 Q15,12 22,3"
+                            stroke="#ff5265"
+                            stroke-width="3"
+                            fill="none">
+                        </path>
+
+                    </g>
+
+                </g>
+
+            </svg>
+
+            <div
+                id="boom">
+                💥
+            </div>
+
+            <div
+                class="wind"
+                id="wind1"
+                style="left:100px;top:250px;width:100px">
+            </div>
+
+            <div
+                class="wind"
+                id="wind2"
+                style="left:410px;top:320px;width:80px">
+            </div>
+
+            <div
+                class="wind"
+                id="wind3"
+                style="left:160px;top:410px;width:90px">
+            </div>
+
+            <!-- PAUSE -->
+
+            <div
+                id="pauseOverlay"
+                class="overlay">
+
+                <div class="overlayCard">
+
+                    <h1>일시정지</h1>
+
+                    <button
+                        class="pauseBtn continueBtn"
+                        onclick="continueGame()">
+                        ▶️ 계속하기
+                    </button>
+
+                    <button
+                        class="pauseBtn restartBtn"
+                        onclick="restartGame()">
+                        🔄 다시하기
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- DEATH -->
+
+            <div
+                id="deathOverlay"
+                class="overlay">
+
+                <div class="overlayCard">
+
+                    <h1 class="deathTitle">
+                        YOU DIE
+                    </h1>
+
+                    <h2>
+                        점수:
+                        <span id="finalScore">
+                            0
+                        </span>
+                    </h2>
+
+                    <button
+                        class="deathBtn restartBtn"
+                        onclick="restartGame()">
+                        🔄 다시하기
+                    </button>
+
+                    <button
+                        class="deathBtn mainBackBtn"
+                        onclick="showScreen('mainScreen')">
+                        🏠 메인으로
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </section>
-<div id="notice"></div>
+
+<div id="notification"></div>
+
 </div>
 
+
 <script>
-const GRID=36,COLS=18,ROWS=18,NORMAL=155,DASH_DURATION=2000,COOLDOWN=10000;
-const worms={
-basic:{name:"기본 지렁이",emoji:"🪱",color:"#315fc9",price:0},
-fire:{name:"화염 지렁이",emoji:"🔥",color:"#e94a32",price:500},
-lightning:{name:"번개 지렁이",emoji:"⚡",color:"#e7ca36",price:1000},
-ghost:{name:"유령 지렁이",emoji:"👻",color:"#a879e8",price:1500},
-rainbow:{name:"무지개 지렁이",emoji:"🌈",color:"#e35db7",price:2000},
-dragon:{name:"용 지렁이",emoji:"🐉",color:"#df4b45",price:2500}
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const worms = {
+
+    basic:{
+        name:"기본 지렁이",
+        emoji:"🪱",
+        color:"#315fc9",
+        price:0
+    },
+
+    fire:{
+        name:"화염 지렁이",
+        emoji:"🔥",
+        color:"#e34b32",
+        price:500
+    },
+
+    lightning:{
+        name:"번개 지렁이",
+        emoji:"⚡",
+        color:"#e4c52e",
+        price:1000
+    },
+
+    ghost:{
+        name:"유령 지렁이",
+        emoji:"👻",
+        color:"#a879e8",
+        price:1500
+    },
+
+    rainbow:{
+        name:"무지개 지렁이",
+        emoji:"🌈",
+        color:"#e35db7",
+        price:2000
+    },
+
+    dragon:{
+        name:"용 지렁이",
+        emoji:"🐉",
+        color:"#df4a45",
+        price:2500
+    }
+
 };
-const skills={
-dash:{name:"질주",price:0,speed:65},
-turbo:{name:"터보 질주",price:700,speed:50},
-wind:{name:"윈드 러너",price:1200,speed:42},
-flash:{name:"플래시",price:1800,speed:32}
+
+const skills = {
+
+    dash:{
+        name:"질주",
+        desc:"LShift 홀드",
+        price:0
+    },
+
+    turbo:{
+        name:"터보 질주",
+        desc:"더 빠른 질주",
+        price:700
+    },
+
+    wind:{
+        name:"윈드 러너",
+        desc:"강력한 바람 효과",
+        price:1200
+    },
+
+    flash:{
+        name:"플래시",
+        desc:"최고속 질주",
+        price:1800
+    }
+
 };
-const pool=[
-{type:"apple",text:"🍎 사과 먹기",target:5,reward:80},
-{type:"apple",text:"🍎 사과 먹기",target:10,reward:150},
-{type:"apple",text:"🍎 사과 먹기",target:15,reward:200},
-{type:"score",text:"🏆 점수 달성",target:10,reward:100},
-{type:"score",text:"🏆 점수 달성",target:20,reward:180},
-{type:"score",text:"🏆 점수 달성",target:30,reward:200},
-{type:"length",text:"🪱 몸 길이 늘리기",target:8,reward:100},
-{type:"length",text:"🪱 몸 길이 늘리기",target:12,reward:150},
-{type:"length",text:"🪱 몸 길이 늘리기",target:18,reward:200}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+let coins =
+    Number(localStorage.getItem("wormCoins") || 0);
+
+let highScore =
+    Number(localStorage.getItem("wormHighScore") || 0);
+
+let equippedWorm =
+    localStorage.getItem("wormEquipped") || "basic";
+
+let equippedSkill =
+    localStorage.getItem("wormSkill") || "dash";
+
+let ownedWorms =
+    JSON.parse(
+        localStorage.getItem("wormOwned") ||
+        '["basic"]'
+    );
+
+let ownedSkills =
+    JSON.parse(
+        localStorage.getItem("skillOwned") ||
+        '["dash"]'
+    );
+
+
+/* =========================================================
+   QUEST DATA
+========================================================= */
+
+const questPool = [
+
+    {
+        type:"apple",
+        text:"🍎 사과 먹기",
+        target:5,
+        reward:80
+    },
+
+    {
+        type:"apple",
+        text:"🍎 사과 먹기",
+        target:10,
+        reward:150
+    },
+
+    {
+        type:"apple",
+        text:"🍎 사과 먹기",
+        target:15,
+        reward:200
+    },
+
+    {
+        type:"score",
+        text:"🏆 점수 달성",
+        target:10,
+        reward:100
+    },
+
+    {
+        type:"score",
+        text:"🏆 점수 달성",
+        target:20,
+        reward:180
+    },
+
+    {
+        type:"score",
+        text:"🏆 점수 달성",
+        target:30,
+        reward:200
+    },
+
+    {
+        type:"length",
+        text:"🪱 몸 길이 늘리기",
+        target:8,
+        reward:100
+    },
+
+    {
+        type:"length",
+        text:"🪱 몸 길이 늘리기",
+        target:12,
+        reward:150
+    },
+
+    {
+        type:"length",
+        text:"🪱 몸 길이 늘리기",
+        target:18,
+        reward:200
+    }
+
 ];
-let coins=Number(localStorage.getItem("wqCoins")||0);
-let highScore=Number(localStorage.getItem("wqHigh")||0);
-let equippedWorm=localStorage.getItem("wqWorm")||"basic";
-let equippedSkill=localStorage.getItem("wqSkill")||"dash";
-let ownedWorms=JSON.parse(localStorage.getItem("wqWorms")||'["basic"]');
-let ownedSkills=JSON.parse(localStorage.getItem("wqSkills")||'["dash"]');
-let quests=JSON.parse(localStorage.getItem("wqQuests")||"null");
-let snake=[],previous=[],food={x:10,y:9},direction={x:1,y:0},nextDirection={x:1,y:0};
-let score=0,dead=false,paused=false,running=false,dashing=false,shiftHeld=false,dashEnd=0,lastDash=-Infinity,lastMove=0,raf=0;
-const $=id=>document.getElementById(id);
 
-function save(){localStorage.setItem("wqCoins",coins);localStorage.setItem("wqHigh",highScore);localStorage.setItem("wqWorm",equippedWorm);localStorage.setItem("wqSkill",equippedSkill);localStorage.setItem("wqWorms",JSON.stringify(ownedWorms));localStorage.setItem("wqSkills",JSON.stringify(ownedSkills));localStorage.setItem("wqQuests",JSON.stringify(quests));updateUI()}
-function updateUI(){$("mainCoins").textContent=coins;$("shopCoins").textContent=coins;$("mainHigh").textContent=highScore;$("gCoins").textContent=coins;$("hHigh").textContent=highScore;$("high").textContent=highScore;$("preview").textContent=worms[equippedWorm].emoji}
-function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");updateUI()}
-function openShop(){renderShop();show("shop")}
-function notify(t){const n=$("notice");n.textContent=t;n.style.display="block";clearTimeout(window.nt);window.nt=setTimeout(()=>n.style.display="none",1800)}
-function renderShop(){
-let wh="";Object.entries(worms).forEach(([id,x])=>{const owned=ownedWorms.includes(id),eq=equippedWorm===id;wh+=`<div class="item"><div class="emoji">${x.emoji}</div><div class="name">${x.name}</div><div class="price">${x.price?`🪙 ${x.price}`:"무료"}</div><button class="${eq?"equipped":owned?"owned":""}" onclick="buyWorm('${id}')">${eq?"장착 중":owned?"장착하기":"구매"}</button></div>`});$("wormGrid").innerHTML=wh;
-let sh="";Object.entries(skills).forEach(([id,x])=>{const owned=ownedSkills.includes(id),eq=equippedSkill===id;sh+=`<div class="item"><div class="emoji">⚡</div><div class="name">${x.name}</div><div class="price">${x.price?`🪙 ${x.price}`:"무료"}</div><button class="${eq?"equipped":owned?"owned":""}" onclick="buySkill('${id}')">${eq?"사용 중":owned?"변경하기":"구매"}</button></div>`});$("skillGrid").innerHTML=sh}
-function buyWorm(id){const x=worms[id];if(ownedWorms.includes(id)){equippedWorm=id;applyWorm();save();renderShop();notify(x.name+" 장착!");return}if(coins<x.price){notify("🪙 코인이 부족합니다!");return}coins-=x.price;ownedWorms.push(id);equippedWorm=id;applyWorm();save();renderShop();notify(x.name+" 구매 완료!")}
-function buySkill(id){const x=skills[id];if(ownedSkills.includes(id)){equippedSkill=id;save();renderShop();notify(x.name+"으로 변경!");return}if(coins<x.price){notify("🪙 코인이 부족합니다!");return}coins-=x.price;ownedSkills.push(id);equippedSkill=id;save();renderShop();notify(x.name+" 구매 완료!")}
-function applyWorm(){const c=worms[equippedWorm].color;$("body").style.stroke=c;$("headFill").style.fill=c}
-function newQuests(){const arr=[...pool];quests=[];for(let i=0;i<3;i++){const n=Math.floor(Math.random()*arr.length);quests.push({...arr[n],progress:0});arr.splice(n,1)}save()}
-if(!Array.isArray(quests)||quests.length!==3)newQuests();
-function updateQuestUI(){const q=quests.find(x=>x.progress<x.target)||quests[0];$("qtext").textContent=`${q.text} ${Math.min(q.progress,q.target)}/${q.target}`;$("qreward").textContent=Math.min(q.reward,200)}
-function questProgress(){
-quests.forEach(q=>{if(q.type==="apple"||q.type==="score")q.progress=score;if(q.type==="length")q.progress=snake.length});
-for(let i=0;i<quests.length;i++)if(quests[i].progress>=quests[i].target){const reward=Math.min(quests[i].reward,200);coins+=reward;notify(`🎉 퀘스트 완료! +${reward} 🪙`);const candidates=pool.filter(p=>!quests.some(q=>q.type===p.type&&q.target===p.target));const list=candidates.length?candidates:pool;const r=list[Math.floor(Math.random()*list.length)];quests[i]={...r,progress:0};break}save();updateQuestUI()
+let quests =
+    JSON.parse(
+        localStorage.getItem("wormQuests") || "null"
+    );
+
+
+function makeInitialQuests(){
+
+    quests = [];
+
+    const pool = [...questPool];
+
+    for(let i=0;i<3;i++){
+
+        const index =
+            Math.floor(
+                Math.random()*pool.length
+            );
+
+        quests.push({
+            ...pool[index],
+            progress:0
+        });
+
+        pool.splice(index,1);
+
+    }
+
+    saveQuests();
+
 }
-function resetSnake(){snake=[{x:7,y:9},{x:6,y:9},{x:5,y:9},{x:4,y:9},{x:3,y:9}];previous=snake.map(p=>({...p}))}
-function createFood(){do{food={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)}}while(snake.some(p=>p.x===food.x&&p.y===food.y))}
-function distanceToFood(){const h=snake[0];return Math.max(Math.abs(h.x-food.x),Math.abs(h.y-food.y))}
-function updateMouth(){const near=distanceToFood()<=2;$("closed").style.display=near?"none":"block";$("open").style.display=near?"block":"none"}
-function lerp(a,b,t){return a+(b-a)*t}
-function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
-function animated(progress){const t=ease(Math.max(0,Math.min(1,progress)));return snake.map((p,i)=>{const o=previous[i]||p;return{x:lerp(o.x,p.x,t),y:lerp(o.y,p.y,t)}})}
-function pathFor(parts){if(parts.length<2)return"";const pts=[...parts].reverse().map(p=>({x:p.x*GRID+18,y:p.y*GRID+18}));let d=`M ${pts[0].x} ${pts[0].y}`;for(let i=1;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],mx=(a.x+b.x)/2,my=(a.y+b.y)/2;d+=` Q ${a.x} ${a.y} ${mx} ${my}`}const z=pts[pts.length-1];return d+` L ${z.x} ${z.y}`}
-function angle(){if(direction.x===1)return 0;if(direction.y===1)return 90;if(direction.x===-1)return 180;return -90}
-function render(progress=1){const a=animated(progress),d=pathFor(a);$("body").setAttribute("d",d);$("shadow").setAttribute("d",d);$("light").setAttribute("d",d);$("trail").setAttribute("d",d);const h=a[0],x=h.x*GRID+18,y=h.y*GRID+18;$("head").setAttribute("transform",`translate(${x} ${y}) rotate(${angle()})`);$("food").style.left=(food.x*GRID+7)+"px";$("food").style.top=(food.y*GRID+7)+"px";$("score").textContent=score;$("hScore").textContent=score;updateMouth()}
-function move(){if(dead||paused||!running)return;direction={...nextDirection};const h=snake[0],nh={x:h.x+direction.x,y:h.y+direction.y};if(nh.x<0||nh.x>=COLS||nh.y<0||nh.y>=ROWS||snake.some(p=>p.x===nh.x&&p.y===nh.y)){crash(nh);return}previous=snake.map(p=>({...p}));snake.unshift(nh);if(nh.x===food.x&&nh.y===food.y){score++;if(score>highScore)highScore=score;createFood();questProgress()}else snake.pop();lastMove=performance.now();render(0)}
-function moveTime(){return dashing?skills[equippedSkill].speed:NORMAL}
-function loop(t){if(!running||paused||dead)return;if(dashing&&t>=dashEnd)stopDash();const mt=moveTime();if(t-lastMove>=mt)move();render(Math.min((t-lastMove)/mt,1));dashUI();raf=requestAnimationFrame(loop)}
-function startGame(){show("gameScreen");score=0;dead=false;paused=false;running=true;dashing=false;shiftHeld=false;lastDash=-Infinity;direction={x:1,y:0};nextDirection={x:1,y:0};$("pause").style.display="none";$("over").style.display="none";$("crash").style.display="none";resetSnake();createFood();lastMove=performance.now();applyWorm();updateQuestUI();render(1);cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}
-function restart(){startGame()}
-function pauseGame(){if(!running||dead||paused)return;paused=true;cancelAnimationFrame(raf);raf=0;$("pause").style.display="flex"}
-function resumeGame(){if(dead)return;paused=false;$("pause").style.display="none";lastMove=performance.now();raf=requestAnimationFrame(loop)}
-function home(){running=false;paused=false;dashing=false;shiftHeld=false;$("pause").style.display="none";$("over").style.display="none";show("main")}
-function startDash(){if(!running||paused||dead||dashing)return;const now=performance.now();if(now-lastDash<COOLDOWN)return;dashing=true;lastDash=now;dashEnd=now+DASH_DURATION;$("board").classList.add("dashing");lastMove=now}
-function stopDash(){dashing=false;$("board").classList.remove("dashing")}
-function dashUI(){const now=performance.now();if(dashing){$("dashStatus").textContent=`🔥 ${Math.max(0,(dashEnd-now)/1000).toFixed(1)}초`;$("dashStatus").className="cool";return}if(lastDash===-Infinity||now-lastDash>=COOLDOWN){$("dashStatus").textContent="준비";$("dashStatus").className="ready"}else{$("dashStatus").textContent=`쿨타임 ${Math.ceil((COOLDOWN-(now-lastDash))/1000)}초`;$("dashStatus").className="cool"}}
-function crash(p){dead=true;running=false;stopDash();$("crash").style.left=(p.x*GRID+18)+"px";$("crash").style.top=(p.y*GRID+18)+"px";$("crash").style.display="block";$("board").classList.add("shake");if(score>highScore)highScore=score;setTimeout(()=>{$("board").classList.remove("shake");$("final").textContent=score;$("finalHigh").textContent=highScore;$("over").style.display="flex";save()},450)}
-window.addEventListener("keydown",e=>{
-const k=e.key.toLowerCase();
-if(e.code==="Escape"){e.preventDefault();if($("gameScreen").classList.contains("active"))paused?resumeGame():pauseGame();return}
-if(e.code==="ShiftLeft"){e.preventDefault();if(!shiftHeld){shiftHeld=true;startDash()}return}
-if(!running||paused||dead)return;
-if((k==="w"||k==="arrowup")&&direction.y!==1)nextDirection={x:0,y:-1};
-else if((k==="s"||k==="arrowdown")&&direction.y!==-1)nextDirection={x:0,y:1};
-else if((k==="a"||k==="arrowleft")&&direction.x!==1)nextDirection={x:-1,y:0};
-else if((k==="d"||k==="arrowright")&&direction.x!==-1)nextDirection={x:1,y:0};
-});
-window.addEventListener("keyup",e=>{if(e.code==="ShiftLeft"){shiftHeld=false;if(dashing)stopDash()}});
-window.addEventListener("blur",()=>{shiftHeld=false;if(dashing)stopDash()});
-updateUI();renderShop();applyWorm();updateQuestUI();
+
+
+function saveQuests(){
+
+    localStorage.setItem(
+        "wormQuests",
+        JSON.stringify(quests)
+    );
+
+}
+
+
+if(
+    !Array.isArray(quests) ||
+    quests.length !== 3
+){
+    makeInitialQuests();
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function updateUI(){
+
+    document.getElementById(
+        "mainCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "shopCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "gameCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "mainHigh"
+    ).textContent = highScore;
+
+    document.getElementById(
+        "gameHigh"
+    ).textContent = highScore;
+
+    document.getElementById(
+        "mainWorm"
+    ).textContent =
+        worms[equippedWorm].emoji;
+
+    document.getElementById(
+        "skillName"
+    ).textContent =
+        skills[equippedSkill].name;
+
+}
+
+
+function saveEverything(){
+
+    localStorage.setItem(
+        "wormCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "wormHighScore",
+        highScore
+    );
+
+    localStorage.setItem(
+        "wormEquipped",
+        equippedWorm
+    );
+
+    localStorage.setItem(
+        "wormSkill",
+        equippedSkill
+    );
+
+    localStorage.setItem(
+        "wormOwned",
+        JSON.stringify(ownedWorms)
+    );
+
+    localStorage.setItem(
+        "skillOwned",
+        JSON.stringify(ownedSkills)
+    );
+
+    saveQuests();
+
+    updateUI();
+
+}
+
+
+function showScreen(id){
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(
+            screen =>
+                screen.classList.remove("active")
+        );
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+
+    updateUI();
+
+    if(id === "shopScreen"){
+        renderShop();
+    }
+
+}
+
+
+function openShop(){
+
+    showScreen("shopScreen");
+
+}
+
+
+/* =========================================================
+   SHOP
+========================================================= */
+
+function renderShop(){
+
+    let wormHTML = "";
+
+    Object.entries(worms).forEach(
+        ([id,worm]) => {
+
+            const owned =
+                ownedWorms.includes(id);
+
+            const equipped =
+                equippedWorm === id;
+
+            let text =
+                equipped
+                ? "장착 중"
+                : owned
+                ? "장착하기"
+                : "구매";
+
+            let cls =
+                equipped
+                ? "equipped"
+                : owned
+                ? "owned"
+                : "";
+
+            wormHTML += `
+
+                <div class="shopItem">
+
+                    <div
+                        class="shopEmoji"
+                        style="color:${worm.color}">
+                        ${worm.emoji}
+                    </div>
+
+                    <div class="shopName">
+                        ${worm.name}
+                    </div>
+
+                    <div class="shopPrice">
+                        ${
+                            worm.price === 0
+                            ? "무료"
+                            : "🪙 " + worm.price
+                        }
+                    </div>
+
+                    <button
+                        class="shopBtn ${cls}"
+                        onclick="buyWorm('${id}')">
+                        ${text}
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+    document.getElementById(
+        "wormShop"
+    ).innerHTML = wormHTML;
+
+
+    let skillHTML = "";
+
+    Object.entries(skills).forEach(
+        ([id,skill]) => {
+
+            const owned =
+                ownedSkills.includes(id);
+
+            const equipped =
+                equippedSkill === id;
+
+            let text =
+                equipped
+                ? "사용 중"
+                : owned
+                ? "변경하기"
+                : "구매";
+
+            let cls =
+                equipped
+                ? "equipped"
+                : owned
+                ? "owned"
+                : "";
+
+            skillHTML += `
+
+                <div class="shopItem">
+
+                    <div class="shopEmoji">
+                        ⚡
+                    </div>
+
+                    <div class="shopName">
+                        ${skill.name}
+                    </div>
+
+                    <div class="shopDesc">
+                        ${skill.desc}
+                    </div>
+
+                    <div class="shopPrice">
+                        ${
+                            skill.price === 0
+                            ? "무료"
+                            : "🪙 " + skill.price
+                        }
+                    </div>
+
+                    <button
+                        class="shopBtn ${cls}"
+                        onclick="buySkill('${id}')">
+                        ${text}
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+    document.getElementById(
+        "skillShop"
+    ).innerHTML = skillHTML;
+
+}
+
+
+function buyWorm(id){
+
+    const item = worms[id];
+
+    if(ownedWorms.includes(id)){
+
+        equippedWorm = id;
+
+        applyWorm();
+
+        saveEverything();
+
+        notify(
+            item.name + " 장착!"
+        );
+
+        renderShop();
+
+        return;
+
+    }
+
+    if(coins < item.price){
+
+        notify("🪙 코인이 부족합니다!");
+
+        return;
+
+    }
+
+    coins -= item.price;
+
+    ownedWorms.push(id);
+
+    equippedWorm = id;
+
+    applyWorm();
+
+    saveEverything();
+
+    notify(
+        item.name + " 구매 완료!"
+    );
+
+    renderShop();
+
+}
+
+
+function buySkill(id){
+
+    const item = skills[id];
+
+    if(ownedSkills.includes(id)){
+
+        equippedSkill = id;
+
+        saveEverything();
+
+        notify(
+            item.name + "으로 변경!"
+        );
+
+        renderShop();
+
+        return;
+
+    }
+
+    if(coins < item.price){
+
+        notify("🪙 코인이 부족합니다!");
+
+        return;
+
+    }
+
+    coins -= item.price;
+
+    ownedSkills.push(id);
+
+    equippedSkill = id;
+
+    saveEverything();
+
+    notify(
+        item.name + " 구매 완료!"
+    );
+
+    renderShop();
+
+}
+
+
+function applyWorm(){
+
+    const color =
+        worms[equippedWorm].color;
+
+    document.getElementById(
+        "snakeBody"
+    ).style.stroke = color;
+
+    document.getElementById(
+        "head"
+    ).style.fill = color;
+
+}
+
+
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+let notificationTimer = null;
+
+function notify(text){
+
+    const box =
+        document.getElementById(
+            "notification"
+        );
+
+    box.textContent = text;
+
+    box.style.display = "block";
+
+    clearTimeout(notificationTimer);
+
+    notificationTimer =
+        setTimeout(
+            () => {
+                box.style.display = "none";
+            },
+            1800
+        );
+
+}
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+const GRID = 18;
+const CELL = 34;
+
+let snake = [];
+let previousSnake = [];
+
+let direction = {
+    x:1,
+    y:0
+};
+
+let nextDirection = {
+    x:1,
+    y:0
+};
+
+let apple = {
+    x:10,
+    y:8
+};
+
+let score = 0;
+
+let gameRunning = false;
+let paused = false;
+let dead = false;
+
+let lastMoveTime = 0;
+
+let dashActive = false;
+let shiftHeld = false;
+let dashStartTime = 0;
+let lastDashTime = -10000;
+
+
+/* =========================================================
+   START / RESTART
+========================================================= */
+
+function startGame(){
+
+    showScreen("gameScreen");
+
+    snake = [
+        {x:8,y:9},
+        {x:7,y:9},
+        {x:6,y:9},
+        {x:5,y:9},
+        {x:4,y:9}
+    ];
+
+    previousSnake =
+        snake.map(
+            point => ({...point})
+        );
+
+    direction = {
+        x:1,
+        y:0
+    };
+
+    nextDirection = {
+        x:1,
+        y:0
+    };
+
+    score = 0;
+
+    gameRunning = true;
+    paused = false;
+    dead = false;
+
+    dashActive = false;
+    shiftHeld = false;
+
+    document.getElementById(
+        "score"
+    ).textContent = "0";
+
+    document.getElementById(
+        "pauseOverlay"
+    ).classList.remove("active");
+
+    document.getElementById(
+        "deathOverlay"
+    ).classList.remove("active");
+
+    document.getElementById(
+        "boom"
+    ).style.display = "none";
+
+    spawnApple();
+
+    lastMoveTime =
+        performance.now();
+
+    applyWorm();
+
+    updateQuestUI();
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+
+function restartGame(){
+
+    startGame();
+
+}
+
+
+/* =========================================================
+   APPLE
+========================================================= */
+
+function spawnApple(){
+
+    let valid = false;
+
+    while(!valid){
+
+        apple = {
+            x:Math.floor(
+                Math.random()*GRID
+            ),
+            y:Math.floor(
+                Math.random()*GRID
+            )
+        };
+
+        valid =
+            !snake.some(
+                point =>
+                    point.x === apple.x &&
+                    point.y === apple.y
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
+function moveSnake(){
+
+    if(
+        !gameRunning ||
+        paused ||
+        dead
+    ){
+        return;
+    }
+
+
+    direction =
+        {...nextDirection};
+
+    const head =
+        snake[0];
+
+    const next = {
+        x:head.x + direction.x,
+        y:head.y + direction.y
+    };
+
+
+    if(
+        next.x < 0 ||
+        next.x >= GRID ||
+        next.y < 0 ||
+        next.y >= GRID
+    ){
+
+        die(next);
+
+        return;
+
+    }
+
+
+    const hitSelf =
+        snake.some(
+            point =>
+                point.x === next.x &&
+                point.y === next.y
+        );
+
+
+    if(hitSelf){
+
+        die(next);
+
+        return;
+
+    }
+
+
+    previousSnake =
+        snake.map(
+            point => ({...point})
+        );
+
+    snake.unshift(next);
+
+
+    if(
+        next.x === apple.x &&
+        next.y === apple.y
+    ){
+
+        score++;
+
+        document.getElementById(
+            "score"
+        ).textContent = score;
+
+        spawnApple();
+
+        updateQuestProgress();
+
+    }else{
+
+        snake.pop();
+
+    }
+
+
+    lastMoveTime =
+        performance.now();
+
+}
+
+
+/* =========================================================
+   SMOOTH RENDER
+========================================================= */
+
+function lerp(a,b,t){
+
+    return a + (b-a)*t;
+
+}
+
+
+function ease(t){
+
+    return t < .5
+        ? 2*t*t
+        : 1-Math.pow(-2*t+2,2)/2;
+
+}
+
+
+function render(progress){
+
+    if(snake.length === 0){
+        return;
+    }
+
+
+    const t = ease(
+        Math.max(
+            0,
+            Math.min(
+                1,
+                progress
+            )
+        )
+    );
+
+
+    const points =
+        snake.map(
+            (point,index) => {
+
+                const old =
+                    previousSnake[index] ||
+                    point;
+
+                return {
+                    x:lerp(old.x,point.x,t),
+                    y:lerp(old.y,point.y,t)
+                };
+
+            }
+        );
+
+
+    let path = "";
+
+    for(
+        let i=points.length-1;
+        i>=0;
+        i--
+    ){
+
+        const p = points[i];
+
+        if(i === points.length-1){
+
+            path +=
+                "M " +
+                (p.x*CELL+17) +
+                " " +
+                (p.y*CELL+17);
+
+        }else{
+
+            path +=
+                " L " +
+                (p.x*CELL+17) +
+                " " +
+                (p.y*CELL+17);
+
+        }
+
+    }
+
+
+    document.getElementById(
+        "snakeBody"
+    ).setAttribute(
+        "d",
+        path
+    );
+
+    document.getElementById(
+        "snakeHighlight"
+    ).setAttribute(
+        "d",
+        path
+    );
+
+
+    const head = points[0];
+
+    let angle = 0;
+
+    if(direction.x === 1)
+        angle = 0;
+
+    if(direction.x === -1)
+        angle = 180;
+
+    if(direction.y === 1)
+        angle = 90;
+
+    if(direction.y === -1)
+        angle = -90;
+
+
+    document.getElementById(
+        "headGroup"
+    ).setAttribute(
+        "transform",
+        `
+        translate(
+            ${head.x*CELL+17}
+            ${head.y*CELL+17}
+        )
+        rotate(${angle})
+        `
+    );
+
+
+    const appleElement =
+        document.getElementById(
+            "apple"
+        );
+
+    appleElement.style.left =
+        (apple.x*CELL) + "px";
+
+    appleElement.style.top =
+        (apple.y*CELL) + "px";
+
+
+    /*
+        사과와 2칸 이내면
+        확실하게 입을 크게 벌림
+    */
+
+    const distance =
+        Math.max(
+            Math.abs(
+                snake[0].x-apple.x
+            ),
+            Math.abs(
+                snake[0].y-apple.y
+            )
+        );
+
+
+    if(distance <= 2){
+
+        document.getElementById(
+            "normalMouth"
+        ).style.display = "none";
+
+        document.getElementById(
+            "openMouth"
+        ).style.display = "block";
+
+    }else{
+
+        document.getElementById(
+            "normalMouth"
+        ).style.display = "block";
+
+        document.getElementById(
+            "openMouth"
+        ).style.display = "none";
+
+    }
+
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function gameLoop(time){
+
+    if(
+        !gameRunning ||
+        dead
+    ){
+        return;
+    }
+
+
+    if(!paused){
+
+        const normalSpeed = 150;
+
+        const moveSpeed =
+            dashActive
+            ? getDashSpeed()
+            : normalSpeed;
+
+
+        const elapsed =
+            time-lastMoveTime;
+
+
+        const progress =
+            Math.min(
+                elapsed/moveSpeed,
+                1
+            );
+
+
+        render(progress);
+
+
+        if(elapsed >= moveSpeed){
+
+            moveSnake();
+
+        }
+
+
+        updateDash();
+
+
+        requestAnimationFrame(
+            gameLoop
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DASH
+========================================================= */
+
+function getDashSpeed(){
+
+    if(equippedSkill === "turbo")
+        return 50;
+
+    if(equippedSkill === "wind")
+        return 42;
+
+    if(equippedSkill === "flash")
+        return 32;
+
+    return 65;
+
+}
+
+
+function activateDash(){
+
+    if(
+        !gameRunning ||
+        paused ||
+        dead ||
+        dashActive
+    ){
+        return;
+    }
+
+
+    const now =
+        performance.now();
+
+
+    /*
+        10초 쿨타임
+    */
+
+    if(
+        now-lastDashTime < 10000
+    ){
+        return;
+    }
+
+
+    dashActive = true;
+
+    dashStartTime = now;
+
+    lastDashTime = now;
+
+
+    document
+        .querySelectorAll(".wind")
+        .forEach(
+            element =>
+                element.classList.add("active")
+        );
+
+}
+
+
+function updateDash(){
+
+    const now =
+        performance.now();
+
+
+    /*
+        LShift를 떼면 즉시 종료
+    */
+
+    if(
+        dashActive &&
+        !shiftHeld
+    ){
+
+        dashActive = false;
+
+        stopWind();
+
+    }
+
+
+    /*
+        최대 실행시간 2초
+    */
+
+    if(
+        dashActive &&
+        now-dashStartTime >= 2000
+    ){
+
+        dashActive = false;
+
+        stopWind();
+
+    }
+
+
+    const status =
+        document.getElementById(
+            "skillStatus"
+        );
+
+
+    const cooldown =
+        10000-(now-lastDashTime);
+
+
+    if(
+        lastDashTime < 0 ||
+        cooldown <= 0
+    ){
+
+        status.textContent = "READY";
+
+        status.className =
+            "skillReady";
+
+    }else if(dashActive){
+
+        status.textContent =
+            "🔥 질주 중!";
+
+        status.className =
+            "skillReady";
+
+    }else{
+
+        status.textContent =
+            Math.ceil(
+                cooldown/1000
+            ) + "초";
+
+        status.className =
+            "skillCool";
+
+    }
+
+}
+
+
+function stopWind(){
+
+    document
+        .querySelectorAll(".wind")
+        .forEach(
+            element =>
+                element.classList.remove("active")
+        );
+
+}
+
+
+/* =========================================================
+   DEATH
+========================================================= */
+
+function die(position){
+
+    dead = true;
+
+    gameRunning = false;
+
+    dashActive = false;
+
+    stopWind();
+
+
+    if(score > highScore){
+
+        highScore = score;
+
+        localStorage.setItem(
+            "wormHighScore",
+            highScore
+        );
+
+    }
+
+
+    const boom =
+        document.getElementById(
+            "boom"
+        );
+
+
+    const safeX =
+        Math.max(
+            0,
+            Math.min(
+                GRID-1,
+                position.x
+            )
+        );
+
+    const safeY =
+        Math.max(
+            0,
+            Math.min(
+                GRID-1,
+                position.y
+            )
+        );
+
+
+    boom.style.left =
+        (safeX*CELL+255) + "px";
+
+    boom.style.top =
+        (safeY*CELL+170) + "px";
+
+    boom.style.display =
+        "block";
+
+
+    setTimeout(
+        () => {
+
+            document.getElementById(
+                "finalScore"
+            ).textContent = score;
+
+            document.getElementById(
+                "deathOverlay"
+            ).classList.add("active");
+
+            updateUI();
+
+        },
+        550
+    );
+
+}
+
+
+/* =========================================================
+   PAUSE
+========================================================= */
+
+function pauseGame(){
+
+    if(
+        !gameRunning ||
+        dead
+    ){
+        return;
+    }
+
+
+    paused = true;
+
+    document.getElementById(
+        "pauseOverlay"
+    ).classList.add("active");
+
+}
+
+
+function continueGame(){
+
+    if(dead){
+        return;
+    }
+
+
+    paused = false;
+
+    document.getElementById(
+        "pauseOverlay"
+    ).classList.remove("active");
+
+    lastMoveTime =
+        performance.now();
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+            ESC
+        */
+
+        if(event.code === "Escape"){
+
+            event.preventDefault();
+
+            if(
+                document
+                    .getElementById("gameScreen")
+                    .classList.contains("active")
+            ){
+
+                if(paused){
+                    continueGame();
+                }else{
+                    pauseGame();
+                }
+
+            }
+
+            return;
+
+        }
+
+
+        /*
+            왼쪽 SHIFT
+        */
+
+        if(event.code === "ShiftLeft"){
+
+            event.preventDefault();
+
+            if(!shiftHeld){
+
+                shiftHeld = true;
+
+                activateDash();
+
+            }
+
+            return;
+
+        }
+
+
+        if(
+            !gameRunning ||
+            paused ||
+            dead
+        ){
+            return;
+        }
+
+
+        const key =
+            event.key.toLowerCase();
+
+
+        if(
+            (
+                key === "w" ||
+                key === "arrowup"
+            ) &&
+            direction.y !== 1
+        ){
+
+            nextDirection = {
+                x:0,
+                y:-1
+            };
+
+        }
+
+
+        if(
+            (
+                key === "s" ||
+                key === "arrowdown"
+            ) &&
+            direction.y !== -1
+        ){
+
+            nextDirection = {
+                x:0,
+                y:1
+            };
+
+        }
+
+
+        if(
+            (
+                key === "a" ||
+                key === "arrowleft"
+            ) &&
+            direction.x !== 1
+        ){
+
+            nextDirection = {
+                x:-1,
+                y:0
+            };
+
+        }
+
+
+        if(
+            (
+                key === "d" ||
+                key === "arrowright"
+            ) &&
+            direction.x !== -1
+        ){
+
+            nextDirection = {
+                x:1,
+                y:0
+            };
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    event => {
+
+        if(event.code === "ShiftLeft"){
+
+            shiftHeld = false;
+
+            if(dashActive){
+
+                dashActive = false;
+
+                stopWind();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   QUEST SYSTEM
+========================================================= */
+
+function updateQuestProgress(){
+
+    quests.forEach(
+        quest => {
+
+            if(
+                quest.type === "apple" ||
+                quest.type === "score"
+            ){
+
+                quest.progress = score;
+
+            }
+
+            if(
+                quest.type === "length"
+            ){
+
+                quest.progress =
+                    snake.length;
+
+            }
+
+        }
+    );
+
+
+    checkQuestCompletion();
+
+    updateQuestUI();
+
+    saveQuests();
+
+}
+
+
+function checkQuestCompletion(){
+
+    for(
+        let i=0;
+        i<quests.length;
+        i++
+    ){
+
+        const quest = quests[i];
+
+
+        if(
+            quest.progress >=
+            quest.target
+        ){
+
+            const reward =
+                Math.min(
+                    Number(quest.reward),
+                    200
+                );
+
+
+            coins += reward;
+
+
+            notify(
+                "🎉 퀘스트 완료! +" +
+                reward +
+                " 🪙"
+            );
+
+
+            /*
+                완료된 퀘스트 하나만
+                새 퀘스트로 교체
+            */
+
+            let available =
+                questPool.filter(
+                    candidate =>
+                        !quests.some(
+                            current =>
+                                current.type ===
+                                    candidate.type &&
+                                current.target ===
+                                    candidate.target
+                        )
+                );
+
+
+            if(
+                available.length === 0
+            ){
+
+                available =
+                    [...questPool];
+
+            }
+
+
+            const replacement =
+                available[
+                    Math.floor(
+                        Math.random()*
+                        available.length
+                    )
+                ];
+
+
+            quests[i] = {
+                ...replacement,
+                progress:0
+            };
+
+
+            saveEverything();
+
+            /*
+                한 번에 하나만 완료 처리
+            */
+
+            break;
+
+        }
+
+    }
+
+}
+
+
+function updateQuestUI(){
+
+    if(
+        !Array.isArray(quests) ||
+        quests.length === 0
+    ){
+        return;
+    }
+
+
+    /*
+        게임 화면에는
+        진행 중인 퀘스트 하나만 표시
+    */
+
+    let quest = quests[0];
+
+
+    for(
+        let i=0;
+        i<quests.length;
+        i++
+    ){
+
+        if(
+            quests[i].progress <
+            quests[i].target
+        ){
+
+            quest = quests[i];
+
+            break;
+
+        }
+
+    }
+
+
+    const progress =
+        Math.min(
+            quest.progress,
+            quest.target
+        );
+
+
+    document.getElementById(
+        "questText"
+    ).textContent =
+        quest.text +
+        " " +
+        progress +
+        "/" +
+        quest.target;
+
+
+    document.getElementById(
+        "questReward"
+    ).textContent =
+        Math.min(
+            quest.reward,
+            200
+        );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+updateUI();
+
+renderShop();
+
+applyWorm();
+
 </script>
+
 </body>
-</html>'''
+</html>
+"""
 
-python_code = '''import streamlit as st
-import streamlit.components.v1 as components
-
-st.set_page_config(
-    page_title="Worm Quest",
-    page_icon="🪱",
-    layout="centered",
-    initial_sidebar_state="collapsed",
+components.html(
+    GAME,
+    height=870,
+    scrolling=False
 )
-
-st.markdown("""
-<style>
-header, footer {visibility:hidden;}
-.block-container {padding:0 !important; max-width:1000px;}
-[data-testid="stAppViewContainer"] {background:#0c1c10;}
-</style>
-""", unsafe_allow_html=True)
-
-HTML = r"""''' + html + '''"""
-
-components.html(HTML, height=900, scrolling=False)
-'''
-
-# Syntax-check before giving the file to the user.
-ast.parse(python_code)
-out.write_text(python_code, encoding="utf-8")
-print("완료: main.py 전체 코드를 새로 작성했습니다.")
-print("Python 문법 검사: 통과")
-print(f"파일 크기: {out.stat().st_size:,} bytes")
