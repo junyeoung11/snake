@@ -1,9 +1,3 @@
-맞아. **이번엔 아까 코드의 숲 배경 + 부드러운 이동을 유지하면서, 메인화면/상점/재화/퀘스트까지 합친 Streamlit 전체 코드**로 줄게.
-
-**`main.py`에 넣을 때 `import streamlit as st`부터 마지막 줄까지 복사해.**
-아래 코드 자체에는 실행에 필요한 별도 파일이 없어.
-
-```python
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -3750,4 +3744,3 @@ components.html(
     height=870,
     scrolling=False
 )
-```
