@@ -1,692 +1,753 @@
 ```python
 import streamlit as st
 import streamlit.components.v1 as components
-import random
-import json
-
-# =========================================================
-# Streamlit 설정
-# =========================================================
 
 st.set_page_config(
     page_title="WORM QUEST",
     page_icon="🪱",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    layout="centered"
 )
 
-# =========================================================
-# Session State
-# =========================================================
+html = r"""
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
 
-if "page" not in st.session_state:
-    st.session_state.page = "main"
-
-if "coins" not in st.session_state:
-    st.session_state.coins = 0
-
-if "high_score" not in st.session_state:
-    st.session_state.high_score = 0
-
-if "owned_worms" not in st.session_state:
-    st.session_state.owned_worms = ["basic"]
-
-if "equipped_worm" not in st.session_state:
-    st.session_state.equipped_worm = "basic"
-
-
-# =========================================================
-# CSS
-# =========================================================
-
-st.markdown("""
 <style>
-
-.stApp {
-    background: #101810;
+* {
+    box-sizing: border-box;
+    user-select: none;
 }
 
-header {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-.block-container {
-    padding-top: 1rem;
-    max-width: 950px;
-}
-
-.main-title {
-    text-align: center;
+body {
+    margin: 0;
+    background: #101510;
     color: white;
-    font-size: 70px;
+    font-family: Arial, sans-serif;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+}
+
+#app {
+    width: 720px;
+    min-height: 800px;
+    margin: auto;
+    position: relative;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+#mainScreen {
+    text-align: center;
+    padding-top: 65px;
+}
+
+.title {
+    font-size: 72px;
     font-weight: 900;
-    margin-top: 40px;
+    margin-bottom: 5px;
 }
 
-.sub-title {
-    text-align: center;
-    color: #9eb69e;
-    font-size: 20px;
-    margin-bottom: 35px;
+.subtitle {
+    color: #9cad9c;
+    font-size: 19px;
+    margin-bottom: 40px;
 }
 
-.stat-box {
-    background: #1b261d;
-    border: 1px solid #344737;
+.mainWorm {
+    font-size: 100px;
+    margin: 20px;
+}
+
+.stats {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.stat {
+    background: #1c281e;
+    border: 2px solid #354937;
     border-radius: 15px;
-    padding: 15px;
-    text-align: center;
-    color: white;
+    padding: 15px 35px;
     font-size: 20px;
     font-weight: bold;
 }
 
-.shop-card {
-    background: #1b261d;
-    border: 2px solid #344737;
-    border-radius: 18px;
-    padding: 20px;
-    text-align: center;
+.bigButton {
+    width: 330px;
+    height: 65px;
+    margin: 9px;
+    border-radius: 15px;
     color: white;
+    font-size: 21px;
+    font-weight: bold;
+    background: #315fc9;
+}
+
+.bigButton:hover {
+    transform: scale(1.03);
+}
+
+.shopButton {
+    background: #8a5bd6;
+}
+
+.backButton {
+    background: #333e35;
+    width: 150px;
+    height: 45px;
+    color: white;
+    border-radius: 10px;
+    font-size: 16px;
     margin-bottom: 15px;
 }
 
-.worm-big {
-    font-size: 75px;
-    text-align: center;
-    margin-top: 35px;
+/* =========================
+   SHOP
+========================= */
+
+#shopScreen {
+    padding: 30px;
 }
 
-</style>
-""", unsafe_allow_html=True)
+.shopTitle {
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 5px;
+}
 
+.coinDisplay {
+    color: #ffd84d;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
 
-# =========================================================
-# 메인 화면
-# =========================================================
+.shopSection {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-size: 25px;
+    font-weight: bold;
+}
 
-def main_page():
+.items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
 
-    st.markdown(
-        '<div class="main-title">🪱 WORM QUEST</div>',
-        unsafe_allow_html=True
-    )
+.item {
+    background: #1c281e;
+    border: 2px solid #354937;
+    border-radius: 18px;
+    padding: 20px;
+    text-align: center;
+}
 
-    st.markdown(
-        '<div class="sub-title">먹고 · 성장하고 · 질주하라</div>',
-        unsafe_allow_html=True
-    )
+.itemEmoji {
+    font-size: 60px;
+}
 
-    c1, c2 = st.columns(2)
+.itemName {
+    font-size: 19px;
+    font-weight: bold;
+    margin: 8px;
+}
 
-    with c1:
-        st.markdown(
-            f"""
-            <div class="stat-box">
-                🪙 {st.session_state.coins}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+.itemPrice {
+    color: #ffd84d;
+    margin: 8px;
+}
 
-    with c2:
-        st.markdown(
-            f"""
-            <div class="stat-box">
-                🏆 {st.session_state.high_score}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+.item button {
+    width: 100%;
+    height: 42px;
+    border-radius: 9px;
+    background: #315fc9;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}
 
-    st.write("")
+.item button.owned {
+    background: #3c7048;
+}
 
-    c1, c2 = st.columns(2)
+.item button.equipped {
+    background: #d08b28;
+}
 
-    with c1:
-        if st.button(
-            "🎮 게임 시작하기",
-            use_container_width=True,
-            type="primary"
-        ):
-            st.session_state.page = "game"
-            st.rerun()
+/* =========================
+   GAME
+========================= */
 
-    with c2:
-        if st.button(
-            "🛒 상점",
-            use_container_width=True
-        ):
-            st.session_state.page = "shop"
-            st.rerun()
+#gameScreen {
+    width: 720px;
+}
 
-    st.markdown(
-        '<div class="worm-big">🪱</div>',
-        unsafe_allow_html=True
-    )
+.gameTop {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 18px;
+}
 
+.score {
+    font-size: 19px;
+    font-weight: bold;
+}
 
-# =========================================================
-# 상점
-# =========================================================
+.high {
+    color: #ffd84d;
+    font-size: 18px;
+    font-weight: bold;
+}
 
-WORMS = {
-    "basic": {
-        "name": "기본 지렁이",
-        "emoji": "🪱",
-        "price": 0,
-        "skill": "기본 질주"
-    },
-    "fire": {
-        "name": "화염 지렁이",
-        "emoji": "🔥",
-        "price": 500,
-        "skill": "화염 질주"
-    },
-    "lightning": {
-        "name": "번개 지렁이",
-        "emoji": "⚡",
-        "price": 1000,
-        "skill": "번개 질주"
-    },
-    "ghost": {
-        "name": "유령 지렁이",
-        "emoji": "👻",
-        "price": 2000,
-        "skill": "유령화"
-    },
-    "rainbow": {
-        "name": "무지개 지렁이",
-        "emoji": "🌈",
-        "price": 3000,
-        "skill": "무지개 질주"
+.gameArea {
+    width: 650px;
+    height: 650px;
+    margin: auto;
+    position: relative;
+}
+
+#board {
+    width: 612px;
+    height: 612px;
+    position: absolute;
+    left: 19px;
+    top: 10px;
+
+    border: 9px solid #234e9e;
+    border-radius: 20px;
+    overflow: hidden;
+
+    background-color: #91c74b;
+
+    background-image:
+        linear-gradient(
+            rgba(0,0,0,0.08) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,0.08) 1px,
+            transparent 1px
+        );
+
+    background-size: 34px 34px;
+}
+
+#snakeSvg {
+    position: absolute;
+    width: 612px;
+    height: 612px;
+    left: 0;
+    top: 0;
+    overflow: visible;
+}
+
+#snakeBody {
+    fill: none;
+    stroke: #315fc9;
+    stroke-width: 29;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#snakeHighlight {
+    fill: none;
+    stroke: #8fb2ff;
+    stroke-width: 5;
+    stroke-linecap: round;
+}
+
+#head {
+    fill: #315fc9;
+}
+
+.eye {
+    fill: white;
+}
+
+.pupil {
+    fill: black;
+}
+
+#normalMouth {
+    stroke: #111;
+    stroke-width: 4;
+    fill: none;
+}
+
+#openMouth {
+    display: none;
+}
+
+#apple {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    font-size: 29px;
+    text-align: center;
+    z-index: 20;
+    animation: applePulse .7s infinite;
+}
+
+@keyframes applePulse {
+    0% { transform: scale(.82); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(.82); }
+}
+
+/* Quest */
+
+#questBox {
+    position: absolute;
+    right: 30px;
+    top: 25px;
+    width: 180px;
+    background: rgba(0,0,0,.75);
+    border-radius: 12px;
+    padding: 9px 12px;
+    z-index: 100;
+    font-size: 12px;
+}
+
+.questTitle {
+    color: #ffd84d;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.questReward {
+    color: #ffd84d;
+    margin-top: 4px;
+}
+
+/* Skill */
+
+#skillBox {
+    position: absolute;
+    left: 30px;
+    top: 25px;
+    background: rgba(0,0,0,.75);
+    border-radius: 12px;
+    padding: 9px 12px;
+    z-index: 100;
+    font-size: 12px;
+}
+
+.skillReady {
+    color: #71e28a;
+}
+
+.skillCooldown {
+    color: #ffd84d;
+}
+
+/* wind */
+
+.wind {
+    position: absolute;
+    height: 4px;
+    background: white;
+    border-radius: 4px;
+    opacity: 0;
+    z-index: 150;
+    pointer-events: none;
+}
+
+.wind.active {
+    animation: windSlash .35s linear infinite;
+}
+
+@keyframes windSlash {
+    0% {
+        opacity: 0;
+        transform: translateX(-30px) rotate(-15deg);
+    }
+    30% {
+        opacity: .9;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(60px) rotate(-15deg);
     }
 }
 
-
-def shop_page():
-
-    top1, top2 = st.columns([3, 1])
-
-    with top1:
-        st.title("🛒 지렁이 상점")
-
-    with top2:
-        st.markdown(
-            f"""
-            <div class="stat-box">
-                🪙 {st.session_state.coins}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    if st.button("← 메인으로"):
-        st.session_state.page = "main"
-        st.rerun()
-
-    st.divider()
-
-    cols = st.columns(2)
-
-    for index, (worm_id, worm) in enumerate(WORMS.items()):
-
-        with cols[index % 2]:
-
-            owned = worm_id in st.session_state.owned_worms
-            equipped = (
-                worm_id ==
-                st.session_state.equipped_worm
-            )
-
-            status = (
-                "✅ 장착 중"
-                if equipped
-                else
-                "⚡ 장착"
-                if owned
-                else
-                f"🪙 {worm['price']} 구매"
-            )
-
-            st.markdown(
-                f"""
-                <div class="shop-card">
-
-                    <div style="font-size:65px;">
-                        {worm['emoji']}
-                    </div>
-
-                    <h3>
-                        {worm['name']}
-                    </h3>
-
-                    <p>
-                        ⚡ {worm['skill']}
-                    </p>
-
-                    <p>
-                        가격: 🪙 {worm['price']}
-                    </p>
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            if st.button(
-                status,
-                key=f"worm_{worm_id}",
-                use_container_width=True
-            ):
-
-                if equipped:
-                    pass
-
-                elif owned:
-
-                    st.session_state.equipped_worm = worm_id
-                    st.rerun()
-
-                else:
-
-                    if (
-                        st.session_state.coins
-                        >= worm["price"]
-                    ):
-
-                        st.session_state.coins -= \
-                            worm["price"]
-
-                        st.session_state.owned_worms.append(
-                            worm_id
-                        )
-
-                        st.session_state.equipped_worm = \
-                            worm_id
-
-                        st.rerun()
-
-                    else:
-                        st.error("🪙 코인이 부족합니다!")
-
-
-# =========================================================
-# 게임
-# =========================================================
-
-def game_page():
-
-    if st.button("← 메인으로"):
-        st.session_state.page = "main"
-        st.rerun()
-
-    worm_id = st.session_state.equipped_worm
-    worm = WORMS[worm_id]
-
-    game_html = f"""
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<style>
-
-* {{
-    box-sizing:border-box;
-    user-select:none;
-}}
-
-body {{
-    margin:0;
-    background:#101810;
-    font-family:Arial,sans-serif;
-    overflow:hidden;
-}}
-
-#game {{
-    width:650px;
-    height:720px;
-    margin:auto;
-    position:relative;
-}}
-
-#board {{
-    width:612px;
-    height:612px;
-    position:absolute;
-    top:60px;
-    left:19px;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(0,0,0,.07) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            rgba(0,0,0,.07) 1px,
-            transparent 1px
-        ),
-        #9dcc4a;
-
-    background-size:34px 34px;
-
-    border:10px solid #214ba0;
-    border-radius:20px;
-
-    overflow:hidden;
-}}
-
-#snake {{
-    position:absolute;
-    width:612px;
-    height:612px;
-    left:0;
-    top:0;
-    pointer-events:none;
-}}
-
-#body {{
-    fill:none;
-    stroke:{worm["color"] if "color" in worm else "#315fc9"};
-    stroke-width:31;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-}}
-
-#light {{
-    fill:none;
-    stroke:#8fb0ff;
-    stroke-width:5;
-    stroke-linecap:round;
-}}
-
-#head {{
-    fill:{worm["color"] if "color" in worm else "#315fc9"};
-}}
-
-#mouth {{
-    stroke:#111;
-    stroke-width:4;
-    fill:none;
-}}
-
-#openMouth {{
-    display:none;
-}}
-
-#apple {{
-    position:absolute;
-    width:34px;
-    height:34px;
-    font-size:30px;
-    z-index:20;
-    animation:pulse .8s infinite;
-}}
-
-@keyframes pulse {{
-    0% {{transform:scale(.8);}}
-    50% {{transform:scale(1.15);}}
-    100% {{transform:scale(.8);}}
-}}
-
-#info {{
-    position:absolute;
-    top:5px;
-    left:20px;
-    color:white;
-    font-weight:bold;
-    font-size:18px;
-}}
-
-#high {{
-    position:absolute;
-    top:5px;
-    right:20px;
-    color:#ffd84d;
-    font-weight:bold;
-}}
-
-#quest {{
-    position:absolute;
-    top:40px;
-    right:20px;
-    width:160px;
-    padding:9px;
-
-    color:white;
-    background:rgba(0,0,0,.75);
-    border-radius:10px;
-
-    font-size:11px;
-    z-index:100;
-}}
-
-#skill {{
-    position:absolute;
-    top:40px;
-    left:20px;
-    color:white;
-    background:rgba(0,0,0,.75);
-    border-radius:10px;
-    padding:7px 10px;
-    font-size:12px;
-}}
-
-#pause,
-#gameover {{
-    display:none;
-
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    transform:translate(-50%,-50%);
-
-    width:430px;
-
-    padding:35px;
-
-    background:rgba(0,0,0,.96);
-
-    border-radius:25px;
-
-    color:white;
-
-    text-align:center;
-
-    z-index:500;
-}}
-
-#pause h1,
-#gameover h1 {{
-    font-size:52px;
-}}
-
-.pauseBtn {{
-    width:270px;
-    height:55px;
-    margin:7px;
-
-    border:0;
-    border-radius:13px;
-
-    color:white;
-    font-size:19px;
-    font-weight:bold;
-}}
-
-#continue {{
-    background:#477fe5;
-}}
-
-#restart {{
-    background:#43b96a;
-}}
-
-#gameover h1 {{
-    color:#ff4040;
-}}
-
-#boom {{
-    display:none;
-
-    position:absolute;
-
-    font-size:70px;
-
-    z-index:300;
-}}
+/* Pause */
+
+.overlay {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 440px;
+    padding: 35px;
+
+    background: rgba(0,0,0,.95);
+    border-radius: 25px;
+    text-align: center;
+
+    z-index: 500;
+}
+
+.overlay.active {
+    display: block;
+}
+
+.overlay h1 {
+    font-size: 55px;
+    margin: 5px;
+}
+
+.overlay button {
+    display: block;
+    width: 280px;
+    height: 53px;
+    margin: 10px auto;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.continue {
+    background: #315fc9;
+}
+
+.restart {
+    background: #3e9d5b;
+}
+
+.death h1 {
+    color: #ff4545;
+}
+
+#boom {
+    display: none;
+    position: absolute;
+    font-size: 75px;
+    z-index: 400;
+}
+
+#deathScreen {
+    z-index: 600;
+}
+
+/* notification */
+
+#notification {
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+
+    background: #202c22;
+    border: 2px solid #4c684e;
+    border-radius: 12px;
+
+    padding: 13px 25px;
+    font-weight: bold;
+
+    display: none;
+    z-index: 1000;
+}
 
 </style>
-
 </head>
 
 <body>
 
-<div id="game">
+<div id="app">
 
-    <div id="info">
-        점수: <span id="score">0</span>
-        &nbsp;&nbsp;
-        🪙 <span id="coins">0</span>
+<!-- ================= MAIN ================= -->
+
+<div id="mainScreen" class="screen active">
+
+    <div class="title">🪱 WORM QUEST</div>
+
+    <div class="subtitle">
+        먹고 · 성장하고 · 질주하라
     </div>
 
-    <div id="high">
-        🏆 최고기록: <span id="highScore">0</span>
-    </div>
+    <div class="mainWorm" id="mainWorm">🪱</div>
 
-    <div id="skill">
-        ⚡ {worm["skill"]}
-        <br>
-        <span id="skillStatus">READY</span>
-    </div>
+    <div class="stats">
 
-    <div id="quest">
-        <b style="color:#ffd84d;">📜 QUEST</b>
-        <div id="questText">
-            🍎 사과 먹기 0/5
+        <div class="stat">
+            🪙 <span id="mainCoins">0</span>
         </div>
+
+        <div class="stat">
+            🏆 <span id="mainHigh">0</span>
+        </div>
+
     </div>
 
-    <div id="board">
+    <button class="bigButton" onclick="startGame()">
+        🎮 게임 시작하기
+    </button>
 
-        <div id="apple">🍎</div>
+    <br>
 
-        <svg id="snake" viewBox="0 0 612 612">
+    <button
+        class="bigButton shopButton"
+        onclick="openShop()">
+        🛒 상점
+    </button>
 
-            <path id="body"></path>
+</div>
 
-            <path id="light"></path>
 
-            <g id="headGroup">
+<!-- ================= SHOP ================= -->
 
-                <circle
-                    id="head"
-                    cx="0"
-                    cy="0"
-                    r="18">
-                </circle>
+<div id="shopScreen" class="screen">
 
-                <circle
-                    cx="7"
-                    cy="-12"
-                    r="7"
-                    fill="white">
-                </circle>
+    <button
+        class="backButton"
+        onclick="showScreen('mainScreen')">
+        ← 메인으로
+    </button>
 
-                <circle
-                    cx="7"
-                    cy="12"
-                    r="7"
-                    fill="white">
-                </circle>
+    <div class="shopTitle">🛒 상점</div>
 
-                <circle
-                    cx="9"
-                    cy="-12"
-                    r="3"
-                    fill="black">
-                </circle>
+    <div class="coinDisplay">
+        🪙 <span id="shopCoins">0</span>
+    </div>
 
-                <circle
-                    cx="9"
-                    cy="12"
-                    r="3"
-                    fill="black">
-                </circle>
+    <div class="shopSection">
+        🪱 지렁이 외형
+    </div>
+
+    <div class="items" id="wormItems"></div>
+
+    <div class="shopSection">
+        ⚡ 스킬 변경
+    </div>
+
+    <div class="items" id="skillItems"></div>
+
+</div>
+
+
+<!-- ================= GAME ================= -->
+
+<div id="gameScreen" class="screen">
+
+    <div class="gameTop">
+
+        <div class="score">
+            점수: <span id="score">0</span>
+            &nbsp;&nbsp;
+            🪙 <span id="gameCoins">0</span>
+        </div>
+
+        <div class="high">
+            🏆 최고기록:
+            <span id="gameHigh">0</span>
+        </div>
+
+    </div>
+
+    <div class="gameArea">
+
+        <div id="board">
+
+            <div id="skillBox">
+                ⚡ <span id="skillName">질주</span>
+                <br>
+                <span id="skillStatus" class="skillReady">
+                    READY
+                </span>
+            </div>
+
+            <div id="questBox">
+
+                <div class="questTitle">
+                    📜 QUEST
+                </div>
+
+                <div id="questText">
+                    사과 먹기 0/5
+                </div>
+
+                <div class="questReward">
+                    🪙 보상: <span id="questReward">80</span>
+                </div>
+
+            </div>
+
+            <div id="apple">🍎</div>
+
+            <svg id="snakeSvg"
+                 viewBox="0 0 612 612">
 
                 <path
-                    id="mouth"
-                    d="M12,-4 Q20,0 12,4">
+                    id="snakeBody">
                 </path>
 
-                <g id="openMouth">
+                <path
+                    id="snakeHighlight">
+                </path>
 
-                    <ellipse
-                        cx="14"
+                <g id="headGroup">
+
+                    <circle
+                        id="head"
+                        cx="0"
                         cy="0"
-                        rx="9"
-                        ry="7"
-                        fill="#111">
-                    </ellipse>
+                        r="18">
+                    </circle>
 
+                    <circle
+                        class="eye"
+                        cx="7"
+                        cy="-11"
+                        r="7">
+                    </circle>
+
+                    <circle
+                        class="eye"
+                        cx="7"
+                        cy="11"
+                        r="7">
+                    </circle>
+
+                    <circle
+                        class="pupil"
+                        cx="9"
+                        cy="-11"
+                        r="3">
+                    </circle>
+
+                    <circle
+                        class="pupil"
+                        cx="9"
+                        cy="11"
+                        r="3">
+                    </circle>
+
+                    <!-- 평소 입 -->
                     <path
-                        d="M10,3 Q14,9 18,3"
-                        stroke="#ff4c62"
-                        stroke-width="3"
-                        fill="none">
+                        id="normalMouth"
+                        d="M 12,-4 Q 19,0 12,4">
                     </path>
+
+                    <!-- 입 벌린 모습 -->
+                    <g id="openMouth">
+
+                        <ellipse
+                            cx="15"
+                            cy="0"
+                            rx="10"
+                            ry="8"
+                            fill="#111">
+                        </ellipse>
+
+                        <path
+                            d="M10,3 Q15,10 20,3"
+                            stroke="#ff4960"
+                            stroke-width="3"
+                            fill="none">
+                        </path>
+
+                    </g>
 
                 </g>
 
-            </g>
+            </svg>
 
-        </svg>
+            <div id="boom">💥</div>
 
-        <div id="boom">💥</div>
 
-        <div id="pause">
+            <!-- PAUSE -->
 
-            <h1>일시정지</h1>
+            <div id="pauseScreen" class="overlay">
 
-            <button
-                class="pauseBtn"
-                id="continue">
-                ▶️ 계속하기
-            </button>
+                <h1>일시정지</h1>
 
-            <button
-                class="pauseBtn"
-                id="restart">
-                🔄 다시하기
-            </button>
+                <button
+                    class="continue"
+                    onclick="continueGame()">
+                    ▶️ 계속하기
+                </button>
 
-        </div>
+                <button
+                    class="restart"
+                    onclick="restartGame()">
+                    🔄 다시하기
+                </button>
 
-        <div id="gameover">
+            </div>
 
-            <h1>YOU DIE</h1>
 
-            <h2>
-                점수:
-                <span id="finalScore">0</span>
-            </h2>
+            <!-- DEATH -->
 
-            <button
-                class="pauseBtn"
-                id="restart2">
-                🔄 다시하기
-            </button>
+            <div id="deathScreen"
+                 class="overlay death">
+
+                <h1>YOU DIE</h1>
+
+                <h2>
+                    점수:
+                    <span id="finalScore">0</span>
+                </h2>
+
+                <button
+                    class="restart"
+                    onclick="restartGame()">
+                    🔄 다시하기
+                </button>
+
+                <button
+                    class="continue"
+                    onclick="showScreen('mainScreen')">
+                    🏠 메인으로
+                </button>
+
+            </div>
+
+
+            <!-- WIND EFFECTS -->
+
+            <div
+                class="wind"
+                id="wind1"
+                style="width:100px;top:230px;left:80px">
+            </div>
+
+            <div
+                class="wind"
+                id="wind2"
+                style="width:70px;top:300px;left:420px">
+            </div>
+
+            <div
+                class="wind"
+                id="wind3"
+                style="width:90px;top:380px;left:150px">
+            </div>
 
         </div>
 
@@ -694,314 +755,1060 @@ body {{
 
 </div>
 
+<div id="notification"></div>
+
+</div>
+
 
 <script>
+
+/* =====================================================
+   DATA
+===================================================== */
+
+const worms = {
+
+    basic: {
+        name: "기본 지렁이",
+        emoji: "🪱",
+        color: "#315fc9",
+        price: 0
+    },
+
+    fire: {
+        name: "화염 지렁이",
+        emoji: "🔥",
+        color: "#e14b32",
+        price: 500
+    },
+
+    lightning: {
+        name: "번개 지렁이",
+        emoji: "⚡",
+        color: "#d8b62b",
+        price: 1000
+    },
+
+    ghost: {
+        name: "유령 지렁이",
+        emoji: "👻",
+        color: "#a77be8",
+        price: 1500
+    },
+
+    rainbow: {
+        name: "무지개 지렁이",
+        emoji: "🌈",
+        color: "#e95db8",
+        price: 2000
+    }
+
+};
+
+
+const skills = {
+
+    dash: {
+        name: "질주",
+        price: 0,
+        description: "LShift 홀드"
+    },
+
+    turbo: {
+        name: "터보 질주",
+        price: 700,
+        description: "더 빠른 질주"
+    },
+
+    wind: {
+        name: "윈드 러너",
+        price: 1200,
+        description: "강력한 바람 질주"
+    },
+
+    flash: {
+        name: "플래시",
+        price: 1800,
+        description: "최고속 질주"
+    }
+
+};
+
+
+/* =====================================================
+   SAVE DATA
+===================================================== */
+
+let coins =
+    Number(localStorage.getItem("wormCoins") || 0);
+
+let highScore =
+    Number(localStorage.getItem("wormHigh") || 0);
+
+let equippedWorm =
+    localStorage.getItem("wormEquipped") || "basic";
+
+let equippedSkill =
+    localStorage.getItem("wormSkill") || "dash";
+
+let ownedWorms =
+    JSON.parse(
+        localStorage.getItem("wormOwned") ||
+        '["basic"]'
+    );
+
+let ownedSkills =
+    JSON.parse(
+        localStorage.getItem("skillOwned") ||
+        '["dash"]'
+    );
+
+
+/* =====================================================
+   QUEST
+===================================================== */
+
+const questPool = [
+
+    {
+        type: "apple",
+        text: "🍎 사과 먹기",
+        target: 5,
+        reward: 80
+    },
+
+    {
+        type: "apple",
+        text: "🍎 사과 먹기",
+        target: 10,
+        reward: 150
+    },
+
+    {
+        type: "score",
+        text: "🏆 점수 달성",
+        target: 15,
+        reward: 200
+    },
+
+    {
+        type: "score",
+        text: "🏆 점수 달성",
+        target: 25,
+        reward: 200
+    },
+
+    {
+        type: "length",
+        text: "🪱 몸 길이 늘리기",
+        target: 10,
+        reward: 120
+    },
+
+    {
+        type: "length",
+        text: "🪱 몸 길이 늘리기",
+        target: 15,
+        reward: 180
+    }
+
+];
+
+let quests = [];
+
+function newQuests() {
+
+    quests = [];
+
+    let copy = [...questPool];
+
+    for(let i=0;i<3;i++) {
+
+        let index =
+            Math.floor(
+                Math.random()*copy.length
+            );
+
+        quests.push(
+            copy.splice(index,1)[0]
+        );
+
+    }
+
+    quests.forEach(q => q.progress = 0);
+
+    localStorage.setItem(
+        "wormQuests",
+        JSON.stringify(quests)
+    );
+}
+
+function loadQuests() {
+
+    let saved =
+        localStorage.getItem("wormQuests");
+
+    if(saved) {
+
+        try {
+
+            quests = JSON.parse(saved);
+
+            if(
+                !Array.isArray(quests) ||
+                quests.length !== 3
+            ) {
+                newQuests();
+            }
+
+        } catch {
+
+            newQuests();
+
+        }
+
+    } else {
+
+        newQuests();
+
+    }
+
+}
+
+loadQuests();
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+function saveData() {
+
+    localStorage.setItem(
+        "wormCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "wormHigh",
+        highScore
+    );
+
+    localStorage.setItem(
+        "wormEquipped",
+        equippedWorm
+    );
+
+    localStorage.setItem(
+        "wormSkill",
+        equippedSkill
+    );
+
+    localStorage.setItem(
+        "wormOwned",
+        JSON.stringify(ownedWorms)
+    );
+
+    localStorage.setItem(
+        "skillOwned",
+        JSON.stringify(ownedSkills)
+    );
+
+    localStorage.setItem(
+        "wormQuests",
+        JSON.stringify(quests)
+    );
+
+    updateUI();
+
+}
+
+
+function updateUI() {
+
+    document.getElementById(
+        "mainCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "shopCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "gameCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "mainHigh"
+    ).textContent = highScore;
+
+    document.getElementById(
+        "gameHigh"
+    ).textContent = highScore;
+
+    document.getElementById(
+        "mainWorm"
+    ).textContent =
+        worms[equippedWorm].emoji;
+
+    document.getElementById(
+        "skillName"
+    ).textContent =
+        skills[equippedSkill].name;
+
+}
+
+
+/* =====================================================
+   SCREEN
+===================================================== */
+
+function showScreen(id) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(
+            s => s.classList.remove("active")
+        );
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+
+    updateUI();
+
+    if(id === "shopScreen") {
+        renderShop();
+    }
+
+}
+
+
+function openShop() {
+    showScreen("shopScreen");
+}
+
+
+/* =====================================================
+   SHOP
+===================================================== */
+
+function renderShop() {
+
+    let wormHTML = "";
+
+    for(
+        const [id,worm]
+        of Object.entries(worms)
+    ) {
+
+        let owned =
+            ownedWorms.includes(id);
+
+        let equipped =
+            equippedWorm === id;
+
+        let buttonText =
+            equipped
+            ? "장착 중"
+            : owned
+            ? "장착하기"
+            : "구매";
+
+        let cls =
+            equipped
+            ? "equipped"
+            : owned
+            ? "owned"
+            : "";
+
+        wormHTML += `
+
+        <div class="item">
+
+            <div
+                class="itemEmoji"
+                style="color:${worm.color}">
+                ${worm.emoji}
+            </div>
+
+            <div class="itemName">
+                ${worm.name}
+            </div>
+
+            <div class="itemPrice">
+                ${
+                    worm.price === 0
+                    ? "무료"
+                    : "🪙 " + worm.price
+                }
+            </div>
+
+            <button
+                class="${cls}"
+                onclick="buyWorm('${id}')">
+                ${buttonText}
+            </button>
+
+        </div>
+
+        `;
+
+    }
+
+    document.getElementById(
+        "wormItems"
+    ).innerHTML = wormHTML;
+
+
+    let skillHTML = "";
+
+    for(
+        const [id,skill]
+        of Object.entries(skills)
+    ) {
+
+        let owned =
+            ownedSkills.includes(id);
+
+        let equipped =
+            equippedSkill === id;
+
+        let buttonText =
+            equipped
+            ? "사용 중"
+            : owned
+            ? "변경하기"
+            : "구매";
+
+        let cls =
+            equipped
+            ? "equipped"
+            : owned
+            ? "owned"
+            : "";
+
+        skillHTML += `
+
+        <div class="item">
+
+            <div
+                class="itemEmoji">
+                ⚡
+            </div>
+
+            <div class="itemName">
+                ${skill.name}
+            </div>
+
+            <div>
+                ${skill.description}
+            </div>
+
+            <div class="itemPrice">
+                ${
+                    skill.price === 0
+                    ? "무료"
+                    : "🪙 " + skill.price
+                }
+            </div>
+
+            <button
+                class="${cls}"
+                onclick="buySkill('${id}')">
+                ${buttonText}
+            </button>
+
+        </div>
+
+        `;
+
+    }
+
+    document.getElementById(
+        "skillItems"
+    ).innerHTML = skillHTML;
+
+}
+
+
+function buyWorm(id) {
+
+    if(ownedWorms.includes(id)) {
+
+        equippedWorm = id;
+
+        applyWorm();
+
+        saveData();
+
+        notify(
+            worms[id].name +
+            " 장착!"
+        );
+
+        renderShop();
+
+        return;
+    }
+
+    let price = worms[id].price;
+
+    if(coins < price) {
+
+        notify("🪙 코인이 부족합니다!");
+
+        return;
+    }
+
+    coins -= price;
+
+    ownedWorms.push(id);
+
+    equippedWorm = id;
+
+    applyWorm();
+
+    saveData();
+
+    notify(
+        worms[id].name +
+        " 구매 완료!"
+    );
+
+    renderShop();
+
+}
+
+
+function buySkill(id) {
+
+    if(ownedSkills.includes(id)) {
+
+        equippedSkill = id;
+
+        saveData();
+
+        notify(
+            skills[id].name +
+            "으로 변경!"
+        );
+
+        renderShop();
+
+        return;
+    }
+
+    let price = skills[id].price;
+
+    if(coins < price) {
+
+        notify("🪙 코인이 부족합니다!");
+
+        return;
+    }
+
+    coins -= price;
+
+    ownedSkills.push(id);
+
+    equippedSkill = id;
+
+    saveData();
+
+    notify(
+        skills[id].name +
+        " 구매 완료!"
+    );
+
+    renderShop();
+
+}
+
+
+function applyWorm() {
+
+    let color =
+        worms[equippedWorm].color;
+
+    document.getElementById(
+        "snakeBody"
+    ).style.stroke = color;
+
+    document.getElementById(
+        "head"
+    ).style.fill = color;
+
+}
+
+
+/* =====================================================
+   NOTIFICATION
+===================================================== */
+
+let notificationTimer;
+
+function notify(text) {
+
+    let n =
+        document.getElementById(
+            "notification"
+        );
+
+    n.textContent = text;
+
+    n.style.display = "block";
+
+    clearTimeout(notificationTimer);
+
+    notificationTimer =
+        setTimeout(
+            () => {
+                n.style.display = "none";
+            },
+            1800
+        );
+
+}
+
+
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
 
 const GRID = 34;
 const SIZE = 18;
 
-let snake;
-let oldSnake;
+let snake = [];
+let previousSnake = [];
 
-let direction;
-let nextDirection;
+let direction = {
+    x:1,
+    y:0
+};
 
-let apple;
+let nextDirection = {
+    x:1,
+    y:0
+};
+
+let apple = {
+    x:10,
+    y:10
+};
 
 let score = 0;
 
-let dead = false;
+let gameRunning = false;
 let paused = false;
+let dead = false;
 
-let lastMove = performance.now();
+let lastMove = 0;
 
 let shiftHeld = false;
-let dash = false;
+let dashActive = false;
 
 let dashStart = 0;
 let lastDash = -10000;
 
-const DASH_TIME = 2000;
-const DASH_COOLDOWN = 10000;
 
+/* =====================================================
+   GAME START
+===================================================== */
 
-/* =========================================
-   시작
-========================================= */
+function startGame() {
 
-function startGame() {{
+    showScreen("gameScreen");
+
+    applyWorm();
 
     snake = [
-        {{x:8,y:9}},
-        {{x:7,y:9}},
-        {{x:6,y:9}},
-        {{x:5,y:9}},
-        {{x:4,y:9}}
+
+        {x:8,y:9},
+        {x:7,y:9},
+        {x:6,y:9},
+        {x:5,y:9},
+        {x:4,y:9}
+
     ];
 
-    oldSnake =
-        snake.map(p => ({{...p}}));
+    previousSnake =
+        snake.map(
+            p => ({...p})
+        );
 
-    direction = {{x:1,y:0}};
-    nextDirection = {{x:1,y:0}};
+    direction = {
+        x:1,
+        y:0
+    };
+
+    nextDirection = {
+        x:1,
+        y:0
+    };
 
     score = 0;
 
-    dead = false;
+    gameRunning = true;
     paused = false;
+    dead = false;
 
     document.getElementById(
-        "pause"
-    ).style.display="none";
+        "score"
+    ).textContent = 0;
 
     document.getElementById(
-        "gameover"
-    ).style.display="none";
+        "pauseScreen"
+    ).classList.remove("active");
+
+    document.getElementById(
+        "deathScreen"
+    ).classList.remove("active");
 
     document.getElementById(
         "boom"
-    ).style.display="none";
+    ).style.display = "none";
 
     spawnApple();
 
-    lastMove = performance.now();
+    lastMove =
+        performance.now();
 
-    requestAnimationFrame(loop);
-}}
+    updateQuestUI();
+
+    requestAnimationFrame(gameLoop);
+
+}
 
 
-/* =========================================
-   사과
-========================================= */
+function restartGame() {
+    startGame();
+}
 
-function spawnApple(){{
 
-    do {{
+/* =====================================================
+   APPLE
+===================================================== */
 
-        apple = {{
-            x:Math.floor(Math.random()*SIZE),
-            y:Math.floor(Math.random()*SIZE)
-        }};
+function spawnApple() {
 
-    }}while(
+    do {
+
+        apple = {
+            x: Math.floor(
+                Math.random()*SIZE
+            ),
+            y: Math.floor(
+                Math.random()*SIZE
+            )
+        };
+
+    } while(
         snake.some(
             p =>
-                p.x===apple.x &&
-                p.y===apple.y
+                p.x === apple.x &&
+                p.y === apple.y
         )
     );
-}}
+
+}
 
 
-/* =========================================
-   이동
-========================================= */
+/* =====================================================
+   MOVEMENT
+===================================================== */
 
-function moveSnake(){{
-
-    if(dead || paused) return;
-
-    direction = nextDirection;
-
-    const head = snake[0];
-
-    const next = {{
-        x:head.x+direction.x,
-        y:head.y+direction.y
-    }};
+function moveSnake() {
 
     if(
-        next.x<0 ||
-        next.x>=SIZE ||
-        next.y<0 ||
-        next.y>=SIZE
-    ){{
+        !gameRunning ||
+        paused ||
+        dead
+    ) return;
+
+
+    direction =
+        {...nextDirection};
+
+
+    let head = snake[0];
+
+    let next = {
+
+        x:
+            head.x +
+            direction.x,
+
+        y:
+            head.y +
+            direction.y
+
+    };
+
+
+    if(
+        next.x < 0 ||
+        next.x >= SIZE ||
+        next.y < 0 ||
+        next.y >= SIZE
+    ) {
 
         die(next);
+
         return;
-    }}
+
+    }
+
 
     if(
         snake.some(
             p =>
-                p.x===next.x &&
-                p.y===next.y
+                p.x === next.x &&
+                p.y === next.y
         )
-    ){{
+    ) {
 
         die(next);
-        return;
-    }}
 
-    oldSnake =
-        snake.map(p => ({{...p}}));
+        return;
+
+    }
+
+
+    previousSnake =
+        snake.map(
+            p => ({...p})
+        );
+
 
     snake.unshift(next);
 
+
     if(
-        next.x===apple.x &&
-        next.y===apple.y
-    ){{
+        next.x === apple.x &&
+        next.y === apple.y
+    ) {
 
         score++;
 
-        spawnApple();
-
         document.getElementById(
             "score"
-        ).textContent=score;
+        ).textContent = score;
 
-        updateQuest();
+        spawnApple();
 
-    }}else{{
+        updateQuestProgress();
+
+    } else {
 
         snake.pop();
-    }}
 
-    lastMove=performance.now();
-}}
+    }
 
 
-/* =========================================
-   부드러운 렌더링
-========================================= */
+    lastMove =
+        performance.now();
 
-function lerp(a,b,t){{
-
-    return a+(b-a)*t;
-}}
+}
 
 
-function render(progress){{
+/* =====================================================
+   SMOOTH RENDER
+===================================================== */
 
-    const points =
+function lerp(a,b,t) {
+    return a + (b-a)*t;
+}
+
+
+function render(progress) {
+
+    if(snake.length < 2)
+        return;
+
+
+    let points =
         snake.map(
-            (p,i)=>{{
+            (p,i) => {
 
-                const old =
-                    oldSnake[i] || p;
+                let old =
+                    previousSnake[i] || p;
 
-                return {{
-                    x:lerp(old.x,p.x,progress),
-                    y:lerp(old.y,p.y,progress)
-                }};
-            }}
+                return {
+
+                    x: lerp(
+                        old.x,
+                        p.x,
+                        progress
+                    ),
+
+                    y: lerp(
+                        old.y,
+                        p.y,
+                        progress
+                    )
+
+                };
+
+            }
         );
 
-    if(points.length<2) return;
 
     let path =
-        "M "+
+        "M " +
         (
-            points[points.length-1].x*GRID+17
-        )+
-        " "+
+            points[
+                points.length-1
+            ].x*GRID+17
+        ) +
+        " " +
         (
-            points[points.length-1].y*GRID+17
+            points[
+                points.length-1
+            ].y*GRID+17
         );
 
+
     for(
-        let i=points.length-2;
-        i>=0;
+        let i =
+            points.length-2;
+        i >= 0;
         i--
-    ){{
+    ) {
 
         path +=
-            " L "+
+            " L " +
             (
                 points[i].x*GRID+17
-            )+
-            " "+
+            ) +
+            " " +
             (
                 points[i].y*GRID+17
             );
-    }}
+
+    }
+
 
     document.getElementById(
-        "body"
-    ).setAttribute("d",path);
+        "snakeBody"
+    ).setAttribute(
+        "d",
+        path
+    );
 
     document.getElementById(
-        "light"
-    ).setAttribute("d",path);
+        "snakeHighlight"
+    ).setAttribute(
+        "d",
+        path
+    );
 
 
-    const head = points[0];
+    let head =
+        points[0];
 
-    let angle=0;
 
-    if(direction.x===1) angle=0;
-    if(direction.y===1) angle=90;
-    if(direction.x===-1) angle=180;
-    if(direction.y===-1) angle=-90;
+    let angle = 0;
+
+    if(direction.x === 1)
+        angle = 0;
+
+    if(direction.x === -1)
+        angle = 180;
+
+    if(direction.y === 1)
+        angle = 90;
+
+    if(direction.y === -1)
+        angle = -90;
+
 
     document.getElementById(
         "headGroup"
     ).setAttribute(
         "transform",
-        `translate(${{head.x*GRID+17}}
-        ${{head.y*GRID+17}})
-        rotate(${{angle}})`
+        `
+        translate(
+            ${head.x*GRID+17}
+            ${head.y*GRID+17}
+        )
+        rotate(${angle})
+        `
     );
 
 
-    document.getElementById(
-        "apple"
-    ).style.left =
-        apple.x*GRID+"px";
-
-    document.getElementById(
-        "apple"
-    ).style.top =
-        apple.y*GRID+"px";
+    let appleElement =
+        document.getElementById(
+            "apple"
+        );
 
 
-    const dist =
+    appleElement.style.left =
+        apple.x*GRID + "px";
+
+    appleElement.style.top =
+        apple.y*GRID + "px";
+
+
+    /* 입 벌리기 */
+
+    let distance =
         Math.max(
             Math.abs(
-                snake[0].x-apple.x
+                snake[0].x -
+                apple.x
             ),
             Math.abs(
-                snake[0].y-apple.y
+                snake[0].y -
+                apple.y
             )
         );
 
 
-    if(dist<=2){{
+    if(distance <= 2) {
 
         document.getElementById(
-            "mouth"
-        ).style.display="none";
-
-        document.getElementById(
-            "openMouth"
-        ).style.display="block";
-
-    }}else{{
-
-        document.getElementById(
-            "mouth"
-        ).style.display="block";
+            "normalMouth"
+        ).style.display = "none";
 
         document.getElementById(
             "openMouth"
-        ).style.display="none";
-    }}
-}}
+        ).style.display = "block";
+
+    } else {
+
+        document.getElementById(
+            "normalMouth"
+        ).style.display = "block";
+
+        document.getElementById(
+            "openMouth"
+        ).style.display = "none";
+
+    }
+
+}
 
 
-/* =========================================
-   게임 루프
-========================================= */
+/* =====================================================
+   GAME LOOP
+===================================================== */
 
-function loop(time){{
+function gameLoop(time) {
 
-    if(dead) return;
+    if(
+        !gameRunning ||
+        dead
+    ) return;
 
-    if(!paused){{
+
+    if(!paused) {
 
         let speed =
-            dash ? 65 : 160;
+            dashActive
+            ? getDashSpeed()
+            : 155;
+
 
         let progress =
             Math.min(
@@ -1009,329 +1816,673 @@ function loop(time){{
                 1
             );
 
-        progress =
-            progress<.5
+
+        /*
+            부드러운 ease-in-out
+        */
+
+        let smooth =
+            progress < .5
             ? 2*progress*progress
-            : 1-
+            : 1 -
               Math.pow(
                   -2*progress+2,
                   2
               )/2;
 
-        render(progress);
+
+        render(smooth);
+
 
         if(
-            time-lastMove>=speed
-        ){{
+            time-lastMove >= speed
+        ) {
+
             moveSnake();
-        }}
 
-        updateSkill();
-
-        requestAnimationFrame(loop);
-    }}
-}}
+        }
 
 
-/* =========================================
-   질주
-========================================= */
+        updateDash();
 
-function activateDash(){{
 
-    if(dead || paused || dash)
-        return;
+        requestAnimationFrame(
+            gameLoop
+        );
 
-    const now =
-        performance.now();
+    }
+
+}
+
+
+/* =====================================================
+   SKILLS
+===================================================== */
+
+function getDashSpeed() {
+
+    if(equippedSkill === "turbo")
+        return 48;
+
+    if(equippedSkill === "wind")
+        return 38;
+
+    if(equippedSkill === "flash")
+        return 28;
+
+    return 65;
+
+}
+
+
+function activateDash() {
 
     if(
-        now-lastDash<DASH_COOLDOWN
+        !gameRunning ||
+        paused ||
+        dead ||
+        dashActive
     )
         return;
 
-    dash=true;
 
-    lastDash=now;
-
-    dashStart=now;
-}}
-
-
-function updateSkill(){{
-
-    const now =
+    let now =
         performance.now();
 
-    const status =
+
+    if(
+        now-lastDash < 10000
+    )
+        return;
+
+
+    dashActive = true;
+
+    dashStart = now;
+
+    lastDash = now;
+
+    document
+        .querySelectorAll(".wind")
+        .forEach(
+            w =>
+                w.classList.add("active")
+        );
+
+}
+
+
+function updateDash() {
+
+    let now =
+        performance.now();
+
+
+    if(dashActive) {
+
+        if(
+            now-dashStart >= 2000
+        ) {
+
+            dashActive = false;
+
+            document
+                .querySelectorAll(".wind")
+                .forEach(
+                    w =>
+                        w.classList.remove(
+                            "active"
+                        )
+                );
+
+        }
+
+    }
+
+
+    let status =
         document.getElementById(
             "skillStatus"
         );
 
-    if(dash){{
 
-        if(
-            now-dashStart>=DASH_TIME
-        ){{
-            dash=false;
-        }}else{{
-
-            status.textContent =
-                "🔥 질주 중";
-            return;
-        }}
-    }}
-
-    const remaining =
-        DASH_COOLDOWN-
+    let remaining =
+        10000 -
         (now-lastDash);
 
+
     if(
-        lastDash<0 ||
-        remaining<=0
-    ){{
-        status.textContent="READY";
-    }}else{{
+        lastDash < 0 ||
+        remaining <= 0
+    ) {
+
+        status.textContent =
+            "READY";
+
+        status.className =
+            "skillReady";
+
+    } else if(dashActive) {
+
+        status.textContent =
+            "🔥 질주 중!";
+
+        status.className =
+            "skillReady";
+
+    } else {
+
         status.textContent =
             Math.ceil(
                 remaining/1000
-            )+
-            "초";
-    }}
-}}
+            ) + "초";
+
+        status.className =
+            "skillCooldown";
+
+    }
+
+}
 
 
-/* =========================================
-   죽음
-========================================= */
+/* =====================================================
+   DEATH
+===================================================== */
 
-function die(pos){{
+function die(position) {
 
-    dead=true;
-    dash=false;
+    dead = true;
 
-    const boom =
-        document.getElementById("boom");
+    gameRunning = false;
+
+    dashActive = false;
+
+
+    if(score > highScore) {
+
+        highScore = score;
+
+        localStorage.setItem(
+            "wormHigh",
+            highScore
+        );
+
+    }
+
+
+    let boom =
+        document.getElementById(
+            "boom"
+        );
+
 
     boom.style.left =
-        pos.x*GRID+"px";
+        position.x*GRID + "px";
 
     boom.style.top =
-        pos.y*GRID+"px";
+        position.y*GRID + "px";
 
-    boom.style.display="block";
+    boom.style.display =
+        "block";
+
 
     setTimeout(
-        ()=>{{
+        () => {
 
             document.getElementById(
                 "finalScore"
-            ).textContent=score;
+            ).textContent = score;
 
             document.getElementById(
-                "gameover"
-            ).style.display="block";
+                "deathScreen"
+            ).classList.add(
+                "active"
+            );
 
-        }},
-        500
+            updateUI();
+
+        },
+        600
     );
-}}
+
+}
 
 
-/* =========================================
-   퀘스트
-========================================= */
+/* =====================================================
+   PAUSE
+===================================================== */
 
-function updateQuest(){{
+function pauseGame() {
 
-    let progress =
-        Math.min(score,5);
+    if(
+        !gameRunning ||
+        dead
+    ) return;
+
+
+    paused = true;
 
     document.getElementById(
-        "questText"
-    ).textContent =
-        "🍎 사과 먹기 "+
-        progress+
-        "/5";
+        "pauseScreen"
+    ).classList.add(
+        "active"
+    );
 
-    if(score>=5){{
-
-        document.getElementById(
-            "questText"
-        ).textContent =
-            "🎉 완료! +80 🪙";
-    }}
-}}
+}
 
 
-/* =========================================
-   키보드
-========================================= */
+function continueGame() {
+
+    if(dead)
+        return;
+
+
+    paused = false;
+
+    document.getElementById(
+        "pauseScreen"
+    ).classList.remove(
+        "active"
+    );
+
+
+    lastMove =
+        performance.now();
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
 
 document.addEventListener(
     "keydown",
-    e => {{
+    function(e) {
 
-        const key =
-            e.key.toLowerCase();
+        /*
+            ESC
+        */
 
-
-        /* ESC */
-
-        if(e.code==="Escape"){{
+        if(e.code === "Escape") {
 
             e.preventDefault();
 
-            if(dead) return;
+            if(
+                document
+                .getElementById(
+                    "gameScreen"
+                )
+                .classList.contains(
+                    "active"
+                )
+            ) {
 
-            paused=!paused;
+                if(paused)
+                    continueGame();
+                else
+                    pauseGame();
 
-            document.getElementById(
-                "pause"
-            ).style.display =
-                paused
-                ? "block"
-                : "none";
-
-            if(!paused){{
-                lastMove=performance.now();
-                requestAnimationFrame(loop);
-            }}
+            }
 
             return;
-        }}
+
+        }
 
 
-        /* LEFT SHIFT */
+        /*
+            LSHIFT
+        */
 
-        if(e.code==="ShiftLeft"){{
+        if(
+            e.code === "ShiftLeft"
+        ) {
 
             e.preventDefault();
 
-            shiftHeld=true;
+            shiftHeld = true;
 
             activateDash();
 
             return;
-        }}
+
+        }
 
 
-        if(paused || dead)
+        if(
+            paused ||
+            dead ||
+            !gameRunning
+        )
             return;
 
 
-        if(
-            (key==="w" ||
-             key==="arrowup") &&
-            direction.y!==1
-        ){{
-            nextDirection={{x:0,y:-1}};
-        }}
+        let key =
+            e.key.toLowerCase();
+
 
         if(
-            (key==="s" ||
-             key==="arrowdown") &&
-            direction.y!==-1
-        ){{
-            nextDirection={{x:0,y:1}};
-        }}
+            (
+                key === "w" ||
+                key === "arrowup"
+            ) &&
+            direction.y !== 1
+        ) {
+
+            nextDirection = {
+                x:0,
+                y:-1
+            };
+
+        }
+
 
         if(
-            (key==="a" ||
-             key==="arrowleft") &&
-            direction.x!==1
-        ){{
-            nextDirection={{x:-1,y:0}};
-        }}
+            (
+                key === "s" ||
+                key === "arrowdown"
+            ) &&
+            direction.y !== -1
+        ) {
+
+            nextDirection = {
+                x:0,
+                y:1
+            };
+
+        }
+
 
         if(
-            (key==="d" ||
-             key==="arrowright") &&
-            direction.x!==-1
-        ){{
-            nextDirection={{x:1,y:0}};
-        }}
-    }}
+            (
+                key === "a" ||
+                key === "arrowleft"
+            ) &&
+            direction.x !== 1
+        ) {
+
+            nextDirection = {
+                x:-1,
+                y:0
+            };
+
+        }
+
+
+        if(
+            (
+                key === "d" ||
+                key === "arrowright"
+            ) &&
+            direction.x !== -1
+        ) {
+
+            nextDirection = {
+                x:1,
+                y:0
+            };
+
+        }
+
+    }
 );
 
 
 document.addEventListener(
     "keyup",
-    e => {{
+    function(e) {
 
-        if(e.code==="ShiftLeft"){{
+        if(
+            e.code === "ShiftLeft"
+        ) {
 
-            shiftHeld=false;
+            shiftHeld = false;
 
-            dash=false;
-        }}
-    }}
+            dashActive = false;
+
+            document
+                .querySelectorAll(".wind")
+                .forEach(
+                    w =>
+                        w.classList.remove(
+                            "active"
+                        )
+                );
+
+        }
+
+    }
 );
 
 
-/* =========================================
-   버튼
-========================================= */
+/* =====================================================
+   QUEST SYSTEM
+===================================================== */
 
-document.getElementById(
-    "continue"
-).onclick=()=>{{
+function updateQuestProgress() {
 
-    paused=false;
+    quests.forEach(
+        q => {
+
+            if(
+                q.type === "apple"
+            ) {
+
+                q.progress = score;
+
+            }
+
+            if(
+                q.type === "score"
+            ) {
+
+                q.progress = score;
+
+            }
+
+            if(
+                q.type === "length"
+            ) {
+
+                q.progress =
+                    snake.length;
+
+            }
+
+        }
+    );
+
+
+    checkQuestCompletion();
+
+    updateQuestUI();
+
+    saveData();
+
+}
+
+
+function checkQuestCompletion() {
+
+    let completedIndex = -1;
+
+
+    for(
+        let i=0;
+        i<quests.length;
+        i++
+    ) {
+
+        if(
+            quests[i].progress >=
+            quests[i].target
+        ) {
+
+            completedIndex = i;
+
+            break;
+
+        }
+
+    }
+
+
+    if(completedIndex !== -1) {
+
+        let reward =
+            Math.min(
+                quests[
+                    completedIndex
+                ].reward,
+                200
+            );
+
+
+        coins += reward;
+
+
+        notify(
+            "🎉 퀘스트 완료! +" +
+            reward +
+            " 🪙"
+        );
+
+
+        /*
+            완료한 퀘스트 하나만
+            새로운 퀘스트로 교체
+        */
+
+        let available =
+            questPool.filter(
+                q =>
+                    !quests.some(
+                        current =>
+                            current.text === q.text &&
+                            current.target === q.target
+                    )
+            );
+
+
+        if(
+            available.length === 0
+        ) {
+
+            available =
+                questPool;
+
+        }
+
+
+        let replacement =
+            available[
+                Math.floor(
+                    Math.random() *
+                    available.length
+                )
+            ];
+
+
+        quests[
+            completedIndex
+        ] = {
+            ...replacement,
+            progress: 0
+        };
+
+
+        saveData();
+
+    }
+
+}
+
+
+function updateQuestUI() {
+
+    if(!quests.length)
+        return;
+
+
+    let q = quests[0];
+
+
+    /*
+        게임 화면에는
+        가장 먼저 진행 중인 퀘스트
+        하나만 작게 표시
+    */
+
+    for(
+        let i=0;
+        i<quests.length;
+        i++
+    ) {
+
+        if(
+            quests[i].progress <
+            quests[i].target
+        ) {
+
+            q = quests[i];
+
+            break;
+
+        }
+
+    }
+
+
+    let progress =
+        Math.min(
+            q.progress,
+            q.target
+        );
+
 
     document.getElementById(
-        "pause"
-    ).style.display="none";
-
-    lastMove=performance.now();
-
-    requestAnimationFrame(loop);
-}};
-
-
-document.getElementById(
-    "restart"
-).onclick=()=>{{
-    startGame();
-}};
+        "questText"
+    ).textContent =
+        q.text +
+        " " +
+        progress +
+        "/" +
+        q.target;
 
 
-document.getElementById(
-    "restart2"
-).onclick=()=>{{
-    startGame();
-}};
+    document.getElementById(
+        "questReward"
+    ).textContent =
+        Math.min(
+            q.reward,
+            200
+        );
+
+}
 
 
-startGame();
+/* =====================================================
+   INIT
+===================================================== */
+
+updateUI();
+
+renderShop();
 
 </script>
 
 </body>
-
 </html>
 """
 
-    components.html(
-        game_html,
-        height=750,
-        scrolling=False
-    )
-
-
-# =========================================================
-# 페이지 실행
-# =========================================================
-
-if st.session_state.page == "main":
-
-    main_page()
-
-elif st.session_state.page == "shop":
-
-    shop_page()
-
-elif st.session_state.page == "game":
-
-    game_page()
+components.html(
+    html,
+    height=850,
+    scrolling=False
+)
 ```
