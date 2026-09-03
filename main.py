@@ -54,6 +54,7 @@ button{
     display:block;
 }
 
+
 /* =========================
    MAIN
 ========================= */
@@ -89,8 +90,13 @@ button{
 }
 
 @keyframes floatWorm{
-    0%,100%{transform:translateY(0) rotate(-3deg)}
-    50%{transform:translateY(-10px) rotate(3deg)}
+    0%,100%{
+        transform:translateY(0) rotate(-3deg)
+    }
+
+    50%{
+        transform:translateY(-10px) rotate(3deg)
+    }
 }
 
 .mainStats{
@@ -108,14 +114,6 @@ button{
     background:#152119;
     font-size:19px;
     font-weight:800;
-}
-
-.coin{
-    color:#ffd84d;
-}
-
-.high{
-    color:#8bb7ff;
 }
 
 .mainButton{
@@ -142,6 +140,7 @@ button{
     background:#744cc0;
     box-shadow:0 5px 0 #4b3180;
 }
+
 
 /* =========================
    SHOP
@@ -241,6 +240,7 @@ button{
     background:#c28727;
 }
 
+
 /* =========================
    GAME
 ========================= */
@@ -286,15 +286,30 @@ button{
     border:10px solid #214e9c;
     border-radius:20px;
     overflow:hidden;
+
     background:
-        linear-gradient(rgba(255,255,255,.045) 2px,transparent 2px),
-        linear-gradient(90deg,rgba(255,255,255,.045) 2px,transparent 2px),
+        linear-gradient(
+            rgba(255,255,255,.045) 2px,
+            transparent 2px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.045) 2px,
+            transparent 2px
+        ),
         #75b93d;
+
     background-size:35px 35px;
+
     box-shadow:
         0 10px 25px rgba(0,0,0,.45),
         inset 0 0 20px rgba(0,0,0,.2);
 }
+
+
+/* =========================
+   WORM
+========================= */
 
 #snakeSvg{
     position:absolute;
@@ -307,7 +322,7 @@ button{
 #snakeBody{
     fill:none;
     stroke:#315fc9;
-    stroke-width:28;
+    stroke-width:30;
     stroke-linecap:round;
     stroke-linejoin:round;
 }
@@ -317,7 +332,9 @@ button{
     stroke:#9ab9ff;
     stroke-width:5;
     stroke-linecap:round;
-    opacity:.8;
+    stroke-linejoin:round;
+    opacity:.75;
+    pointer-events:none;
 }
 
 #head{
@@ -342,24 +359,40 @@ button{
     display:none;
 }
 
+
+/* =========================
+   APPLE
+========================= */
+
 #apple{
     position:absolute;
     z-index:20;
     width:35px;
     height:35px;
+
     display:flex;
     justify-content:center;
     align-items:center;
+
     font-size:30px;
+
     animation:applePulse .65s infinite;
 }
 
 @keyframes applePulse{
-    0%,100%{transform:scale(.85)}
-    50%{transform:scale(1.13)}
+    0%,100%{
+        transform:scale(.85)
+    }
+
+    50%{
+        transform:scale(1.13)
+    }
 }
 
-/* QUEST */
+
+/* =========================
+   QUEST
+========================= */
 
 #questBox{
     position:absolute;
@@ -367,10 +400,14 @@ button{
     right:20px;
     top:18px;
     width:190px;
+
     padding:10px 12px;
+
     border-radius:12px;
+
     background:rgba(0,0,0,.78);
     border:1px solid rgba(255,255,255,.15);
+
     font-size:12px;
 }
 
@@ -386,16 +423,23 @@ button{
     margin-top:4px;
 }
 
-/* SKILL */
+
+/* =========================
+   SKILL
+========================= */
 
 #skillBox{
     position:absolute;
     z-index:100;
     left:20px;
     top:18px;
+
     padding:9px 12px;
+
     border-radius:12px;
+
     background:rgba(0,0,0,.78);
+
     font-size:12px;
 }
 
@@ -409,15 +453,23 @@ button{
     font-weight:bold;
 }
 
-/* WIND */
+
+/* =========================
+   WIND
+========================= */
 
 .wind{
     position:absolute;
     z-index:150;
+
     height:4px;
+
     border-radius:4px;
+
     background:white;
+
     opacity:0;
+
     pointer-events:none;
 }
 
@@ -426,27 +478,37 @@ button{
 }
 
 @keyframes slash{
+
     0%{
         opacity:0;
         transform:translateX(-40px) rotate(-15deg);
     }
+
     25%{
         opacity:.9;
     }
+
     100%{
         opacity:0;
         transform:translateX(80px) rotate(-15deg);
     }
 }
 
-/* PAUSE / DEATH */
+
+/* =========================
+   OVERLAY
+========================= */
 
 .overlay{
     display:none;
+
     position:absolute;
     z-index:500;
+
     inset:0;
+
     background:rgba(0,0,0,.82);
+
     justify-content:center;
     align-items:center;
 }
@@ -457,29 +519,44 @@ button{
 
 .overlayCard{
     width:450px;
+
     padding:38px;
+
     border-radius:25px;
+
     background:#101711;
+
     border:2px solid #3b4e3e;
+
     text-align:center;
-    box-shadow:0 20px 50px rgba(0,0,0,.7);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.7);
 }
 
 .overlayCard h1{
     margin:0 0 30px;
+
     font-size:65px;
+
     font-weight:1000;
 }
 
 .pauseBtn,
 .deathBtn{
     display:block;
+
     width:290px;
     height:55px;
+
     margin:11px auto;
+
     border-radius:12px;
+
     color:white;
+
     font-size:18px;
+
     font-weight:900;
 }
 
@@ -499,56 +576,100 @@ button{
     color:#ff4545;
 }
 
+
+/* =========================
+   EFFECT
+========================= */
+
 #boom{
     display:none;
+
     position:absolute;
+
     z-index:450;
+
     font-size:80px;
+
     pointer-events:none;
+
     animation:boom .55s ease-out;
 }
 
 @keyframes boom{
-    0%{transform:scale(.3);opacity:0}
-    40%{transform:scale(1.25);opacity:1}
-    100%{transform:scale(1);opacity:1}
+
+    0%{
+        transform:scale(.3);
+        opacity:0;
+    }
+
+    40%{
+        transform:scale(1.25);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
 }
 
 #notification{
     position:fixed;
+
     z-index:1000;
+
     left:50%;
     bottom:25px;
+
     transform:translateX(-50%);
+
     padding:13px 24px;
+
     border-radius:12px;
+
     background:#1c291e;
+
     border:2px solid #49624c;
+
     font-weight:900;
+
     display:none;
 }
 
 @media(max-width:780px){
+
     #app{
         transform:scale(.9);
         transform-origin:top center;
     }
+
 }
 </style>
 </head>
+
 
 <body>
 
 <div id="app">
 
-<!-- ================= MAIN ================= -->
+
+<!-- =========================
+     MAIN
+========================= -->
 
 <section id="mainScreen" class="screen active">
 
-    <div class="logo">🪱 WORM QUEST</div>
-    <div class="logoSub">먹고 · 성장하고 · 질주하라</div>
+    <div class="logo">
+        🪱 WORM QUEST
+    </div>
 
-    <div class="mainWorm" id="mainWorm">🪱</div>
+    <div class="logoSub">
+        먹고 · 성장하고 · 질주하라
+    </div>
+
+    <div class="mainWorm" id="mainWorm">
+        🪱
+    </div>
 
     <div class="mainStats">
 
@@ -565,7 +686,9 @@ button{
     <button
         class="mainButton startButton"
         onclick="startGame()">
+
         🎮 게임 시작하기
+
     </button>
 
     <br>
@@ -573,13 +696,17 @@ button{
     <button
         class="mainButton shopOpen"
         onclick="openShop()">
+
         🛒 상점
+
     </button>
 
 </section>
 
 
-<!-- ================= SHOP ================= -->
+<!-- =========================
+     SHOP
+========================= -->
 
 <section id="shopScreen" class="screen">
 
@@ -588,10 +715,14 @@ button{
         <button
             class="back"
             onclick="showScreen('mainScreen')">
+
             ← 메인으로
+
         </button>
 
-        <div class="pageTitle">🛒 상점</div>
+        <div class="pageTitle">
+            🛒 상점
+        </div>
 
         <div class="shopCoin">
             🪙 <span id="shopCoins">0</span>
@@ -599,14 +730,20 @@ button{
 
     </div>
 
-    <div class="sectionTitle">🪱 지렁이 외형</div>
+
+    <div class="sectionTitle">
+        🪱 지렁이 외형
+    </div>
 
     <div
         class="shopGrid"
         id="wormShop">
     </div>
 
-    <div class="sectionTitle">⚡ 스킬 변경</div>
+
+    <div class="sectionTitle">
+        ⚡ 스킬 변경
+    </div>
 
     <div
         class="shopGrid"
@@ -616,60 +753,108 @@ button{
 </section>
 
 
-<!-- ================= GAME ================= -->
+<!-- =========================
+     GAME
+========================= -->
 
 <section id="gameScreen" class="screen">
 
     <div class="gameHeader">
 
         <div class="scoreBox">
+
             점수:
             <span id="score">0</span>
+
             &nbsp;&nbsp;
-            🪙 <span id="gameCoins">0</span>
+
+            🪙
+            <span id="gameCoins">0</span>
+
         </div>
 
         <div class="bestBox">
+
             🏆 최고기록:
             <span id="gameHigh">0</span>
+
         </div>
 
     </div>
+
 
     <div id="gameWrapper">
 
         <div id="board">
 
+
+            <!-- SKILL -->
+
             <div id="skillBox">
-                ⚡ <span id="skillName">질주</span>
+
+                ⚡
+                <span id="skillName">
+                    질주
+                </span>
+
                 <br>
+
                 <span
                     id="skillStatus"
                     class="skillReady">
+
                     READY
+
                 </span>
+
             </div>
 
+
+            <!-- QUEST -->
+
             <div id="questBox">
-                <div class="questTitle">📜 QUEST</div>
+
+                <div class="questTitle">
+                    📜 QUEST
+                </div>
 
                 <div id="questText">
                     사과 먹기 0/5
                 </div>
 
                 <div class="questReward">
+
                     🪙 보상:
-                    <span id="questReward">80</span>
+                    <span id="questReward">
+                        80
+                    </span>
+
                 </div>
+
             </div>
 
-            <div id="apple">🍎</div>
 
-            <svg id="snakeSvg"
-                 viewBox="0 0 620 620">
+            <!-- APPLE -->
 
-                <path id="snakeBody"></path>
-                <path id="snakeHighlight"></path>
+            <div id="apple">
+                🍎
+            </div>
+
+
+            <!-- SNAKE -->
+
+            <svg
+                id="snakeSvg"
+                viewBox="0 0 620 620">
+
+                <path
+                    id="snakeBody">
+                </path>
+
+                <path
+                    id="snakeHighlight">
+                </path>
+
 
                 <g id="headGroup">
 
@@ -680,6 +865,7 @@ button{
                         r="18">
                     </circle>
 
+
                     <circle
                         class="eye"
                         cx="7"
@@ -694,6 +880,7 @@ button{
                         r="7">
                     </circle>
 
+
                     <circle
                         class="pupil"
                         cx="9"
@@ -707,11 +894,13 @@ button{
                         cy="11"
                         r="3">
                     </circle>
+
 
                     <path
                         id="normalMouth"
                         d="M12,-4 Q20,0 12,4">
                     </path>
+
 
                     <g id="openMouth">
 
@@ -736,28 +925,46 @@ button{
 
             </svg>
 
-            <div
-                id="boom">
+
+            <!-- BOOM -->
+
+            <div id="boom">
                 💥
             </div>
+
+
+            <!-- WIND -->
 
             <div
                 class="wind"
                 id="wind1"
-                style="left:100px;top:250px;width:100px">
+                style="
+                    left:100px;
+                    top:250px;
+                    width:100px
+                ">
             </div>
 
             <div
                 class="wind"
                 id="wind2"
-                style="left:410px;top:320px;width:80px">
+                style="
+                    left:410px;
+                    top:320px;
+                    width:80px
+                ">
             </div>
 
             <div
                 class="wind"
                 id="wind3"
-                style="left:160px;top:410px;width:90px">
+                style="
+                    left:160px;
+                    top:410px;
+                    width:90px
+                ">
             </div>
+
 
             <!-- PAUSE -->
 
@@ -767,23 +974,30 @@ button{
 
                 <div class="overlayCard">
 
-                    <h1>일시정지</h1>
+                    <h1>
+                        일시정지
+                    </h1>
 
                     <button
                         class="pauseBtn continueBtn"
                         onclick="continueGame()">
+
                         ▶️ 계속하기
+
                     </button>
 
                     <button
                         class="pauseBtn restartBtn"
                         onclick="restartGame()">
+
                         🔄 다시하기
+
                     </button>
 
                 </div>
 
             </div>
+
 
             <!-- DEATH -->
 
@@ -798,22 +1012,28 @@ button{
                     </h1>
 
                     <h2>
+
                         점수:
                         <span id="finalScore">
                             0
                         </span>
+
                     </h2>
 
                     <button
                         class="deathBtn restartBtn"
                         onclick="restartGame()">
+
                         🔄 다시하기
+
                     </button>
 
                     <button
                         class="deathBtn mainBackBtn"
                         onclick="showScreen('mainScreen')">
+
                         🏠 메인으로
+
                     </button>
 
                 </div>
@@ -825,6 +1045,7 @@ button{
     </div>
 
 </section>
+
 
 <div id="notification"></div>
 
@@ -883,6 +1104,7 @@ const worms = {
 
 };
 
+
 const skills = {
 
     dash:{
@@ -917,10 +1139,14 @@ const skills = {
 ========================================================= */
 
 let coins =
-    Number(localStorage.getItem("wormCoins") || 0);
+    Number(
+        localStorage.getItem("wormCoins") || 0
+    );
 
 let highScore =
-    Number(localStorage.getItem("wormHighScore") || 0);
+    Number(
+        localStorage.getItem("wormHighScore") || 0
+    );
 
 let equippedWorm =
     localStorage.getItem("wormEquipped") || "basic";
@@ -928,11 +1154,13 @@ let equippedWorm =
 let equippedSkill =
     localStorage.getItem("wormSkill") || "dash";
 
+
 let ownedWorms =
     JSON.parse(
         localStorage.getItem("wormOwned") ||
         '["basic"]'
     );
+
 
 let ownedSkills =
     JSON.parse(
@@ -1012,6 +1240,7 @@ const questPool = [
 
 ];
 
+
 let quests =
     JSON.parse(
         localStorage.getItem("wormQuests") || "null"
@@ -1028,7 +1257,7 @@ function makeInitialQuests(){
 
         const index =
             Math.floor(
-                Math.random()*pool.length
+                Math.random() * pool.length
             );
 
         quests.push({
@@ -1037,11 +1266,9 @@ function makeInitialQuests(){
         });
 
         pool.splice(index,1);
-
     }
 
     saveQuests();
-
 }
 
 
@@ -1059,7 +1286,9 @@ if(
     !Array.isArray(quests) ||
     quests.length !== 3
 ){
+
     makeInitialQuests();
+
 }
 
 
@@ -1208,7 +1437,9 @@ function renderShop(){
                     <div
                         class="shopEmoji"
                         style="color:${worm.color}">
+
                         ${worm.emoji}
+
                     </div>
 
                     <div class="shopName">
@@ -1216,17 +1447,21 @@ function renderShop(){
                     </div>
 
                     <div class="shopPrice">
+
                         ${
                             worm.price === 0
                             ? "무료"
                             : "🪙 " + worm.price
                         }
+
                     </div>
 
                     <button
                         class="shopBtn ${cls}"
                         onclick="buyWorm('${id}')">
+
                         ${text}
+
                     </button>
 
                 </div>
@@ -1235,6 +1470,7 @@ function renderShop(){
 
         }
     );
+
 
     document.getElementById(
         "wormShop"
@@ -1283,17 +1519,21 @@ function renderShop(){
                     </div>
 
                     <div class="shopPrice">
+
                         ${
                             skill.price === 0
                             ? "무료"
                             : "🪙 " + skill.price
                         }
+
                     </div>
 
                     <button
                         class="shopBtn ${cls}"
                         onclick="buySkill('${id}')">
+
                         ${text}
+
                     </button>
 
                 </div>
@@ -1302,6 +1542,7 @@ function renderShop(){
 
         }
     );
+
 
     document.getElementById(
         "skillShop"
@@ -1332,13 +1573,17 @@ function buyWorm(id){
 
     }
 
+
     if(coins < item.price){
 
-        notify("🪙 코인이 부족합니다!");
+        notify(
+            "🪙 코인이 부족합니다!"
+        );
 
         return;
 
     }
+
 
     coins -= item.price;
 
@@ -1379,13 +1624,17 @@ function buySkill(id){
 
     }
 
+
     if(coins < item.price){
 
-        notify("🪙 코인이 부족합니다!");
+        notify(
+            "🪙 코인이 부족합니다!"
+        );
 
         return;
 
     }
+
 
     coins -= item.price;
 
@@ -1426,6 +1675,7 @@ function applyWorm(){
 
 let notificationTimer = null;
 
+
 function notify(text){
 
     const box =
@@ -1442,7 +1692,9 @@ function notify(text){
     notificationTimer =
         setTimeout(
             () => {
+
                 box.style.display = "none";
+
             },
             1800
         );
@@ -1485,8 +1737,13 @@ let lastMoveTime = 0;
 
 let dashActive = false;
 let shiftHeld = false;
+
 let dashStartTime = 0;
 let lastDashTime = -10000;
+
+
+/* ★ 재시작 시 중복 루프 방지 */
+let gameLoopId = null;
 
 
 /* =========================================================
@@ -1495,66 +1752,109 @@ let lastDashTime = -10000;
 
 function startGame(){
 
+    /* 기존 게임 루프 제거 */
+    if(gameLoopId !== null){
+
+        cancelAnimationFrame(gameLoopId);
+
+        gameLoopId = null;
+
+    }
+
+
     showScreen("gameScreen");
 
+
     snake = [
+
         {x:8,y:9},
         {x:7,y:9},
         {x:6,y:9},
         {x:5,y:9},
         {x:4,y:9}
+
     ];
+
 
     previousSnake =
         snake.map(
             point => ({...point})
         );
 
+
     direction = {
         x:1,
         y:0
     };
+
 
     nextDirection = {
         x:1,
         y:0
     };
 
+
     score = 0;
+
 
     gameRunning = true;
     paused = false;
     dead = false;
 
+
     dashActive = false;
     shiftHeld = false;
+
+    lastDashTime = -10000;
+
 
     document.getElementById(
         "score"
     ).textContent = "0";
 
+
     document.getElementById(
         "pauseOverlay"
     ).classList.remove("active");
+
 
     document.getElementById(
         "deathOverlay"
     ).classList.remove("active");
 
+
     document.getElementById(
         "boom"
     ).style.display = "none";
 
+
+    /*
+        ★★★★★★★★★★★★★★★★★★★★★★★
+        새 게임마다 퀘스트 완전 초기화
+        ★★★★★★★★★★★★★★★★★★★★★★★
+    */
+
+    makeInitialQuests();
+
+
     spawnApple();
+
 
     lastMoveTime =
         performance.now();
 
+
     applyWorm();
+
 
     updateQuestUI();
 
-    requestAnimationFrame(gameLoop);
+
+    render(1);
+
+
+    gameLoopId =
+        requestAnimationFrame(gameLoop);
 
 }
 
@@ -1577,13 +1877,17 @@ function spawnApple(){
     while(!valid){
 
         apple = {
+
             x:Math.floor(
                 Math.random()*GRID
             ),
+
             y:Math.floor(
                 Math.random()*GRID
             )
+
         };
+
 
         valid =
             !snake.some(
@@ -1608,19 +1912,30 @@ function moveSnake(){
         paused ||
         dead
     ){
+
         return;
+
     }
 
 
     direction =
         {...nextDirection};
 
+
     const head =
         snake[0];
 
+
     const next = {
-        x:head.x + direction.x,
-        y:head.y + direction.y
+
+        x:
+            head.x +
+            direction.x,
+
+        y:
+            head.y +
+            direction.y
+
     };
 
 
@@ -1637,6 +1952,10 @@ function moveSnake(){
 
     }
 
+
+    /*
+        자기 몸 충돌
+    */
 
     const hitSelf =
         snake.some(
@@ -1660,6 +1979,7 @@ function moveSnake(){
             point => ({...point})
         );
 
+
     snake.unshift(next);
 
 
@@ -1670,13 +1990,17 @@ function moveSnake(){
 
         score++;
 
+
         document.getElementById(
             "score"
         ).textContent = score;
 
+
         spawnApple();
 
+
         updateQuestProgress();
+
 
     }else{
 
@@ -1692,7 +2016,7 @@ function moveSnake(){
 
 
 /* =========================================================
-   SMOOTH RENDER
+   SMOOTH WORM RENDER
 ========================================================= */
 
 function lerp(a,b,t){
@@ -1705,29 +2029,214 @@ function lerp(a,b,t){
 function ease(t){
 
     return t < .5
+
         ? 2*t*t
-        : 1-Math.pow(-2*t+2,2)/2;
+
+        : 1-Math.pow(
+            -2*t+2,
+            2
+        )/2;
 
 }
 
 
-function render(progress){
+/*
+    몸통을 자연스럽게 연결하는
+    Catmull-Rom 곡선
+*/
 
-    if(snake.length === 0){
-        return;
+function catmullRom(
+    p0,
+    p1,
+    p2,
+    p3,
+    t
+){
+
+    const t2 = t*t;
+    const t3 = t2*t;
+
+
+    return {
+
+        x:
+            0.5 * (
+
+                (2*p1.x)
+
+                +
+
+                (-p0.x+p2.x)*t
+
+                +
+
+                (
+                    2*p0.x
+                    -5*p1.x
+                    +4*p2.x
+                    -p3.x
+                )*t2
+
+                +
+
+                (
+                    -p0.x
+                    +3*p1.x
+                    -3*p2.x
+                    +p3.x
+                )*t3
+
+            ),
+
+
+        y:
+            0.5 * (
+
+                (2*p1.y)
+
+                +
+
+                (-p0.y+p2.y)*t
+
+                +
+
+                (
+                    2*p0.y
+                    -5*p1.y
+                    +4*p2.y
+                    -p3.y
+                )*t2
+
+                +
+
+                (
+                    -p0.y
+                    +3*p1.y
+                    -3*p2.y
+                    +p3.y
+                )*t3
+
+            )
+
+    };
+
+}
+
+
+/*
+    여러 점을 부드러운 곡선으로 연결
+*/
+
+function createSmoothPath(points){
+
+    if(points.length === 0){
+
+        return "";
+
     }
 
 
-    const t = ease(
-        Math.max(
-            0,
-            Math.min(
-                1,
-                progress
-            )
-        )
-    );
+    if(points.length === 1){
 
+        return `
+            M
+            ${points[0].x}
+            ${points[0].y}
+        `;
+
+    }
+
+
+    let path =
+        `M ${points[0].x} ${points[0].y}`;
+
+
+    for(
+        let i=0;
+        i<points.length-1;
+        i++
+    ){
+
+        const p0 =
+            points[
+                Math.max(0,i-1)
+            ];
+
+        const p1 =
+            points[i];
+
+        const p2 =
+            points[i+1];
+
+        const p3 =
+            points[
+                Math.min(
+                    points.length-1,
+                    i+2
+                )
+            ];
+
+
+        /*
+            한 칸을 여러 구간으로 나눠서
+            곡선을 더 부드럽게 만듦
+        */
+
+        for(let j=1;j<=6;j++){
+
+            const t = j/6;
+
+            const p =
+                catmullRom(
+                    p0,
+                    p1,
+                    p2,
+                    p3,
+                    t
+                );
+
+
+            path +=
+                ` L ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+
+        }
+
+    }
+
+
+    return path;
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render(progress){
+
+    if(snake.length === 0){
+
+        return;
+
+    }
+
+
+    const t =
+        ease(
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    progress
+                )
+            )
+        );
+
+
+    /*
+        각 몸통 위치를 부드럽게 보간
+    */
 
     const points =
         snake.map(
@@ -1737,44 +2246,35 @@ function render(progress){
                     previousSnake[index] ||
                     point;
 
+
                 return {
-                    x:lerp(old.x,point.x,t),
-                    y:lerp(old.y,point.y,t)
+
+                    x:
+                        lerp(
+                            old.x,
+                            point.x,
+                            t
+                        ) * CELL + 17,
+
+                    y:
+                        lerp(
+                            old.y,
+                            point.y,
+                            t
+                        ) * CELL + 17
+
                 };
 
             }
         );
 
 
-    let path = "";
+    /*
+        곡선 몸통
+    */
 
-    for(
-        let i=points.length-1;
-        i>=0;
-        i--
-    ){
-
-        const p = points[i];
-
-        if(i === points.length-1){
-
-            path +=
-                "M " +
-                (p.x*CELL+17) +
-                " " +
-                (p.y*CELL+17);
-
-        }else{
-
-            path +=
-                " L " +
-                (p.x*CELL+17) +
-                " " +
-                (p.y*CELL+17);
-
-        }
-
-    }
+    const path =
+        createSmoothPath(points);
 
 
     document.getElementById(
@@ -1784,6 +2284,7 @@ function render(progress){
         path
     );
 
+
     document.getElementById(
         "snakeHighlight"
     ).setAttribute(
@@ -1792,9 +2293,16 @@ function render(progress){
     );
 
 
-    const head = points[0];
+    /*
+        머리
+    */
+
+    const head =
+        points[0];
+
 
     let angle = 0;
+
 
     if(direction.x === 1)
         angle = 0;
@@ -1815,18 +2323,23 @@ function render(progress){
         "transform",
         `
         translate(
-            ${head.x*CELL+17}
-            ${head.y*CELL+17}
+            ${head.x}
+            ${head.y}
         )
         rotate(${angle})
         `
     );
 
 
+    /*
+        사과
+    */
+
     const appleElement =
         document.getElementById(
             "apple"
         );
+
 
     appleElement.style.left =
         (apple.x*CELL) + "px";
@@ -1836,18 +2349,22 @@ function render(progress){
 
 
     /*
-        사과와 2칸 이내면
-        확실하게 입을 크게 벌림
+        사과 가까이 가면 입 벌림
     */
 
     const distance =
         Math.max(
+
             Math.abs(
-                snake[0].x-apple.x
+                snake[0].x -
+                apple.x
             ),
+
             Math.abs(
-                snake[0].y-apple.y
+                snake[0].y -
+                apple.y
             )
+
         );
 
 
@@ -1856,6 +2373,7 @@ function render(progress){
         document.getElementById(
             "normalMouth"
         ).style.display = "none";
+
 
         document.getElementById(
             "openMouth"
@@ -1866,6 +2384,7 @@ function render(progress){
         document.getElementById(
             "normalMouth"
         ).style.display = "block";
+
 
         document.getElementById(
             "openMouth"
@@ -1886,13 +2405,18 @@ function gameLoop(time){
         !gameRunning ||
         dead
     ){
+
+        gameLoopId = null;
+
         return;
+
     }
 
 
     if(!paused){
 
         const normalSpeed = 150;
+
 
         const moveSpeed =
             dashActive
@@ -1901,12 +2425,14 @@ function gameLoop(time){
 
 
         const elapsed =
-            time-lastMoveTime;
+            time -
+            lastMoveTime;
 
 
         const progress =
             Math.min(
-                elapsed/moveSpeed,
+                elapsed /
+                moveSpeed,
                 1
             );
 
@@ -1914,7 +2440,9 @@ function gameLoop(time){
         render(progress);
 
 
-        if(elapsed >= moveSpeed){
+        if(
+            elapsed >= moveSpeed
+        ){
 
             moveSnake();
 
@@ -1923,12 +2451,18 @@ function gameLoop(time){
 
         updateDash();
 
+    }
 
+
+    /*
+        ★ 기존 루프와 겹치지 않게
+        현재 루프 ID를 계속 저장
+    */
+
+    gameLoopId =
         requestAnimationFrame(
             gameLoop
         );
-
-    }
 
 }
 
@@ -1961,7 +2495,9 @@ function activateDash(){
         dead ||
         dashActive
     ){
+
         return;
+
     }
 
 
@@ -1969,14 +2505,12 @@ function activateDash(){
         performance.now();
 
 
-    /*
-        10초 쿨타임
-    */
-
     if(
         now-lastDashTime < 10000
     ){
+
         return;
+
     }
 
 
@@ -2004,7 +2538,7 @@ function updateDash(){
 
 
     /*
-        LShift를 떼면 즉시 종료
+        SHIFT를 떼면 종료
     */
 
     if(
@@ -2020,7 +2554,7 @@ function updateDash(){
 
 
     /*
-        최대 실행시간 2초
+        최대 2초
     */
 
     if(
@@ -2042,7 +2576,8 @@ function updateDash(){
 
 
     const cooldown =
-        10000-(now-lastDashTime);
+        10000 -
+        (now-lastDashTime);
 
 
     if(
@@ -2050,7 +2585,8 @@ function updateDash(){
         cooldown <= 0
     ){
 
-        status.textContent = "READY";
+        status.textContent =
+            "READY";
 
         status.className =
             "skillReady";
@@ -2105,6 +2641,21 @@ function die(position){
     stopWind();
 
 
+    /*
+        현재 애니메이션 루프 종료
+    */
+
+    if(gameLoopId !== null){
+
+        cancelAnimationFrame(
+            gameLoopId
+        );
+
+        gameLoopId = null;
+
+    }
+
+
     if(score > highScore){
 
         highScore = score;
@@ -2132,6 +2683,7 @@ function die(position){
             )
         );
 
+
     const safeY =
         Math.max(
             0,
@@ -2143,10 +2695,14 @@ function die(position){
 
 
     boom.style.left =
-        (safeX*CELL+255) + "px";
+        (safeX*CELL+255) +
+        "px";
+
 
     boom.style.top =
-        (safeY*CELL+170) + "px";
+        (safeY*CELL+170) +
+        "px";
+
 
     boom.style.display =
         "block";
@@ -2157,11 +2713,16 @@ function die(position){
 
             document.getElementById(
                 "finalScore"
-            ).textContent = score;
+            ).textContent =
+                score;
+
 
             document.getElementById(
                 "deathOverlay"
-            ).classList.add("active");
+            ).classList.add(
+                "active"
+            );
+
 
             updateUI();
 
@@ -2182,15 +2743,20 @@ function pauseGame(){
         !gameRunning ||
         dead
     ){
+
         return;
+
     }
 
 
     paused = true;
 
+
     document.getElementById(
         "pauseOverlay"
-    ).classList.add("active");
+    ).classList.add(
+        "active"
+    );
 
 }
 
@@ -2198,22 +2764,38 @@ function pauseGame(){
 function continueGame(){
 
     if(dead){
+
         return;
+
     }
 
 
     paused = false;
 
+
     document.getElementById(
         "pauseOverlay"
-    ).classList.remove("active");
+    ).classList.remove(
+        "active"
+    );
+
 
     lastMoveTime =
         performance.now();
 
-    requestAnimationFrame(
-        gameLoop
-    );
+
+    /*
+        이미 실행 중인 루프가 없을 때만 시작
+    */
+
+    if(gameLoopId === null){
+
+        gameLoopId =
+            requestAnimationFrame(
+                gameLoop
+            );
+
+    }
 
 }
 
@@ -2226,27 +2808,39 @@ document.addEventListener(
     "keydown",
     event => {
 
+
         /*
             ESC
+            일시정지 / 계속하기
         */
 
         if(event.code === "Escape"){
 
             event.preventDefault();
 
+
             if(
                 document
-                    .getElementById("gameScreen")
-                    .classList.contains("active")
+                    .getElementById(
+                        "gameScreen"
+                    )
+                    .classList.contains(
+                        "active"
+                    )
             ){
 
                 if(paused){
+
                     continueGame();
+
                 }else{
+
                     pauseGame();
+
                 }
 
             }
+
 
             return;
 
@@ -2254,12 +2848,48 @@ document.addEventListener(
 
 
         /*
-            왼쪽 SHIFT
+            ★★★★★★★★★★★★★
+            R = 다시하기
+            ★★★★★★★★★★★★★
         */
 
-        if(event.code === "ShiftLeft"){
+        if(
+            event.key.toLowerCase() === "r"
+        ){
 
             event.preventDefault();
+
+
+            if(
+                document
+                    .getElementById(
+                        "gameScreen"
+                    )
+                    .classList.contains(
+                        "active"
+                    )
+            ){
+
+                restartGame();
+
+            }
+
+
+            return;
+
+        }
+
+
+        /*
+            왼쪽 SHIFT = 질주
+        */
+
+        if(
+            event.code === "ShiftLeft"
+        ){
+
+            event.preventDefault();
+
 
             if(!shiftHeld){
 
@@ -2268,6 +2898,7 @@ document.addEventListener(
                 activateDash();
 
             }
+
 
             return;
 
@@ -2279,7 +2910,9 @@ document.addEventListener(
             paused ||
             dead
         ){
+
             return;
+
         }
 
 
@@ -2287,12 +2920,21 @@ document.addEventListener(
             event.key.toLowerCase();
 
 
+        /*
+            W / ↑
+        */
+
         if(
+
             (
                 key === "w" ||
                 key === "arrowup"
-            ) &&
+            )
+
+            &&
+
             direction.y !== 1
+
         ){
 
             nextDirection = {
@@ -2303,12 +2945,21 @@ document.addEventListener(
         }
 
 
+        /*
+            S / ↓
+        */
+
         if(
+
             (
                 key === "s" ||
                 key === "arrowdown"
-            ) &&
+            )
+
+            &&
+
             direction.y !== -1
+
         ){
 
             nextDirection = {
@@ -2319,12 +2970,21 @@ document.addEventListener(
         }
 
 
+        /*
+            A / ←
+        */
+
         if(
+
             (
                 key === "a" ||
                 key === "arrowleft"
-            ) &&
+            )
+
+            &&
+
             direction.x !== 1
+
         ){
 
             nextDirection = {
@@ -2335,12 +2995,21 @@ document.addEventListener(
         }
 
 
+        /*
+            D / →
+        */
+
         if(
+
             (
                 key === "d" ||
                 key === "arrowright"
-            ) &&
+            )
+
+            &&
+
             direction.x !== -1
+
         ){
 
             nextDirection = {
@@ -2354,13 +3023,20 @@ document.addEventListener(
 );
 
 
+/* =========================================================
+   KEYUP
+========================================================= */
+
 document.addEventListener(
     "keyup",
     event => {
 
-        if(event.code === "ShiftLeft"){
+        if(
+            event.code === "ShiftLeft"
+        ){
 
             shiftHeld = false;
+
 
             if(dashActive){
 
@@ -2385,14 +3061,17 @@ function updateQuestProgress(){
     quests.forEach(
         quest => {
 
+
             if(
                 quest.type === "apple" ||
                 quest.type === "score"
             ){
 
-                quest.progress = score;
+                quest.progress =
+                    score;
 
             }
+
 
             if(
                 quest.type === "length"
@@ -2424,7 +3103,8 @@ function checkQuestCompletion(){
         i++
     ){
 
-        const quest = quests[i];
+        const quest =
+            quests[i];
 
 
         if(
@@ -2434,7 +3114,9 @@ function checkQuestCompletion(){
 
             const reward =
                 Math.min(
-                    Number(quest.reward),
+                    Number(
+                        quest.reward
+                    ),
                     200
                 );
 
@@ -2450,8 +3132,8 @@ function checkQuestCompletion(){
 
 
             /*
-                완료된 퀘스트 하나만
-                새 퀘스트로 교체
+                완료된 퀘스트와
+                겹치지 않는 새 퀘스트 찾기
             */
 
             let available =
@@ -2459,10 +3141,14 @@ function checkQuestCompletion(){
                     candidate =>
                         !quests.some(
                             current =>
+
                                 current.type ===
-                                    candidate.type &&
+                                candidate.type
+
+                                &&
+
                                 current.target ===
-                                    candidate.target
+                                candidate.target
                         )
                 );
 
@@ -2480,22 +3166,26 @@ function checkQuestCompletion(){
             const replacement =
                 available[
                     Math.floor(
-                        Math.random()*
+                        Math.random() *
                         available.length
                     )
                 ];
 
 
             quests[i] = {
+
                 ...replacement,
+
                 progress:0
+
             };
 
 
             saveEverything();
 
+
             /*
-                한 번에 하나만 완료 처리
+                한 번에 하나만 완료
             */
 
             break;
@@ -2513,16 +3203,19 @@ function updateQuestUI(){
         !Array.isArray(quests) ||
         quests.length === 0
     ){
+
         return;
+
     }
 
 
     /*
-        게임 화면에는
-        진행 중인 퀘스트 하나만 표시
+        아직 완료되지 않은
+        첫 번째 퀘스트 표시
     */
 
-    let quest = quests[0];
+    let quest =
+        quests[0];
 
 
     for(
@@ -2536,7 +3229,8 @@ function updateQuestUI(){
             quests[i].target
         ){
 
-            quest = quests[i];
+            quest =
+                quests[i];
 
             break;
 
@@ -2555,6 +3249,7 @@ function updateQuestUI(){
     document.getElementById(
         "questText"
     ).textContent =
+
         quest.text +
         " " +
         progress +
@@ -2565,6 +3260,7 @@ function updateQuestUI(){
     document.getElementById(
         "questReward"
     ).textContent =
+
         Math.min(
             quest.reward,
             200
@@ -2588,6 +3284,7 @@ applyWorm();
 </body>
 </html>
 """
+
 
 components.html(
     GAME,
