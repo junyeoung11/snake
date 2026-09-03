@@ -1,1083 +1,1464 @@
-
+```python
 import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="🪱 지렁이 게임",
+    page_title="WORM QUEST",
     page_icon="🪱",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
-st.markdown("""
-<style>
-header {visibility:hidden;}
-.block-container {
-    padding-top:1rem;
-    max-width:950px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-components.html(r"""
+GAME = r"""
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <style>
-* {
+*{
     box-sizing:border-box;
+    user-select:none;
+    -webkit-user-select:none;
 }
 
-body {
+html,body{
     margin:0;
-    background:#193d22;
-    font-family:Arial,sans-serif;
+    padding:0;
+    background:#0b120d;
+    color:white;
+    font-family:Arial,"Noto Sans KR",sans-serif;
     overflow:hidden;
 }
 
-#container {
-    width:780px;
-    height:780px;
+button{
+    font-family:inherit;
+    cursor:pointer;
+    border:0;
+}
+
+#app{
+    width:760px;
+    min-height:850px;
     margin:auto;
     position:relative;
-    overflow:hidden;
-    border-radius:25px;
-
-    background:
-        radial-gradient(circle at 10% 10%,#6ca64c,transparent 20%),
-        radial-gradient(circle at 90% 15%,#396f32,transparent 22%),
-        radial-gradient(circle at 15% 90%,#4a8238,transparent 25%),
-        radial-gradient(circle at 90% 90%,#315f2e,transparent 25%),
-        #24542b;
 }
 
-.tree {
-    position:absolute;
-    width:115px;
-    height:115px;
-    border-radius:50%;
-
-    background:
-        radial-gradient(
-            circle at 30% 25%,
-            #9bd75b,
-            #55943b 48%,
-            #1d5128 80%
-        );
-
-    box-shadow:
-        inset -10px -12px 20px rgba(0,0,0,.28),
-        0 10px 15px rgba(0,0,0,.45);
+.screen{
+    display:none;
+    width:100%;
+    min-height:850px;
 }
 
-#game {
-    position:absolute;
-    width:648px;
-    height:648px;
-    left:66px;
-    top:66px;
-    overflow:hidden;
-
-    border:18px solid #254da5;
-    border-radius:20px;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(0,0,0,.06) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            rgba(0,0,0,.06) 1px,
-            transparent 1px
-        ),
-        #9dcc4a;
-
-    background-size:34px 34px;
-
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,.22),
-        0 10px 20px rgba(0,0,0,.45);
+.screen.active{
+    display:block;
 }
-
 
 /* =========================
-   점수
+   MAIN
 ========================= */
 
-#scoreBox,
-#highScoreBox {
-    position:absolute;
-    top:18px;
-    z-index:100;
-
-    background:rgba(0,0,0,.78);
-    color:white;
-
-    padding:11px 18px;
-    border-radius:15px;
-
-    font-size:20px;
-    font-weight:bold;
+#mainScreen{
+    text-align:center;
+    padding-top:55px;
 }
 
-#scoreBox {
-    left:18px;
+.logo{
+    font-size:72px;
+    font-weight:1000;
+    letter-spacing:-4px;
+    text-shadow:0 5px 0 #182219;
 }
 
-#highScoreBox {
-    right:18px;
+.logoSub{
+    margin-top:-4px;
+    color:#91a695;
+    font-size:18px;
 }
 
-
-/* =========================
-   질주 UI
-========================= */
-
-#dashBox {
-    position:absolute;
-
-    left:50%;
-    top:18px;
-
-    transform:translateX(-50%);
-
-    z-index:110;
-
-    background:rgba(0,0,0,.78);
-
-    color:white;
-
-    padding:10px 18px;
-
-    border-radius:15px;
-
-    font-size:17px;
-
-    font-weight:bold;
-
-    white-space:nowrap;
-}
-
-#dashStatus {
-    color:#6eff91;
-}
-
-
-/* =========================
-   사과
-========================= */
-
-#food {
-    position:absolute;
-
-    width:34px;
-    height:34px;
-
+.mainWorm{
+    margin:35px auto 15px;
+    width:180px;
+    height:180px;
     display:flex;
     justify-content:center;
     align-items:center;
-
-    font-size:31px;
-
-    z-index:40;
-
-    animation:applePulse 1s ease-in-out infinite;
-
-    transform-origin:center;
-
-    filter:drop-shadow(
-        0 3px 3px rgba(0,0,0,.35)
-    );
+    font-size:125px;
+    filter:drop-shadow(0 12px 10px rgba(0,0,0,.4));
+    animation:floatWorm 1.8s ease-in-out infinite;
 }
 
-@keyframes applePulse {
-
-    0% {
-        transform:scale(.72);
-    }
-
-    50% {
-        transform:scale(1.15);
-    }
-
-    100% {
-        transform:scale(.72);
-    }
+@keyframes floatWorm{
+    0%,100%{transform:translateY(0) rotate(-3deg)}
+    50%{transform:translateY(-10px) rotate(3deg)}
 }
 
-
-/* =========================
-   뱀
-========================= */
-
-#snakeSVG {
-    position:absolute;
-
-    width:648px;
-    height:648px;
-
-    left:0;
-    top:0;
-
-    overflow:visible;
-
-    pointer-events:none;
-
-    z-index:30;
+.mainStats{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin:20px 0 30px;
 }
 
-#snakeShadow {
-    fill:none;
-
-    stroke:#17336e;
-
-    stroke-width:42;
-
-    stroke-linecap:round;
-    stroke-linejoin:round;
-
-    opacity:.35;
+.mainStat{
+    min-width:155px;
+    padding:13px 22px;
+    border:2px solid #304b35;
+    border-radius:15px;
+    background:#152119;
+    font-size:19px;
+    font-weight:800;
 }
 
-#snakeBody {
-    fill:none;
-
-    stroke:#315fc9;
-
-    stroke-width:36;
-
-    stroke-linecap:round;
-    stroke-linejoin:round;
+.coin{
+    color:#ffd84d;
 }
 
-#snakeLight {
-    fill:none;
-
-    stroke:#739cff;
-
-    stroke-width:6;
-
-    stroke-linecap:round;
-    stroke-linejoin:round;
-
-    opacity:.45;
+.high{
+    color:#8bb7ff;
 }
 
-
-/* =========================
-   머리
-========================= */
-
-#headGroup {
-    transition:transform .04s linear;
-}
-
-
-/* 닫힌 입 */
-
-#mouthClosed {
-    fill:none;
-
-    stroke:#102b63;
-
-    stroke-width:3;
-
-    stroke-linecap:round;
-}
-
-
-/* 벌어진 입 */
-
-#mouthOpenGroup {
-    display:none;
-}
-
-#openMouth {
-    fill:#111;
-
-    stroke:#081535;
-
-    stroke-width:2;
-}
-
-#tongue {
-    fill:#ff4b55;
-
-    stroke:#b51f2c;
-
-    stroke-width:1.5;
-}
-
-.tooth {
-    fill:white;
-
-    stroke:#cfd7e5;
-
-    stroke-width:1;
-}
-
-
-/* =========================
-   질주 바람
-========================= */
-
-#windLayer {
-    display:none;
-}
-
-.wind {
-    fill:none;
-
-    stroke:white;
-
-    stroke-width:4;
-
-    stroke-linecap:round;
-
-    opacity:0;
-}
-
-.dashActive #windLayer {
-    display:block;
-}
-
-.dashActive .wind1 {
-    animation:windMove .28s infinite;
-}
-
-.dashActive .wind2 {
-    animation:windMove .38s infinite .08s;
-}
-
-.dashActive .wind3 {
-    animation:windMove .32s infinite .15s;
-}
-
-.dashActive .wind4 {
-    animation:windMove .42s infinite .05s;
-}
-
-@keyframes windMove {
-
-    0% {
-        opacity:0;
-
-        transform:
-            translateX(18px)
-            scaleX(.4);
-    }
-
-    30% {
-        opacity:.8;
-    }
-
-    100% {
-        opacity:0;
-
-        transform:
-            translateX(-35px)
-            scaleX(1.3);
-    }
-}
-
-
-/* =========================
-   질주 잔상
-========================= */
-
-#dashTrail {
-    display:none;
-
-    fill:none;
-
-    stroke:#b7d6ff;
-
-    stroke-width:9;
-
-    stroke-linecap:round;
-
-    opacity:.4;
-
-    stroke-dasharray:15 15;
-}
-
-.dashing #dashTrail {
-    display:block;
-
-    animation:
-        trailMove .25s linear infinite;
-}
-
-@keyframes trailMove {
-
-    from {
-        stroke-dashoffset:0;
-    }
-
-    to {
-        stroke-dashoffset:-30;
-    }
-}
-
-
-/* =========================
-   충돌
-========================= */
-
-#crash {
-    position:absolute;
-
-    display:none;
-
-    font-size:78px;
-
-    z-index:300;
-
-    transform:
-        translate(-50%,-50%);
-
-    filter:
-        drop-shadow(
-            0 4px 4px rgba(0,0,0,.5)
-        );
-
-    animation:
-        crashPop .45s ease-out;
-}
-
-@keyframes crashPop {
-
-    0% {
-        transform:
-            translate(-50%,-50%)
-            scale(.2)
-            rotate(-20deg);
-    }
-
-    60% {
-        transform:
-            translate(-50%,-50%)
-            scale(1.25)
-            rotate(8deg);
-    }
-
-    100% {
-        transform:
-            translate(-50%,-50%)
-            scale(1)
-            rotate(0deg);
-    }
-}
-
-.shake {
-    animation:shake .45s;
-}
-
-@keyframes shake {
-
-    0%,100% {
-        transform:translate(0,0);
-    }
-
-    20% {
-        transform:translate(-10px,5px);
-    }
-
-    40% {
-        transform:translate(10px,-5px);
-    }
-
-    60% {
-        transform:translate(-8px,4px);
-    }
-
-    80% {
-        transform:translate(8px,-3px);
-    }
-}
-
-
-/* =========================
-   일시정지 / 게임오버
-========================= */
-
-.overlay {
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    transform:
-        translate(-50%,-50%);
-
-    width:430px;
-
-    padding:35px 30px;
-
-    text-align:center;
-
-    border-radius:25px;
-
-    background:rgba(0,0,0,.92);
-
+.mainButton{
+    width:360px;
+    height:65px;
+    margin:8px;
+    border-radius:15px;
     color:white;
-
-    z-index:500;
-
-    display:none;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.5);
+    font-size:21px;
+    font-weight:900;
+    transition:.15s;
 }
 
-.overlay h1 {
-    margin:0 0 30px;
+.mainButton:hover{
+    transform:scale(1.025);
+}
 
-    font-size:64px;
+.startButton{
+    background:#315fc9;
+    box-shadow:0 5px 0 #1e3d82;
+}
 
+.shopOpen{
+    background:#744cc0;
+    box-shadow:0 5px 0 #4b3180;
+}
+
+/* =========================
+   SHOP
+========================= */
+
+#shopScreen{
+    padding:25px 35px;
+}
+
+.pageTop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
+}
+
+.back{
+    background:#29352c;
+    color:white;
+    padding:11px 18px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.pageTitle{
+    font-size:43px;
+    font-weight:1000;
+}
+
+.shopCoin{
+    color:#ffd84d;
+    font-size:20px;
     font-weight:900;
 }
 
-.menuButton {
-    display:block;
+.sectionTitle{
+    font-size:25px;
+    font-weight:900;
+    margin:22px 0 12px;
+}
 
-    width:270px;
-    height:62px;
+.shopGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
 
-    margin:10px auto;
+.shopItem{
+    background:#152119;
+    border:2px solid #304b35;
+    border-radius:15px;
+    padding:14px;
+    text-align:center;
+}
 
-    border:none;
+.shopEmoji{
+    height:75px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:55px;
+}
 
-    border-radius:16px;
+.shopName{
+    font-size:16px;
+    font-weight:900;
+    margin:4px 0;
+}
 
-    font-size:23px;
+.shopDesc{
+    font-size:12px;
+    color:#9aaa9e;
+    min-height:28px;
+}
 
+.shopPrice{
+    color:#ffd84d;
     font-weight:bold;
-
-    cursor:pointer;
-
-    transition:.12s;
+    margin:8px;
 }
 
-.menuButton:hover {
-    transform:scale(1.04);
-    filter:brightness(1.12);
-}
-
-.menuButton:active {
-    transform:scale(.97);
-}
-
-#continueButton {
-    background:#4f8cff;
+.shopBtn{
+    width:100%;
+    height:38px;
+    border-radius:8px;
+    background:#315fc9;
     color:white;
+    font-weight:bold;
 }
 
-#restartButton,
-#gameOverRestart {
-    background:#48b96b;
-    color:white;
+.shopBtn.owned{
+    background:#347548;
 }
 
-#gameOver h1 {
-    color:#ff4242;
+.shopBtn.equipped{
+    background:#c28727;
 }
-
-#gameOver h2 {
-    font-size:28px;
-}
-
 
 /* =========================
-   질주 시작 효과
+   GAME
 ========================= */
 
-#game.dashFlash::after {
-    content:"";
+#gameScreen{
+    min-height:850px;
+}
 
+.gameHeader{
+    width:720px;
+    margin:auto;
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+}
+
+.scoreBox{
+    font-size:19px;
+    font-weight:900;
+}
+
+.bestBox{
+    color:#ffd84d;
+    font-size:18px;
+    font-weight:900;
+}
+
+#gameWrapper{
+    position:relative;
+    width:680px;
+    height:680px;
+    margin:auto;
+}
+
+#board{
     position:absolute;
-
-    inset:0;
-
-    pointer-events:none;
-
+    left:20px;
+    top:15px;
+    width:640px;
+    height:640px;
+    border:10px solid #214e9c;
+    border-radius:20px;
+    overflow:hidden;
     background:
-        radial-gradient(
-            circle,
-            transparent 45%,
-            rgba(255,255,255,.15)
-        );
-
-    animation:
-        dashFlash .18s;
+        linear-gradient(rgba(255,255,255,.045) 2px,transparent 2px),
+        linear-gradient(90deg,rgba(255,255,255,.045) 2px,transparent 2px),
+        #75b93d;
+    background-size:35px 35px;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.45),
+        inset 0 0 20px rgba(0,0,0,.2);
 }
 
-@keyframes dashFlash {
+#snakeSvg{
+    position:absolute;
+    inset:0;
+    width:620px;
+    height:620px;
+    overflow:visible;
+}
 
-    from {
-        opacity:1;
-    }
+#snakeBody{
+    fill:none;
+    stroke:#315fc9;
+    stroke-width:28;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
 
-    to {
+#snakeHighlight{
+    fill:none;
+    stroke:#9ab9ff;
+    stroke-width:5;
+    stroke-linecap:round;
+    opacity:.8;
+}
+
+#head{
+    fill:#315fc9;
+}
+
+.eye{
+    fill:white;
+}
+
+.pupil{
+    fill:#111;
+}
+
+#normalMouth{
+    fill:none;
+    stroke:#111;
+    stroke-width:4;
+}
+
+#openMouth{
+    display:none;
+}
+
+#apple{
+    position:absolute;
+    z-index:20;
+    width:35px;
+    height:35px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    animation:applePulse .65s infinite;
+}
+
+@keyframes applePulse{
+    0%,100%{transform:scale(.85)}
+    50%{transform:scale(1.13)}
+}
+
+/* QUEST */
+
+#questBox{
+    position:absolute;
+    z-index:100;
+    right:20px;
+    top:18px;
+    width:190px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(0,0,0,.78);
+    border:1px solid rgba(255,255,255,.15);
+    font-size:12px;
+}
+
+.questTitle{
+    color:#ffd84d;
+    font-weight:900;
+    font-size:14px;
+    margin-bottom:5px;
+}
+
+.questReward{
+    color:#ffd84d;
+    margin-top:4px;
+}
+
+/* SKILL */
+
+#skillBox{
+    position:absolute;
+    z-index:100;
+    left:20px;
+    top:18px;
+    padding:9px 12px;
+    border-radius:12px;
+    background:rgba(0,0,0,.78);
+    font-size:12px;
+}
+
+.skillReady{
+    color:#68e985;
+    font-weight:bold;
+}
+
+.skillCool{
+    color:#ffd84d;
+    font-weight:bold;
+}
+
+/* WIND */
+
+.wind{
+    position:absolute;
+    z-index:150;
+    height:4px;
+    border-radius:4px;
+    background:white;
+    opacity:0;
+    pointer-events:none;
+}
+
+.wind.active{
+    animation:slash .25s linear infinite;
+}
+
+@keyframes slash{
+    0%{
         opacity:0;
+        transform:translateX(-40px) rotate(-15deg);
+    }
+    25%{
+        opacity:.9;
+    }
+    100%{
+        opacity:0;
+        transform:translateX(80px) rotate(-15deg);
     }
 }
 
+/* PAUSE / DEATH */
+
+.overlay{
+    display:none;
+    position:absolute;
+    z-index:500;
+    inset:0;
+    background:rgba(0,0,0,.82);
+    justify-content:center;
+    align-items:center;
+}
+
+.overlay.active{
+    display:flex;
+}
+
+.overlayCard{
+    width:450px;
+    padding:38px;
+    border-radius:25px;
+    background:#101711;
+    border:2px solid #3b4e3e;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.7);
+}
+
+.overlayCard h1{
+    margin:0 0 30px;
+    font-size:65px;
+    font-weight:1000;
+}
+
+.pauseBtn,
+.deathBtn{
+    display:block;
+    width:290px;
+    height:55px;
+    margin:11px auto;
+    border-radius:12px;
+    color:white;
+    font-size:18px;
+    font-weight:900;
+}
+
+.continueBtn{
+    background:#315fc9;
+}
+
+.restartBtn{
+    background:#38834c;
+}
+
+.mainBackBtn{
+    background:#39423b;
+}
+
+.deathTitle{
+    color:#ff4545;
+}
+
+#boom{
+    display:none;
+    position:absolute;
+    z-index:450;
+    font-size:80px;
+    pointer-events:none;
+    animation:boom .55s ease-out;
+}
+
+@keyframes boom{
+    0%{transform:scale(.3);opacity:0}
+    40%{transform:scale(1.25);opacity:1}
+    100%{transform:scale(1);opacity:1}
+}
+
+#notification{
+    position:fixed;
+    z-index:1000;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%);
+    padding:13px 24px;
+    border-radius:12px;
+    background:#1c291e;
+    border:2px solid #49624c;
+    font-weight:900;
+    display:none;
+}
+
+@media(max-width:780px){
+    #app{
+        transform:scale(.9);
+        transform-origin:top center;
+    }
+}
 </style>
 </head>
 
 <body>
 
-<div id="container">
+<div id="app">
 
-    <!-- 나무 -->
+<!-- ================= MAIN ================= -->
 
-    <div class="tree" style="left:-45px;top:-40px;"></div>
-    <div class="tree" style="left:110px;top:-50px;"></div>
-    <div class="tree" style="left:280px;top:-50px;"></div>
-    <div class="tree" style="left:470px;top:-50px;"></div>
-    <div class="tree" style="left:650px;top:-40px;"></div>
+<section id="mainScreen" class="screen active">
 
-    <div class="tree" style="left:-60px;top:170px;"></div>
-    <div class="tree" style="left:-60px;top:380px;"></div>
-    <div class="tree" style="left:-60px;top:570px;"></div>
+    <div class="logo">🪱 WORM QUEST</div>
+    <div class="logoSub">먹고 · 성장하고 · 질주하라</div>
 
-    <div class="tree" style="right:-60px;top:170px;"></div>
-    <div class="tree" style="right:-60px;top:380px;"></div>
-    <div class="tree" style="right:-60px;top:570px;"></div>
+    <div class="mainWorm" id="mainWorm">🪱</div>
 
-    <div class="tree" style="left:50px;bottom:-60px;"></div>
-    <div class="tree" style="left:240px;bottom:-60px;"></div>
-    <div class="tree" style="left:440px;bottom:-60px;"></div>
-    <div class="tree" style="left:620px;bottom:-60px;"></div>
+    <div class="mainStats">
 
+        <div class="mainStat">
+            🪙 <span id="mainCoins">0</span>
+        </div>
 
-    <!-- 점수 -->
+        <div class="mainStat">
+            🏆 <span id="mainHigh">0</span>
+        </div>
 
-    <div id="scoreBox">
-        🏆 점수:
-        <span id="score">0</span>
     </div>
 
+    <button
+        class="mainButton startButton"
+        onclick="startGame()">
+        🎮 게임 시작하기
+    </button>
 
-    <!-- 최고기록 -->
+    <br>
 
-    <div id="highScoreBox">
-        👑 최고기록:
-        <span id="highScore">0</span>
+    <button
+        class="mainButton shopOpen"
+        onclick="openShop()">
+        🛒 상점
+    </button>
+
+</section>
+
+
+<!-- ================= SHOP ================= -->
+
+<section id="shopScreen" class="screen">
+
+    <div class="pageTop">
+
+        <button
+            class="back"
+            onclick="showScreen('mainScreen')">
+            ← 메인으로
+        </button>
+
+        <div class="pageTitle">🛒 상점</div>
+
+        <div class="shopCoin">
+            🪙 <span id="shopCoins">0</span>
+        </div>
+
     </div>
 
+    <div class="sectionTitle">🪱 지렁이 외형</div>
 
-    <!-- 질주 상태 -->
-
-    <div id="dashBox">
-        ⚡ 질주:
-        <span id="dashStatus">준비</span>
+    <div
+        class="shopGrid"
+        id="wormShop">
     </div>
 
+    <div class="sectionTitle">⚡ 스킬 변경</div>
 
-    <div id="game">
+    <div
+        class="shopGrid"
+        id="skillShop">
+    </div>
 
-        <!-- 사과 -->
-
-        <div id="food">🍎</div>
-
-
-        <svg
-            id="snakeSVG"
-            viewBox="0 0 648 648"
-        >
-
-            <path id="snakeShadow"></path>
-
-            <path id="snakeBody"></path>
-
-            <path id="snakeLight"></path>
+</section>
 
 
-            <!-- 질주 잔상 -->
+<!-- ================= GAME ================= -->
 
-            <path id="dashTrail"></path>
+<section id="gameScreen" class="screen">
 
+    <div class="gameHeader">
 
-            <!-- 바람 -->
+        <div class="scoreBox">
+            점수:
+            <span id="score">0</span>
+            &nbsp;&nbsp;
+            🪙 <span id="gameCoins">0</span>
+        </div>
 
-            <g id="windLayer">
+        <div class="bestBox">
+            🏆 최고기록:
+            <span id="gameHigh">0</span>
+        </div>
 
-                <path
-                    class="wind wind1"
-                    d="M 0 -12 Q -30 -20 -55 -12">
-                </path>
+    </div>
 
-                <path
-                    class="wind wind2"
-                    d="M 0 0 Q -38 -5 -68 5">
-                </path>
+    <div id="gameWrapper">
 
-                <path
-                    class="wind wind3"
-                    d="M 0 12 Q -30 20 -58 14">
-                </path>
+        <div id="board">
 
-                <path
-                    class="wind wind4"
-                    d="M -5 22 Q -35 28 -50 25">
-                </path>
+            <div id="skillBox">
+                ⚡ <span id="skillName">질주</span>
+                <br>
+                <span
+                    id="skillStatus"
+                    class="skillReady">
+                    READY
+                </span>
+            </div>
 
-            </g>
+            <div id="questBox">
+                <div class="questTitle">📜 QUEST</div>
 
+                <div id="questText">
+                    사과 먹기 0/5
+                </div>
 
-            <!-- 머리 -->
+                <div class="questReward">
+                    🪙 보상:
+                    <span id="questReward">80</span>
+                </div>
+            </div>
 
-            <g id="headGroup">
+            <div id="apple">🍎</div>
 
-                <ellipse
-                    cx="0"
-                    cy="4"
-                    rx="28"
-                    ry="24"
-                    fill="#17336e"
-                    opacity=".35">
-                </ellipse>
+            <svg id="snakeSvg"
+                 viewBox="0 0 620 620">
 
+                <path id="snakeBody"></path>
+                <path id="snakeHighlight"></path>
 
-                <path
-                    d="
-                    M -18 -21
-                    Q 4 -28 21 -15
-                    Q 34 0 21 15
-                    Q 4 28 -18 21
-                    Q -30 11 -30 0
-                    Q -30 -11 -18 -21
-                    "
+                <g id="headGroup">
 
-                    fill="#315fc9"
-                    stroke="#244a9f"
-                    stroke-width="3">
-                </path>
+                    <circle
+                        id="head"
+                        cx="0"
+                        cy="0"
+                        r="18">
+                    </circle>
 
+                    <circle
+                        class="eye"
+                        cx="7"
+                        cy="-11"
+                        r="7">
+                    </circle>
 
-                <path
-                    d="M -17 -17 Q -2 -23 10 -15"
-                    fill="none"
-                    stroke="#6f98ff"
-                    stroke-width="6"
-                    stroke-linecap="round"
-                    opacity=".5">
-                </path>
+                    <circle
+                        class="eye"
+                        cx="7"
+                        cy="11"
+                        r="7">
+                    </circle>
 
+                    <circle
+                        class="pupil"
+                        cx="9"
+                        cy="-11"
+                        r="3">
+                    </circle>
 
-                <!-- 눈 -->
-
-                <circle
-                    cx="4"
-                    cy="-18"
-                    r="10"
-                    fill="#f8fbff"
-                    stroke="#31528e"
-                    stroke-width="2">
-                </circle>
-
-                <circle
-                    cx="4"
-                    cy="18"
-                    r="10"
-                    fill="#f8fbff"
-                    stroke="#31528e"
-                    stroke-width="2">
-                </circle>
-
-
-                <circle
-                    cx="7"
-                    cy="-17"
-                    r="4.5"
-                    fill="#18234b">
-                </circle>
-
-                <circle
-                    cx="7"
-                    cy="17"
-                    r="4.5"
-                    fill="#18234b">
-                </circle>
-
-
-                <circle
-                    cx="8"
-                    cy="-19"
-                    r="1.5"
-                    fill="white">
-                </circle>
-
-                <circle
-                    cx="8"
-                    cy="15"
-                    r="1.5"
-                    fill="white">
-                </circle>
-
-
-                <!-- 닫힌 입 -->
-
-                <path
-                    id="mouthClosed"
-                    d="M 16 -5 Q 23 0 16 5">
-                </path>
-
-
-                <!-- 벌어진 입 -->
-
-                <g id="mouthOpenGroup">
+                    <circle
+                        class="pupil"
+                        cx="9"
+                        cy="11"
+                        r="3">
+                    </circle>
 
                     <path
-                        id="openMouth"
-                        d="
-                        M 12 -8
-                        Q 25 -9 27 0
-                        Q 25 9 12 8
-                        Q 17 0 12 -8
-                        ">
+                        id="normalMouth"
+                        d="M12,-4 Q20,0 12,4">
                     </path>
 
+                    <g id="openMouth">
 
-                    <path
-                        id="tongue"
-                        d="
-                        M 16 3
-                        Q 21 0 25 3
-                        Q 21 10 16 6
-                        Z
-                        ">
-                    </path>
+                        <ellipse
+                            cx="15"
+                            cy="0"
+                            rx="11"
+                            ry="9"
+                            fill="#111">
+                        </ellipse>
 
+                        <path
+                            d="M8,3 Q15,12 22,3"
+                            stroke="#ff5265"
+                            stroke-width="3"
+                            fill="none">
+                        </path>
 
-                    <path
-                        class="tooth"
-                        d="M 16 -7 L 19 -2 L 22 -7 Z">
-                    </path>
-
-                    <path
-                        class="tooth"
-                        d="M 22 -7 L 25 -2 L 27 -6 Z">
-                    </path>
-
-                    <path
-                        class="tooth"
-                        d="M 17 7 L 20 3 L 22 8 Z">
-                    </path>
+                    </g>
 
                 </g>
 
-            </g>
+            </svg>
 
-        </svg>
+            <div
+                id="boom">
+                💥
+            </div>
 
+            <div
+                class="wind"
+                id="wind1"
+                style="left:100px;top:250px;width:100px">
+            </div>
 
-        <!-- 충돌 -->
+            <div
+                class="wind"
+                id="wind2"
+                style="left:410px;top:320px;width:80px">
+            </div>
 
-        <div id="crash">💥</div>
+            <div
+                class="wind"
+                id="wind3"
+                style="left:160px;top:410px;width:90px">
+            </div>
+
+            <!-- PAUSE -->
+
+            <div
+                id="pauseOverlay"
+                class="overlay">
+
+                <div class="overlayCard">
+
+                    <h1>일시정지</h1>
+
+                    <button
+                        class="pauseBtn continueBtn"
+                        onclick="continueGame()">
+                        ▶️ 계속하기
+                    </button>
+
+                    <button
+                        class="pauseBtn restartBtn"
+                        onclick="restartGame()">
+                        🔄 다시하기
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- DEATH -->
+
+            <div
+                id="deathOverlay"
+                class="overlay">
+
+                <div class="overlayCard">
+
+                    <h1 class="deathTitle">
+                        YOU DIE
+                    </h1>
+
+                    <h2>
+                        점수:
+                        <span id="finalScore">
+                            0
+                        </span>
+                    </h2>
+
+                    <button
+                        class="deathBtn restartBtn"
+                        onclick="restartGame()">
+                        🔄 다시하기
+                    </button>
+
+                    <button
+                        class="deathBtn mainBackBtn"
+                        onclick="showScreen('mainScreen')">
+                        🏠 메인으로
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
+</section>
 
-    <!-- =====================
-         일시정지
-    ====================== -->
-
-    <div
-        id="pauseOverlay"
-        class="overlay"
-    >
-
-        <h1>일시정지</h1>
-
-        <button
-            id="continueButton"
-            class="menuButton"
-        >
-            ▶️ 계속하기
-        </button>
-
-        <button
-            id="restartButton"
-            class="menuButton"
-        >
-            🔄 다시하기
-        </button>
-
-    </div>
-
-
-    <!-- =====================
-         게임오버
-    ====================== -->
-
-    <div
-        id="gameOver"
-        class="overlay"
-    >
-
-        <h1>YOU DIE</h1>
-
-        <h2>
-            점수:
-            <span id="finalScore">0</span>
-        </h2>
-
-        <h2>
-            👑 최고기록:
-            <span id="gameOverHighScore">0</span>
-        </h2>
-
-        <button
-            id="gameOverRestart"
-            class="menuButton"
-        >
-            🔄 다시하기
-        </button>
-
-        <p>R 키를 눌러 다시 시작</p>
-
-    </div>
+<div id="notification"></div>
 
 </div>
 
 
 <script>
 
-/* =========================
-   게임 설정
-========================= */
+/* =========================================================
+   DATA
+========================================================= */
 
-const GRID = 34;
+const worms = {
 
-const COLS = 18;
+    basic:{
+        name:"기본 지렁이",
+        emoji:"🪱",
+        color:"#315fc9",
+        price:0
+    },
 
-const ROWS = 18;
+    fire:{
+        name:"화염 지렁이",
+        emoji:"🔥",
+        color:"#e34b32",
+        price:500
+    },
+
+    lightning:{
+        name:"번개 지렁이",
+        emoji:"⚡",
+        color:"#e4c52e",
+        price:1000
+    },
+
+    ghost:{
+        name:"유령 지렁이",
+        emoji:"👻",
+        color:"#a879e8",
+        price:1500
+    },
+
+    rainbow:{
+        name:"무지개 지렁이",
+        emoji:"🌈",
+        color:"#e35db7",
+        price:2000
+    },
+
+    dragon:{
+        name:"용 지렁이",
+        emoji:"🐉",
+        color:"#df4a45",
+        price:2500
+    }
+
+};
+
+const skills = {
+
+    dash:{
+        name:"질주",
+        desc:"LShift 홀드",
+        price:0
+    },
+
+    turbo:{
+        name:"터보 질주",
+        desc:"더 빠른 질주",
+        price:700
+    },
+
+    wind:{
+        name:"윈드 러너",
+        desc:"강력한 바람 효과",
+        price:1200
+    },
+
+    flash:{
+        name:"플래시",
+        desc:"최고속 질주",
+        price:1800
+    }
+
+};
 
 
-/* 일반 속도 */
+/* =========================================================
+   STORAGE
+========================================================= */
 
-const NORMAL_MOVE_TIME = 160;
+let coins =
+    Number(localStorage.getItem("wormCoins") || 0);
 
+let highScore =
+    Number(localStorage.getItem("wormHighScore") || 0);
 
-/* 질주 속도 */
+let equippedWorm =
+    localStorage.getItem("wormEquipped") || "basic";
 
-const DASH_MOVE_TIME = 65;
+let equippedSkill =
+    localStorage.getItem("wormSkill") || "dash";
 
-
-/* 최대 질주 시간 */
-
-const DASH_DURATION = 2000;
-
-
-/* 쿨타임 */
-
-const DASH_COOLDOWN = 10000;
-
-
-/* =========================
-   요소
-========================= */
-
-const game =
-    document.getElementById("game");
-
-const foodElement =
-    document.getElementById("food");
-
-const scoreElement =
-    document.getElementById("score");
-
-const highScoreElement =
-    document.getElementById("highScore");
-
-const dashStatus =
-    document.getElementById("dashStatus");
-
-const finalScoreElement =
-    document.getElementById("finalScore");
-
-const gameOverHighScoreElement =
-    document.getElementById(
-        "gameOverHighScore"
+let ownedWorms =
+    JSON.parse(
+        localStorage.getItem("wormOwned") ||
+        '["basic"]'
     );
 
-const gameOverElement =
-    document.getElementById(
-        "gameOver"
+let ownedSkills =
+    JSON.parse(
+        localStorage.getItem("skillOwned") ||
+        '["dash"]'
     );
 
-const pauseOverlay =
-    document.getElementById(
-        "pauseOverlay"
+
+/* =========================================================
+   QUEST DATA
+========================================================= */
+
+const questPool = [
+
+    {
+        type:"apple",
+        text:"🍎 사과 먹기",
+        target:5,
+        reward:80
+    },
+
+    {
+        type:"apple",
+        text:"🍎 사과 먹기",
+        target:10,
+        reward:150
+    },
+
+    {
+        type:"apple",
+        text:"🍎 사과 먹기",
+        target:15,
+        reward:200
+    },
+
+    {
+        type:"score",
+        text:"🏆 점수 달성",
+        target:10,
+        reward:100
+    },
+
+    {
+        type:"score",
+        text:"🏆 점수 달성",
+        target:20,
+        reward:180
+    },
+
+    {
+        type:"score",
+        text:"🏆 점수 달성",
+        target:30,
+        reward:200
+    },
+
+    {
+        type:"length",
+        text:"🪱 몸 길이 늘리기",
+        target:8,
+        reward:100
+    },
+
+    {
+        type:"length",
+        text:"🪱 몸 길이 늘리기",
+        target:12,
+        reward:150
+    },
+
+    {
+        type:"length",
+        text:"🪱 몸 길이 늘리기",
+        target:18,
+        reward:200
+    }
+
+];
+
+let quests =
+    JSON.parse(
+        localStorage.getItem("wormQuests") || "null"
     );
 
-const crashElement =
-    document.getElementById(
-        "crash"
+
+function makeInitialQuests(){
+
+    quests = [];
+
+    const pool = [...questPool];
+
+    for(let i=0;i<3;i++){
+
+        const index =
+            Math.floor(
+                Math.random()*pool.length
+            );
+
+        quests.push({
+            ...pool[index],
+            progress:0
+        });
+
+        pool.splice(index,1);
+
+    }
+
+    saveQuests();
+
+}
+
+
+function saveQuests(){
+
+    localStorage.setItem(
+        "wormQuests",
+        JSON.stringify(quests)
     );
 
-const snakeBody =
+}
+
+
+if(
+    !Array.isArray(quests) ||
+    quests.length !== 3
+){
+    makeInitialQuests();
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function updateUI(){
+
+    document.getElementById(
+        "mainCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "shopCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "gameCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "mainHigh"
+    ).textContent = highScore;
+
+    document.getElementById(
+        "gameHigh"
+    ).textContent = highScore;
+
+    document.getElementById(
+        "mainWorm"
+    ).textContent =
+        worms[equippedWorm].emoji;
+
+    document.getElementById(
+        "skillName"
+    ).textContent =
+        skills[equippedSkill].name;
+
+}
+
+
+function saveEverything(){
+
+    localStorage.setItem(
+        "wormCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "wormHighScore",
+        highScore
+    );
+
+    localStorage.setItem(
+        "wormEquipped",
+        equippedWorm
+    );
+
+    localStorage.setItem(
+        "wormSkill",
+        equippedSkill
+    );
+
+    localStorage.setItem(
+        "wormOwned",
+        JSON.stringify(ownedWorms)
+    );
+
+    localStorage.setItem(
+        "skillOwned",
+        JSON.stringify(ownedSkills)
+    );
+
+    saveQuests();
+
+    updateUI();
+
+}
+
+
+function showScreen(id){
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(
+            screen =>
+                screen.classList.remove("active")
+        );
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+
+    updateUI();
+
+    if(id === "shopScreen"){
+        renderShop();
+    }
+
+}
+
+
+function openShop(){
+
+    showScreen("shopScreen");
+
+}
+
+
+/* =========================================================
+   SHOP
+========================================================= */
+
+function renderShop(){
+
+    let wormHTML = "";
+
+    Object.entries(worms).forEach(
+        ([id,worm]) => {
+
+            const owned =
+                ownedWorms.includes(id);
+
+            const equipped =
+                equippedWorm === id;
+
+            let text =
+                equipped
+                ? "장착 중"
+                : owned
+                ? "장착하기"
+                : "구매";
+
+            let cls =
+                equipped
+                ? "equipped"
+                : owned
+                ? "owned"
+                : "";
+
+            wormHTML += `
+
+                <div class="shopItem">
+
+                    <div
+                        class="shopEmoji"
+                        style="color:${worm.color}">
+                        ${worm.emoji}
+                    </div>
+
+                    <div class="shopName">
+                        ${worm.name}
+                    </div>
+
+                    <div class="shopPrice">
+                        ${
+                            worm.price === 0
+                            ? "무료"
+                            : "🪙 " + worm.price
+                        }
+                    </div>
+
+                    <button
+                        class="shopBtn ${cls}"
+                        onclick="buyWorm('${id}')">
+                        ${text}
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+    document.getElementById(
+        "wormShop"
+    ).innerHTML = wormHTML;
+
+
+    let skillHTML = "";
+
+    Object.entries(skills).forEach(
+        ([id,skill]) => {
+
+            const owned =
+                ownedSkills.includes(id);
+
+            const equipped =
+                equippedSkill === id;
+
+            let text =
+                equipped
+                ? "사용 중"
+                : owned
+                ? "변경하기"
+                : "구매";
+
+            let cls =
+                equipped
+                ? "equipped"
+                : owned
+                ? "owned"
+                : "";
+
+            skillHTML += `
+
+                <div class="shopItem">
+
+                    <div class="shopEmoji">
+                        ⚡
+                    </div>
+
+                    <div class="shopName">
+                        ${skill.name}
+                    </div>
+
+                    <div class="shopDesc">
+                        ${skill.desc}
+                    </div>
+
+                    <div class="shopPrice">
+                        ${
+                            skill.price === 0
+                            ? "무료"
+                            : "🪙 " + skill.price
+                        }
+                    </div>
+
+                    <button
+                        class="shopBtn ${cls}"
+                        onclick="buySkill('${id}')">
+                        ${text}
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+    document.getElementById(
+        "skillShop"
+    ).innerHTML = skillHTML;
+
+}
+
+
+function buyWorm(id){
+
+    const item = worms[id];
+
+    if(ownedWorms.includes(id)){
+
+        equippedWorm = id;
+
+        applyWorm();
+
+        saveEverything();
+
+        notify(
+            item.name + " 장착!"
+        );
+
+        renderShop();
+
+        return;
+
+    }
+
+    if(coins < item.price){
+
+        notify("🪙 코인이 부족합니다!");
+
+        return;
+
+    }
+
+    coins -= item.price;
+
+    ownedWorms.push(id);
+
+    equippedWorm = id;
+
+    applyWorm();
+
+    saveEverything();
+
+    notify(
+        item.name + " 구매 완료!"
+    );
+
+    renderShop();
+
+}
+
+
+function buySkill(id){
+
+    const item = skills[id];
+
+    if(ownedSkills.includes(id)){
+
+        equippedSkill = id;
+
+        saveEverything();
+
+        notify(
+            item.name + "으로 변경!"
+        );
+
+        renderShop();
+
+        return;
+
+    }
+
+    if(coins < item.price){
+
+        notify("🪙 코인이 부족합니다!");
+
+        return;
+
+    }
+
+    coins -= item.price;
+
+    ownedSkills.push(id);
+
+    equippedSkill = id;
+
+    saveEverything();
+
+    notify(
+        item.name + " 구매 완료!"
+    );
+
+    renderShop();
+
+}
+
+
+function applyWorm(){
+
+    const color =
+        worms[equippedWorm].color;
+
     document.getElementById(
         "snakeBody"
-    );
+    ).style.stroke = color;
 
-const snakeShadow =
     document.getElementById(
-        "snakeShadow"
-    );
+        "head"
+    ).style.fill = color;
 
-const snakeLight =
-    document.getElementById(
-        "snakeLight"
-    );
-
-const dashTrail =
-    document.getElementById(
-        "dashTrail"
-    );
-
-const headGroup =
-    document.getElementById(
-        "headGroup"
-    );
-
-const mouthClosed =
-    document.getElementById(
-        "mouthClosed"
-    );
-
-const mouthOpenGroup =
-    document.getElementById(
-        "mouthOpenGroup"
-    );
-
-const continueButton =
-    document.getElementById(
-        "continueButton"
-    );
-
-const restartButton =
-    document.getElementById(
-        "restartButton"
-    );
-
-const gameOverRestart =
-    document.getElementById(
-        "gameOverRestart"
-    );
+}
 
 
-/* =========================
-   게임 변수
-========================= */
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+let notificationTimer = null;
+
+function notify(text){
+
+    const box =
+        document.getElementById(
+            "notification"
+        );
+
+    box.textContent = text;
+
+    box.style.display = "block";
+
+    clearTimeout(notificationTimer);
+
+    notificationTimer =
+        setTimeout(
+            () => {
+                box.style.display = "none";
+            },
+            1800
+        );
+
+}
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+const GRID = 18;
+const CELL = 34;
 
 let snake = [];
-
 let previousSnake = [];
 
 let direction = {
@@ -1090,90 +1471,32 @@ let nextDirection = {
     y:0
 };
 
-let food = {
+let apple = {
     x:10,
-    y:9
+    y:8
 };
 
 let score = 0;
 
+let gameRunning = false;
+let paused = false;
 let dead = false;
 
-let paused = false;
+let lastMoveTime = 0;
 
-
-/* =========================
-   질주 변수
-========================= */
-
-let dashing = false;
-
-
-/*
-   질주가 끝나는 시간
-*/
-
-let dashEndTime = 0;
-
-
-/*
-   마지막으로 질주를 시작한 시간
-*/
-
-let lastDashTime = -Infinity;
-
-
-/*
-   LShift가 현재 눌려 있는지
-*/
-
+let dashActive = false;
 let shiftHeld = false;
+let dashStartTime = 0;
+let lastDashTime = -10000;
 
 
-/* =========================
-   이동 시간
-========================= */
+/* =========================================================
+   START / RESTART
+========================================================= */
 
-function getMoveTime() {
+function startGame(){
 
-    if (dashing) {
-        return DASH_MOVE_TIME;
-    }
-
-    return NORMAL_MOVE_TIME;
-}
-
-
-/* =========================
-   애니메이션
-========================= */
-
-let lastMoveTime =
-    performance.now();
-
-let animationFrame = null;
-
-
-/* =========================
-   최고기록
-========================= */
-
-let highScore =
-    Number(
-        localStorage.getItem(
-            "wormHighScore"
-        ) || 0
-    );
-
-highScoreElement.textContent =
-    highScore;
-
-
-/* =========================
-   뱀 초기화
-========================= */
-
-function resetSnake() {
+    showScreen("gameScreen");
 
     snake = [
         {x:8,y:9},
@@ -1184,1210 +1507,1092 @@ function resetSnake() {
     ];
 
     previousSnake =
-        snake.map(part => ({
-            x:part.x,
-            y:part.y
-        }));
-}
-
-
-/* =========================
-   사과 생성
-========================= */
-
-function createFood() {
-
-    let valid = false;
-
-    while (!valid) {
-
-        food = {
-
-            x:
-                Math.floor(
-                    Math.random() * COLS
-                ),
-
-            y:
-                Math.floor(
-                    Math.random() * ROWS
-                )
-        };
-
-
-        valid =
-            !snake.some(part =>
-                part.x === food.x &&
-                part.y === food.y
-            );
-    }
-}
-
-
-/* =========================
-   사과 거리
-========================= */
-
-function foodDistance() {
-
-    const head = snake[0];
-
-    return Math.max(
-
-        Math.abs(
-            head.x - food.x
-        ),
-
-        Math.abs(
-            head.y - food.y
-        )
-    );
-}
-
-
-/* =========================
-   입
-========================= */
-
-function updateMouth() {
-
-    if (dead) {
-        return;
-    }
-
-
-    if (foodDistance() <= 2) {
-
-        mouthClosed.style.display =
-            "none";
-
-        mouthOpenGroup.style.display =
-            "block";
-
-    } else {
-
-        mouthClosed.style.display =
-            "block";
-
-        mouthOpenGroup.style.display =
-            "none";
-    }
-}
-
-
-/* =========================
-   보간
-========================= */
-
-function lerp(a,b,t) {
-
-    return a + (b-a) * t;
-}
-
-
-function getAnimatedSnake(progress) {
-
-    return snake.map(
-        (part,index) => {
-
-            const oldPart =
-                previousSnake[index] ||
-                part;
-
-            return {
-
-                x:
-                    lerp(
-                        oldPart.x,
-                        part.x,
-                        progress
-                    ),
-
-                y:
-                    lerp(
-                        oldPart.y,
-                        part.y,
-                        progress
-                    )
-            };
-        }
-    );
-}
-
-
-/* =========================
-   몸통 경로
-========================= */
-
-function createPath(animatedSnake) {
-
-    const points =
-        [...animatedSnake]
-        .reverse()
-        .map(part => ({
-
-            x:
-                part.x * GRID +
-                GRID / 2,
-
-            y:
-                part.y * GRID +
-                GRID / 2
-        }));
-
-
-    if (points.length < 2) {
-        return "";
-    }
-
-
-    let path =
-        `M ${points[0].x} ${points[0].y}`;
-
-
-    for (
-        let i=1;
-        i<points.length-1;
-        i++
-    ) {
-
-        const a =
-            points[i];
-
-        const b =
-            points[i+1];
-
-
-        const midX =
-            (a.x+b.x)/2;
-
-        const midY =
-            (a.y+b.y)/2;
-
-
-        path +=
-            ` Q ${a.x} ${a.y} ${midX} ${midY}`;
-    }
-
-
-    const last =
-        points[points.length-1];
-
-
-    path +=
-        ` L ${last.x} ${last.y}`;
-
-
-    return path;
-}
-
-
-/* =========================
-   머리 방향
-========================= */
-
-function getAngle() {
-
-    if (direction.x === 1)
-        return 0;
-
-    if (direction.y === 1)
-        return 90;
-
-    if (direction.x === -1)
-        return 180;
-
-    if (direction.y === -1)
-        return -90;
-
-    return 0;
-}
-
-
-/* =========================
-   화면 그리기
-========================= */
-
-function render(progress=1) {
-
-    const animatedSnake =
-        getAnimatedSnake(progress);
-
-
-    const path =
-        createPath(
-            animatedSnake
+        snake.map(
+            point => ({...point})
         );
-
-
-    snakeBody.setAttribute(
-        "d",
-        path
-    );
-
-    snakeShadow.setAttribute(
-        "d",
-        path
-    );
-
-    snakeLight.setAttribute(
-        "d",
-        path
-    );
-
-
-    dashTrail.setAttribute(
-        "d",
-        path
-    );
-
-
-    const head =
-        animatedSnake[0];
-
-
-    const x =
-        head.x * GRID +
-        GRID / 2;
-
-    const y =
-        head.y * GRID +
-        GRID / 2;
-
-
-    headGroup.setAttribute(
-        "transform",
-        `translate(${x} ${y}) rotate(${getAngle()})`
-    );
-
-
-    foodElement.style.left =
-        food.x * GRID + "px";
-
-    foodElement.style.top =
-        food.y * GRID + "px";
-
-
-    scoreElement.textContent =
-        score;
-
-    highScoreElement.textContent =
-        highScore;
-
-
-    updateMouth();
-}
-
-
-/* =========================
-   질주 UI
-========================= */
-
-function updateDashUI() {
-
-    const now =
-        performance.now();
-
-
-    if (dashing) {
-
-        const remaining =
-            Math.max(
-                0,
-                dashEndTime - now
-            );
-
-
-        dashStatus.textContent =
-            "🔥 질주 " +
-            (
-                remaining / 1000
-            ).toFixed(1) +
-            "초";
-
-
-        dashStatus.style.color =
-            "#ffcc4d";
-
-        return;
-    }
-
-
-    const elapsed =
-        now - lastDashTime;
-
-
-    if (
-        lastDashTime === -Infinity ||
-        elapsed >= DASH_COOLDOWN
-    ) {
-
-        dashStatus.textContent =
-            "준비 ⚡";
-
-        dashStatus.style.color =
-            "#6eff91";
-
-    } else {
-
-        const remaining =
-            Math.ceil(
-                (
-                    DASH_COOLDOWN -
-                    elapsed
-                ) / 1000
-            );
-
-
-        dashStatus.textContent =
-            "쿨타임 " +
-            remaining +
-            "초";
-
-        dashStatus.style.color =
-            "#ff7777";
-    }
-}
-
-
-/* =========================
-   애니메이션
-========================= */
-
-function animate(time) {
-
-    if (dead || paused) {
-        return;
-    }
-
-
-    /*
-       2초가 지나면
-       자동으로 질주 종료
-    */
-
-    if (
-        dashing &&
-        time >= dashEndTime
-    ) {
-
-        stopDash();
-    }
-
-
-    const moveTime =
-        getMoveTime();
-
-
-    const progress =
-        Math.min(
-            (
-                time -
-                lastMoveTime
-            ) / moveTime,
-            1
-        );
-
-
-    const eased =
-        progress < .5
-
-        ? 2 * progress * progress
-
-        : 1 -
-          Math.pow(
-              -2 * progress + 2,
-              2
-          ) / 2;
-
-
-    render(eased);
-
-    updateDashUI();
-
-
-    animationFrame =
-        requestAnimationFrame(
-            animate
-        );
-}
-
-
-/* =========================
-   이동
-========================= */
-
-function move() {
-
-    if (dead || paused) {
-        return;
-    }
-
-
-    direction =
-        nextDirection;
-
-
-    const head =
-        snake[0];
-
-
-    const newHead = {
-
-        x:
-            head.x +
-            direction.x,
-
-        y:
-            head.y +
-            direction.y
-    };
-
-
-    /* 벽 충돌 */
-
-    if (
-
-        newHead.x < 0 ||
-
-        newHead.x >= COLS ||
-
-        newHead.y < 0 ||
-
-        newHead.y >= ROWS
-
-    ) {
-
-        crash(head);
-
-        return;
-    }
-
-
-    /* 몸 충돌 */
-
-    if (
-        snake.some(part =>
-            part.x === newHead.x &&
-            part.y === newHead.y
-        )
-    ) {
-
-        crash(newHead);
-
-        return;
-    }
-
-
-    previousSnake =
-        snake.map(part => ({
-            x:part.x,
-            y:part.y
-        }));
-
-
-    snake.unshift(
-        newHead
-    );
-
-
-    /* 사과 */
-
-    if (
-
-        newHead.x === food.x &&
-
-        newHead.y === food.y
-
-    ) {
-
-        score++;
-
-
-        if (score > highScore) {
-
-            highScore =
-                score;
-
-            localStorage.setItem(
-                "wormHighScore",
-                highScore
-            );
-        }
-
-
-        createFood();
-
-    } else {
-
-        snake.pop();
-    }
-
-
-    lastMoveTime =
-        performance.now();
-
-
-    render(0);
-}
-
-
-/* =========================
-   질주 시작
-========================= */
-
-function startDash() {
-
-    if (
-        dead ||
-        paused ||
-        dashing
-    ) {
-        return;
-    }
-
-
-    const now =
-        performance.now();
-
-
-    /*
-       쿨타임 검사
-    */
-
-    if (
-        now - lastDashTime <
-        DASH_COOLDOWN
-    ) {
-
-        return;
-    }
-
-
-    dashing = true;
-
-
-    lastDashTime =
-        now;
-
-
-    dashEndTime =
-        now + DASH_DURATION;
-
-
-    game.classList.add(
-        "dashing"
-    );
-
-    game.classList.add(
-        "dashActive"
-    );
-
-    game.classList.add(
-        "dashFlash"
-    );
-
-
-    setTimeout(() => {
-
-        game.classList.remove(
-            "dashFlash"
-        );
-
-    },180);
-
-
-    lastMoveTime =
-        now;
-
-
-    updateDashUI();
-}
-
-
-/* =========================
-   질주 종료
-========================= */
-
-function stopDash() {
-
-    if (!dashing) {
-        return;
-    }
-
-
-    dashing = false;
-
-
-    game.classList.remove(
-        "dashing"
-    );
-
-    game.classList.remove(
-        "dashActive"
-    );
-
-
-    lastMoveTime =
-        performance.now();
-
-
-    updateDashUI();
-}
-
-
-/* =========================
-   충돌
-========================= */
-
-function crash(position) {
-
-    dead = true;
-
-
-    stopDash();
-
-
-    mouthClosed.style.display =
-        "block";
-
-    mouthOpenGroup.style.display =
-        "none";
-
-
-    crashElement.textContent =
-        "💥";
-
-
-    crashElement.style.left =
-        position.x * GRID +
-        GRID / 2 +
-        "px";
-
-
-    crashElement.style.top =
-        position.y * GRID +
-        GRID / 2 +
-        "px";
-
-
-    crashElement.style.display =
-        "block";
-
-
-    game.classList.add(
-        "shake"
-    );
-
-
-    setTimeout(() => {
-
-        game.classList.remove(
-            "shake"
-        );
-
-
-        finalScoreElement.textContent =
-            score;
-
-
-        gameOverHighScoreElement.textContent =
-            highScore;
-
-
-        gameOverElement.style.display =
-            "block";
-
-    },500);
-}
-
-
-/* =========================
-   일시정지
-========================= */
-
-function pauseGame() {
-
-    if (dead || paused) {
-        return;
-    }
-
-
-    const now =
-        performance.now();
-
-
-    const progress =
-        Math.min(
-
-            (
-                now -
-                lastMoveTime
-            ) /
-            getMoveTime(),
-
-            1
-        );
-
-
-    render(progress);
-
-
-    paused = true;
-
-
-    pauseOverlay.style.display =
-        "block";
-
-
-    if (animationFrame) {
-
-        cancelAnimationFrame(
-            animationFrame
-        );
-
-        animationFrame = null;
-    }
-}
-
-
-/* =========================
-   계속하기
-========================= */
-
-function resumeGame() {
-
-    if (dead) {
-        return;
-    }
-
-
-    paused = false;
-
-
-    pauseOverlay.style.display =
-        "none";
-
-
-    /*
-       일시정지 중에는
-       질주 시간이 지나지 않도록
-       다시 기준점을 잡음
-    */
-
-    if (dashing) {
-
-        /*
-           일시정지 상태에서
-           Shift가 눌려 있었다면
-           남은 질주 시간을 유지
-        */
-
-        const remaining =
-            Math.max(
-                0,
-                dashEndTime -
-                performance.now()
-            );
-
-        dashEndTime =
-            performance.now() +
-            remaining;
-    }
-
-
-    lastMoveTime =
-        performance.now();
-
-
-    animationFrame =
-        requestAnimationFrame(
-            animate
-        );
-}
-
-
-/* =========================
-   다시하기
-========================= */
-
-function restart() {
-
-    score = 0;
-
-    dead = false;
-
-    paused = false;
-
-    dashing = false;
-
-    shiftHeld = false;
-
-    lastDashTime = -Infinity;
-
 
     direction = {
         x:1,
         y:0
     };
 
-
     nextDirection = {
         x:1,
         y:0
     };
 
+    score = 0;
 
-    crashElement.style.display =
-        "none";
+    gameRunning = true;
+    paused = false;
+    dead = false;
+
+    dashActive = false;
+    shiftHeld = false;
+
+    document.getElementById(
+        "score"
+    ).textContent = "0";
+
+    document.getElementById(
+        "pauseOverlay"
+    ).classList.remove("active");
+
+    document.getElementById(
+        "deathOverlay"
+    ).classList.remove("active");
+
+    document.getElementById(
+        "boom"
+    ).style.display = "none";
+
+    spawnApple();
+
+    lastMoveTime =
+        performance.now();
+
+    applyWorm();
+
+    updateQuestUI();
+
+    requestAnimationFrame(gameLoop);
+
+}
 
 
-    gameOverElement.style.display =
-        "none";
+function restartGame(){
+
+    startGame();
+
+}
 
 
-    pauseOverlay.style.display =
-        "none";
+/* =========================================================
+   APPLE
+========================================================= */
+
+function spawnApple(){
+
+    let valid = false;
+
+    while(!valid){
+
+        apple = {
+            x:Math.floor(
+                Math.random()*GRID
+            ),
+            y:Math.floor(
+                Math.random()*GRID
+            )
+        };
+
+        valid =
+            !snake.some(
+                point =>
+                    point.x === apple.x &&
+                    point.y === apple.y
+            );
+
+    }
+
+}
 
 
-    game.classList.remove(
-        "dashing"
-    );
+/* =========================================================
+   MOVEMENT
+========================================================= */
 
-    game.classList.remove(
-        "dashActive"
-    );
+function moveSnake(){
+
+    if(
+        !gameRunning ||
+        paused ||
+        dead
+    ){
+        return;
+    }
 
 
-    resetSnake();
+    direction =
+        {...nextDirection};
 
-    createFood();
+    const head =
+        snake[0];
+
+    const next = {
+        x:head.x + direction.x,
+        y:head.y + direction.y
+    };
+
+
+    if(
+        next.x < 0 ||
+        next.x >= GRID ||
+        next.y < 0 ||
+        next.y >= GRID
+    ){
+
+        die(next);
+
+        return;
+
+    }
+
+
+    const hitSelf =
+        snake.some(
+            point =>
+                point.x === next.x &&
+                point.y === next.y
+        );
+
+
+    if(hitSelf){
+
+        die(next);
+
+        return;
+
+    }
+
+
+    previousSnake =
+        snake.map(
+            point => ({...point})
+        );
+
+    snake.unshift(next);
+
+
+    if(
+        next.x === apple.x &&
+        next.y === apple.y
+    ){
+
+        score++;
+
+        document.getElementById(
+            "score"
+        ).textContent = score;
+
+        spawnApple();
+
+        updateQuestProgress();
+
+    }else{
+
+        snake.pop();
+
+    }
 
 
     lastMoveTime =
         performance.now();
 
-
-    render(1);
-
-    updateDashUI();
-
-
-    if (animationFrame) {
-
-        cancelAnimationFrame(
-            animationFrame
-        );
-    }
-
-
-    animationFrame =
-        requestAnimationFrame(
-            animate
-        );
 }
 
 
-/* =========================
-   버튼
-========================= */
+/* =========================================================
+   SMOOTH RENDER
+========================================================= */
 
-continueButton.addEventListener(
-    "click",
-    resumeGame
-);
+function lerp(a,b,t){
 
-restartButton.addEventListener(
-    "click",
-    restart
-);
+    return a + (b-a)*t;
 
-gameOverRestart.addEventListener(
-    "click",
-    restart
-);
+}
 
 
-/* =========================
-   키보드
-========================= */
+function ease(t){
+
+    return t < .5
+        ? 2*t*t
+        : 1-Math.pow(-2*t+2,2)/2;
+
+}
+
+
+function render(progress){
+
+    if(snake.length === 0){
+        return;
+    }
+
+
+    const t = ease(
+        Math.max(
+            0,
+            Math.min(
+                1,
+                progress
+            )
+        )
+    );
+
+
+    const points =
+        snake.map(
+            (point,index) => {
+
+                const old =
+                    previousSnake[index] ||
+                    point;
+
+                return {
+                    x:lerp(old.x,point.x,t),
+                    y:lerp(old.y,point.y,t)
+                };
+
+            }
+        );
+
+
+    let path = "";
+
+    for(
+        let i=points.length-1;
+        i>=0;
+        i--
+    ){
+
+        const p = points[i];
+
+        if(i === points.length-1){
+
+            path +=
+                "M " +
+                (p.x*CELL+17) +
+                " " +
+                (p.y*CELL+17);
+
+        }else{
+
+            path +=
+                " L " +
+                (p.x*CELL+17) +
+                " " +
+                (p.y*CELL+17);
+
+        }
+
+    }
+
+
+    document.getElementById(
+        "snakeBody"
+    ).setAttribute(
+        "d",
+        path
+    );
+
+    document.getElementById(
+        "snakeHighlight"
+    ).setAttribute(
+        "d",
+        path
+    );
+
+
+    const head = points[0];
+
+    let angle = 0;
+
+    if(direction.x === 1)
+        angle = 0;
+
+    if(direction.x === -1)
+        angle = 180;
+
+    if(direction.y === 1)
+        angle = 90;
+
+    if(direction.y === -1)
+        angle = -90;
+
+
+    document.getElementById(
+        "headGroup"
+    ).setAttribute(
+        "transform",
+        `
+        translate(
+            ${head.x*CELL+17}
+            ${head.y*CELL+17}
+        )
+        rotate(${angle})
+        `
+    );
+
+
+    const appleElement =
+        document.getElementById(
+            "apple"
+        );
+
+    appleElement.style.left =
+        (apple.x*CELL) + "px";
+
+    appleElement.style.top =
+        (apple.y*CELL) + "px";
+
+
+    /*
+        사과와 2칸 이내면
+        확실하게 입을 크게 벌림
+    */
+
+    const distance =
+        Math.max(
+            Math.abs(
+                snake[0].x-apple.x
+            ),
+            Math.abs(
+                snake[0].y-apple.y
+            )
+        );
+
+
+    if(distance <= 2){
+
+        document.getElementById(
+            "normalMouth"
+        ).style.display = "none";
+
+        document.getElementById(
+            "openMouth"
+        ).style.display = "block";
+
+    }else{
+
+        document.getElementById(
+            "normalMouth"
+        ).style.display = "block";
+
+        document.getElementById(
+            "openMouth"
+        ).style.display = "none";
+
+    }
+
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function gameLoop(time){
+
+    if(
+        !gameRunning ||
+        dead
+    ){
+        return;
+    }
+
+
+    if(!paused){
+
+        const normalSpeed = 150;
+
+        const moveSpeed =
+            dashActive
+            ? getDashSpeed()
+            : normalSpeed;
+
+
+        const elapsed =
+            time-lastMoveTime;
+
+
+        const progress =
+            Math.min(
+                elapsed/moveSpeed,
+                1
+            );
+
+
+        render(progress);
+
+
+        if(elapsed >= moveSpeed){
+
+            moveSnake();
+
+        }
+
+
+        updateDash();
+
+
+        requestAnimationFrame(
+            gameLoop
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DASH
+========================================================= */
+
+function getDashSpeed(){
+
+    if(equippedSkill === "turbo")
+        return 50;
+
+    if(equippedSkill === "wind")
+        return 42;
+
+    if(equippedSkill === "flash")
+        return 32;
+
+    return 65;
+
+}
+
+
+function activateDash(){
+
+    if(
+        !gameRunning ||
+        paused ||
+        dead ||
+        dashActive
+    ){
+        return;
+    }
+
+
+    const now =
+        performance.now();
+
+
+    /*
+        10초 쿨타임
+    */
+
+    if(
+        now-lastDashTime < 10000
+    ){
+        return;
+    }
+
+
+    dashActive = true;
+
+    dashStartTime = now;
+
+    lastDashTime = now;
+
+
+    document
+        .querySelectorAll(".wind")
+        .forEach(
+            element =>
+                element.classList.add("active")
+        );
+
+}
+
+
+function updateDash(){
+
+    const now =
+        performance.now();
+
+
+    /*
+        LShift를 떼면 즉시 종료
+    */
+
+    if(
+        dashActive &&
+        !shiftHeld
+    ){
+
+        dashActive = false;
+
+        stopWind();
+
+    }
+
+
+    /*
+        최대 실행시간 2초
+    */
+
+    if(
+        dashActive &&
+        now-dashStartTime >= 2000
+    ){
+
+        dashActive = false;
+
+        stopWind();
+
+    }
+
+
+    const status =
+        document.getElementById(
+            "skillStatus"
+        );
+
+
+    const cooldown =
+        10000-(now-lastDashTime);
+
+
+    if(
+        lastDashTime < 0 ||
+        cooldown <= 0
+    ){
+
+        status.textContent = "READY";
+
+        status.className =
+            "skillReady";
+
+    }else if(dashActive){
+
+        status.textContent =
+            "🔥 질주 중!";
+
+        status.className =
+            "skillReady";
+
+    }else{
+
+        status.textContent =
+            Math.ceil(
+                cooldown/1000
+            ) + "초";
+
+        status.className =
+            "skillCool";
+
+    }
+
+}
+
+
+function stopWind(){
+
+    document
+        .querySelectorAll(".wind")
+        .forEach(
+            element =>
+                element.classList.remove("active")
+        );
+
+}
+
+
+/* =========================================================
+   DEATH
+========================================================= */
+
+function die(position){
+
+    dead = true;
+
+    gameRunning = false;
+
+    dashActive = false;
+
+    stopWind();
+
+
+    if(score > highScore){
+
+        highScore = score;
+
+        localStorage.setItem(
+            "wormHighScore",
+            highScore
+        );
+
+    }
+
+
+    const boom =
+        document.getElementById(
+            "boom"
+        );
+
+
+    const safeX =
+        Math.max(
+            0,
+            Math.min(
+                GRID-1,
+                position.x
+            )
+        );
+
+    const safeY =
+        Math.max(
+            0,
+            Math.min(
+                GRID-1,
+                position.y
+            )
+        );
+
+
+    boom.style.left =
+        (safeX*CELL+255) + "px";
+
+    boom.style.top =
+        (safeY*CELL+170) + "px";
+
+    boom.style.display =
+        "block";
+
+
+    setTimeout(
+        () => {
+
+            document.getElementById(
+                "finalScore"
+            ).textContent = score;
+
+            document.getElementById(
+                "deathOverlay"
+            ).classList.add("active");
+
+            updateUI();
+
+        },
+        550
+    );
+
+}
+
+
+/* =========================================================
+   PAUSE
+========================================================= */
+
+function pauseGame(){
+
+    if(
+        !gameRunning ||
+        dead
+    ){
+        return;
+    }
+
+
+    paused = true;
+
+    document.getElementById(
+        "pauseOverlay"
+    ).classList.add("active");
+
+}
+
+
+function continueGame(){
+
+    if(dead){
+        return;
+    }
+
+
+    paused = false;
+
+    document.getElementById(
+        "pauseOverlay"
+    ).classList.remove("active");
+
+    lastMoveTime =
+        performance.now();
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
 
 document.addEventListener(
     "keydown",
-    function(e) {
+    event => {
 
-        const key =
-            e.key.toLowerCase();
+        /*
+            ESC
+        */
+
+        if(event.code === "Escape"){
+
+            event.preventDefault();
+
+            if(
+                document
+                    .getElementById("gameScreen")
+                    .classList.contains("active")
+            ){
+
+                if(paused){
+                    continueGame();
+                }else{
+                    pauseGame();
+                }
+
+            }
+
+            return;
+
+        }
 
 
-        /* =====================
-           LSHIFT 누름
-        ====================== */
+        /*
+            왼쪽 SHIFT
+        */
 
-        if (
-            e.code === "ShiftLeft"
-        ) {
+        if(event.code === "ShiftLeft"){
 
-            e.preventDefault();
+            event.preventDefault();
 
-
-            /*
-               이미 누르고 있다면
-               다시 발동하지 않음
-            */
-
-            if (!shiftHeld) {
+            if(!shiftHeld){
 
                 shiftHeld = true;
 
-                startDash();
+                activateDash();
+
             }
 
-
             return;
+
         }
 
 
-        /* =====================
-           ESC
-        ====================== */
-
-        if (key === "escape") {
-
-            e.preventDefault();
-
-
-            if (dead) {
-                return;
-            }
-
-
-            if (paused) {
-
-                resumeGame();
-
-            } else {
-
-                pauseGame();
-            }
-
-
-            return;
-        }
-
-
-        /* =====================
-           R
-        ====================== */
-
-        if (
-            key === "r" &&
+        if(
+            !gameRunning ||
+            paused ||
             dead
-        ) {
-
-            restart();
-
+        ){
             return;
         }
 
 
-        if (paused) {
-            return;
-        }
+        const key =
+            event.key.toLowerCase();
 
 
-        /* =====================
-           방향키
-        ====================== */
-
-        if (
-
+        if(
             (
                 key === "w" ||
                 key === "arrowup"
-            )
-
-            &&
-
+            ) &&
             direction.y !== 1
-
-        ) {
+        ){
 
             nextDirection = {
                 x:0,
                 y:-1
             };
+
         }
 
 
-        if (
-
+        if(
             (
                 key === "s" ||
                 key === "arrowdown"
-            )
-
-            &&
-
+            ) &&
             direction.y !== -1
-
-        ) {
+        ){
 
             nextDirection = {
                 x:0,
                 y:1
             };
+
         }
 
 
-        if (
-
+        if(
             (
                 key === "a" ||
                 key === "arrowleft"
-            )
-
-            &&
-
+            ) &&
             direction.x !== 1
-
-        ) {
+        ){
 
             nextDirection = {
                 x:-1,
                 y:0
             };
+
         }
 
 
-        if (
-
+        if(
             (
                 key === "d" ||
                 key === "arrowright"
-            )
-
-            &&
-
+            ) &&
             direction.x !== -1
-
-        ) {
+        ){
 
             nextDirection = {
                 x:1,
                 y:0
             };
+
         }
 
     }
 );
 
-
-/* =========================
-   LShift 떼기
-========================= */
 
 document.addEventListener(
     "keyup",
-    function(e) {
+    event => {
 
-        if (
-            e.code === "ShiftLeft"
-        ) {
+        if(event.code === "ShiftLeft"){
 
             shiftHeld = false;
 
+            if(dashActive){
 
-            /*
-               핵심:
-               Shift를 떼는 순간
-               질주 즉시 종료
-            */
+                dashActive = false;
 
-            if (dashing) {
+                stopWind();
 
-                stopDash();
             }
+
         }
 
     }
 );
 
 
-/* =========================
-   창을 벗어나도
-   Shift가 풀리도록 처리
-========================= */
+/* =========================================================
+   QUEST SYSTEM
+========================================================= */
 
-window.addEventListener(
-    "blur",
-    function() {
+function updateQuestProgress(){
 
-        shiftHeld = false;
+    quests.forEach(
+        quest => {
 
+            if(
+                quest.type === "apple" ||
+                quest.type === "score"
+            ){
 
-        if (dashing) {
+                quest.progress = score;
 
-            stopDash();
+            }
+
+            if(
+                quest.type === "length"
+            ){
+
+                quest.progress =
+                    snake.length;
+
+            }
+
         }
-    }
-);
-
-
-/* =========================
-   시작
-========================= */
-
-resetSnake();
-
-createFood();
-
-render(1);
-
-updateDashUI();
-
-
-animationFrame =
-    requestAnimationFrame(
-        animate
     );
 
 
-/*
-   15ms마다 이동 체크
-*/
+    checkQuestCompletion();
 
-setInterval(
-    function() {
+    updateQuestUI();
 
-        if (dead || paused) {
-            return;
+    saveQuests();
+
+}
+
+
+function checkQuestCompletion(){
+
+    for(
+        let i=0;
+        i<quests.length;
+        i++
+    ){
+
+        const quest = quests[i];
+
+
+        if(
+            quest.progress >=
+            quest.target
+        ){
+
+            const reward =
+                Math.min(
+                    Number(quest.reward),
+                    200
+                );
+
+
+            coins += reward;
+
+
+            notify(
+                "🎉 퀘스트 완료! +" +
+                reward +
+                " 🪙"
+            );
+
+
+            /*
+                완료된 퀘스트 하나만
+                새 퀘스트로 교체
+            */
+
+            let available =
+                questPool.filter(
+                    candidate =>
+                        !quests.some(
+                            current =>
+                                current.type ===
+                                    candidate.type &&
+                                current.target ===
+                                    candidate.target
+                        )
+                );
+
+
+            if(
+                available.length === 0
+            ){
+
+                available =
+                    [...questPool];
+
+            }
+
+
+            const replacement =
+                available[
+                    Math.floor(
+                        Math.random()*
+                        available.length
+                    )
+                ];
+
+
+            quests[i] = {
+                ...replacement,
+                progress:0
+            };
+
+
+            saveEverything();
+
+            /*
+                한 번에 하나만 완료 처리
+            */
+
+            break;
+
         }
 
+    }
 
-        const now =
-            performance.now();
-
-
-        const interval =
-            getMoveTime();
+}
 
 
-        if (
-            now - lastMoveTime >=
-            interval
-        ) {
+function updateQuestUI(){
 
-            move();
+    if(
+        !Array.isArray(quests) ||
+        quests.length === 0
+    ){
+        return;
+    }
+
+
+    /*
+        게임 화면에는
+        진행 중인 퀘스트 하나만 표시
+    */
+
+    let quest = quests[0];
+
+
+    for(
+        let i=0;
+        i<quests.length;
+        i++
+    ){
+
+        if(
+            quests[i].progress <
+            quests[i].target
+        ){
+
+            quest = quests[i];
+
+            break;
+
         }
 
-    },
-    15
-);
+    }
+
+
+    const progress =
+        Math.min(
+            quest.progress,
+            quest.target
+        );
+
+
+    document.getElementById(
+        "questText"
+    ).textContent =
+        quest.text +
+        " " +
+        progress +
+        "/" +
+        quest.target;
+
+
+    document.getElementById(
+        "questReward"
+    ).textContent =
+        Math.min(
+            quest.reward,
+            200
+        );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+updateUI();
+
+renderShop();
+
+applyWorm();
 
 </script>
 
 </body>
 </html>
-""", height=820)
+"""
+
+components.html(
+    GAME,
+    height=870,
+    scrolling=False
+)
 ```
