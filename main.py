@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="🪱 지렁이 게임",
+    page_title="🪱 WORM QUEST",
     page_icon="🪱",
     layout="centered"
 )
@@ -10,12 +10,20 @@ st.set_page_config(
 st.markdown("""
 <style>
 header {visibility:hidden;}
+footer {visibility:hidden;}
+
 .block-container {
-    padding-top:1rem;
-    max-width:950px;
+    padding-top: 10px;
+    padding-bottom: 0;
+    max-width: 1000px;
+}
+
+body {
+    background: #111;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 components.html(r"""
 <!DOCTYPE html>
@@ -24,62 +32,72 @@ components.html(r"""
 <meta charset="UTF-8">
 
 <style>
+
 * {
-    box-sizing:border-box;
+    box-sizing: border-box;
+    user-select: none;
 }
 
-body {
-    margin:0;
-    background:#193d22;
-    font-family:Arial,sans-serif;
-    overflow:hidden;
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 900px;
+    background: #14251a;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
 }
 
-#container {
-    width:780px;
-    height:780px;
-    margin:auto;
-    position:relative;
-    overflow:hidden;
-    border-radius:25px;
-
-    background:
-        radial-gradient(circle at 10% 10%,#6ca64c,transparent 20%),
-        radial-gradient(circle at 90% 15%,#396f32,transparent 22%),
-        radial-gradient(circle at 15% 90%,#4a8238,transparent 25%),
-        radial-gradient(circle at 90% 90%,#315f2e,transparent 25%),
-        #24542b;
+#page {
+    width: 900px;
+    margin: 0 auto;
+    position: relative;
 }
 
-.tree {
-    position:absolute;
-    width:115px;
-    height:115px;
-    border-radius:50%;
+/* =====================================================
+   TOP BAR
+===================================================== */
 
-    background:
-        radial-gradient(
-            circle at 30% 25%,
-            #9bd75b,
-            #55943b 48%,
-            #1d5128 80%
-        );
-
-    box-shadow:
-        inset -10px -12px 20px rgba(0,0,0,.28),
-        0 10px 15px rgba(0,0,0,.45);
+#topbar {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px 10px;
 }
+
+.stat {
+    background: rgba(0,0,0,.82);
+    color: white;
+    border-radius: 15px;
+    padding: 12px 18px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,.3);
+}
+
+#coinTop {
+    color: #ffd84d;
+}
+
+#highTop {
+    color: #fff;
+}
+
+/* =====================================================
+   GAME
+===================================================== */
 
 #game {
-    position:absolute;
-    width:648px;
-    height:648px;
-    left:66px;
-    top:66px;
-    overflow:hidden;
+    width: 648px;
+    height: 648px;
+    margin: 5px auto 0;
+    position: relative;
+    overflow: hidden;
 
-    border:18px solid #254da5;
-    border-radius:20px;
+    border: 18px solid #234da3;
+    border-radius: 22px;
 
     background:
         linear-gradient(
@@ -93,361 +111,269 @@ body {
         ),
         #9dcc4a;
 
-    background-size:34px 34px;
+    background-size: 34px 34px;
 
     box-shadow:
-        inset 0 0 30px rgba(0,0,0,.22),
-        0 10px 20px rgba(0,0,0,.45);
+        inset 0 0 35px rgba(0,0,0,.25),
+        0 12px 30px rgba(0,0,0,.5);
+
+    outline: none;
 }
 
-
-/* =========================
-   점수
-========================= */
-
-#scoreBox,
-#highScoreBox {
-    position:absolute;
-    top:18px;
-    z-index:100;
-
-    background:rgba(0,0,0,.78);
-    color:white;
-
-    padding:11px 18px;
-    border-radius:15px;
-
-    font-size:20px;
-    font-weight:bold;
-}
+/* =====================================================
+   SCORE
+===================================================== */
 
 #scoreBox {
-    left:18px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+
+    z-index: 200;
+
+    padding: 9px 15px;
+    border-radius: 13px;
+
+    background: rgba(0,0,0,.78);
+    color: white;
+
+    font-size: 18px;
+    font-weight: bold;
 }
 
-#highScoreBox {
-    right:18px;
+#skillBox {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    z-index: 200;
+
+    padding: 9px 15px;
+    border-radius: 13px;
+
+    background: rgba(0,0,0,.78);
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
 }
 
-
-/* =========================
-   질주 UI
-========================= */
-
-#dashBox {
-    position:absolute;
-
-    left:50%;
-    top:18px;
-
-    transform:translateX(-50%);
-
-    z-index:110;
-
-    background:rgba(0,0,0,.78);
-
-    color:white;
-
-    padding:10px 18px;
-
-    border-radius:15px;
-
-    font-size:17px;
-
-    font-weight:bold;
-
-    white-space:nowrap;
-}
-
-#dashStatus {
-    color:#6eff91;
-}
-
-
-/* =========================
-   사과
-========================= */
+/* =====================================================
+   APPLE
+===================================================== */
 
 #food {
-    position:absolute;
+    position: absolute;
 
-    width:34px;
-    height:34px;
+    width: 34px;
+    height: 34px;
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    font-size:31px;
+    font-size: 30px;
 
-    z-index:40;
+    z-index: 60;
 
-    animation:applePulse 1s ease-in-out infinite;
+    animation:
+        applePulse 1s infinite ease-in-out;
 
-    transform-origin:center;
-
-    filter:drop-shadow(
-        0 3px 3px rgba(0,0,0,.35)
-    );
+    transform-origin: center;
 }
 
 @keyframes applePulse {
-
     0% {
-        transform:scale(.72);
+        transform: scale(.78);
     }
 
     50% {
-        transform:scale(1.15);
+        transform: scale(1.12);
     }
 
     100% {
-        transform:scale(.72);
+        transform: scale(.78);
     }
 }
 
-
-/* =========================
-   뱀
-========================= */
+/* =====================================================
+   SNAKE SVG
+===================================================== */
 
 #snakeSVG {
-    position:absolute;
+    position: absolute;
+    left: 0;
+    top: 0;
 
-    width:648px;
-    height:648px;
+    width: 648px;
+    height: 648px;
 
-    left:0;
-    top:0;
+    overflow: visible;
 
-    overflow:visible;
+    pointer-events: none;
 
-    pointer-events:none;
-
-    z-index:30;
+    z-index: 40;
 }
 
 #snakeShadow {
-    fill:none;
-
-    stroke:#17336e;
-
-    stroke-width:42;
-
-    stroke-linecap:round;
-    stroke-linejoin:round;
-
-    opacity:.35;
+    fill: none;
+    stroke: #172a60;
+    stroke-width: 43;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .35;
 }
 
 #snakeBody {
-    fill:none;
-
-    stroke:#315fc9;
-
-    stroke-width:36;
-
-    stroke-linecap:round;
-    stroke-linejoin:round;
+    fill: none;
+    stroke-width: 36;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 #snakeLight {
-    fill:none;
-
-    stroke:#739cff;
-
-    stroke-width:6;
-
-    stroke-linecap:round;
-    stroke-linejoin:round;
-
-    opacity:.45;
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    opacity: .45;
 }
-
-
-/* =========================
-   머리
-========================= */
-
-#headGroup {
-    transition:transform .04s linear;
-}
-
-
-/* 닫힌 입 */
-
-#mouthClosed {
-    fill:none;
-
-    stroke:#102b63;
-
-    stroke-width:3;
-
-    stroke-linecap:round;
-}
-
-
-/* 벌어진 입 */
-
-#mouthOpenGroup {
-    display:none;
-}
-
-#openMouth {
-    fill:#111;
-
-    stroke:#081535;
-
-    stroke-width:2;
-}
-
-#tongue {
-    fill:#ff4b55;
-
-    stroke:#b51f2c;
-
-    stroke-width:1.5;
-}
-
-.tooth {
-    fill:white;
-
-    stroke:#cfd7e5;
-
-    stroke-width:1;
-}
-
-
-/* =========================
-   질주 바람
-========================= */
-
-#windLayer {
-    display:none;
-}
-
-.wind {
-    fill:none;
-
-    stroke:white;
-
-    stroke-width:4;
-
-    stroke-linecap:round;
-
-    opacity:0;
-}
-
-.dashActive #windLayer {
-    display:block;
-}
-
-.dashActive .wind1 {
-    animation:windMove .28s infinite;
-}
-
-.dashActive .wind2 {
-    animation:windMove .38s infinite .08s;
-}
-
-.dashActive .wind3 {
-    animation:windMove .32s infinite .15s;
-}
-
-.dashActive .wind4 {
-    animation:windMove .42s infinite .05s;
-}
-
-@keyframes windMove {
-
-    0% {
-        opacity:0;
-
-        transform:
-            translateX(18px)
-            scaleX(.4);
-    }
-
-    30% {
-        opacity:.8;
-    }
-
-    100% {
-        opacity:0;
-
-        transform:
-            translateX(-35px)
-            scaleX(1.3);
-    }
-}
-
-
-/* =========================
-   질주 잔상
-========================= */
 
 #dashTrail {
-    display:none;
+    display: none;
 
-    fill:none;
+    fill: none;
+    stroke-width: 9;
+    stroke-linecap: round;
 
-    stroke:#b7d6ff;
-
-    stroke-width:9;
-
-    stroke-linecap:round;
-
-    opacity:.4;
-
-    stroke-dasharray:15 15;
+    stroke-dasharray: 15 15;
+    opacity: .42;
 }
 
 .dashing #dashTrail {
-    display:block;
+    display: block;
 
     animation:
-        trailMove .25s linear infinite;
+        trailMove .22s linear infinite;
 }
 
 @keyframes trailMove {
-
     from {
-        stroke-dashoffset:0;
+        stroke-dashoffset: 0;
     }
 
     to {
-        stroke-dashoffset:-30;
+        stroke-dashoffset: -30;
     }
 }
 
+/* =====================================================
+   HEAD
+===================================================== */
 
-/* =========================
-   충돌
-========================= */
+#headGroup {
+    transition: transform .03s linear;
+}
+
+#mouthClosed {
+    stroke: #101e4c;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+}
+
+#mouthOpenGroup {
+    display: none;
+}
+
+#openMouth {
+    fill: #111;
+    stroke: #081535;
+    stroke-width: 2;
+}
+
+#tongue {
+    fill: #ff4c62;
+    stroke: #a92335;
+    stroke-width: 1.5;
+}
+
+.tooth {
+    fill: white;
+}
+
+/* =====================================================
+   WIND
+===================================================== */
+
+#windLayer {
+    display: none;
+}
+
+.dashActive #windLayer {
+    display: block;
+}
+
+.wind {
+    fill: none;
+    stroke: white;
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0;
+}
+
+.dashActive .wind1 {
+    animation: wind .28s infinite;
+}
+
+.dashActive .wind2 {
+    animation: wind .36s infinite .06s;
+}
+
+.dashActive .wind3 {
+    animation: wind .32s infinite .12s;
+}
+
+.dashActive .wind4 {
+    animation: wind .4s infinite .17s;
+}
+
+@keyframes wind {
+    0% {
+        opacity: 0;
+        transform: translateX(20px) scaleX(.4);
+    }
+
+    35% {
+        opacity: .85;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-40px) scaleX(1.4);
+    }
+}
+
+/* =====================================================
+   EXPLOSION
+===================================================== */
 
 #crash {
-    position:absolute;
+    display: none;
 
-    display:none;
+    position: absolute;
 
-    font-size:78px;
+    font-size: 78px;
 
-    z-index:300;
+    z-index: 400;
 
     transform:
         translate(-50%,-50%);
-
-    filter:
-        drop-shadow(
-            0 4px 4px rgba(0,0,0,.5)
-        );
 
     animation:
         crashPop .45s ease-out;
 }
 
 @keyframes crashPop {
-
     0% {
         transform:
             translate(-50%,-50%)
@@ -458,7 +384,7 @@ body {
     60% {
         transform:
             translate(-50%,-50%)
-            scale(1.25)
+            scale(1.3)
             rotate(8deg);
     }
 
@@ -470,158 +396,406 @@ body {
     }
 }
 
-.shake {
-    animation:shake .45s;
-}
-
-@keyframes shake {
-
-    0%,100% {
-        transform:translate(0,0);
-    }
-
-    20% {
-        transform:translate(-10px,5px);
-    }
-
-    40% {
-        transform:translate(10px,-5px);
-    }
-
-    60% {
-        transform:translate(-8px,4px);
-    }
-
-    80% {
-        transform:translate(8px,-3px);
-    }
-}
-
-
-/* =========================
-   일시정지 / 게임오버
-========================= */
+/* =====================================================
+   OVERLAY
+===================================================== */
 
 .overlay {
-    position:absolute;
+    display: none;
 
-    left:50%;
-    top:50%;
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
 
     transform:
         translate(-50%,-50%);
 
-    width:430px;
+    width: 450px;
 
-    padding:35px 30px;
+    padding: 35px 25px;
 
-    text-align:center;
+    border-radius: 25px;
 
-    border-radius:25px;
+    background: rgba(0,0,0,.94);
 
-    background:rgba(0,0,0,.92);
+    color: white;
 
-    color:white;
+    text-align: center;
 
-    z-index:500;
-
-    display:none;
+    z-index: 700;
 
     box-shadow:
-        0 15px 40px rgba(0,0,0,.5);
+        0 15px 45px rgba(0,0,0,.55);
 }
 
 .overlay h1 {
-    margin:0 0 30px;
+    margin: 0 0 28px;
 
-    font-size:64px;
-
-    font-weight:900;
+    font-size: 62px;
+    font-weight: 900;
 }
 
 .menuButton {
-    display:block;
+    width: 280px;
+    height: 60px;
 
-    width:270px;
-    height:62px;
+    margin: 9px auto;
 
-    margin:10px auto;
+    border: none;
+    border-radius: 15px;
 
-    border:none;
+    font-size: 22px;
+    font-weight: bold;
 
-    border-radius:16px;
+    cursor: pointer;
 
-    font-size:23px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    transition:.12s;
+    color: white;
 }
 
 .menuButton:hover {
-    transform:scale(1.04);
-    filter:brightness(1.12);
-}
-
-.menuButton:active {
-    transform:scale(.97);
+    transform: scale(1.04);
 }
 
 #continueButton {
-    background:#4f8cff;
-    color:white;
+    background: #4c89ff;
 }
 
 #restartButton,
 #gameOverRestart {
-    background:#48b96b;
-    color:white;
+    background: #43b96a;
 }
 
 #gameOver h1 {
-    color:#ff4242;
+    color: #ff4141;
 }
 
-#gameOver h2 {
-    font-size:28px;
+/* =====================================================
+   QUEST PANEL
+===================================================== */
+
+#questPanel {
+    position: absolute;
+
+    left: 15px;
+    top: 150px;
+
+    width: 205px;
+
+    z-index: 250;
+
+    background: rgba(0,0,0,.83);
+
+    color: white;
+
+    border-radius: 17px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.35);
 }
 
+#questTitle {
+    font-size: 20px;
+    font-weight: 900;
 
-/* =========================
-   질주 시작 효과
-========================= */
+    margin-bottom: 12px;
 
-#game.dashFlash::after {
-    content:"";
+    color: #ffd84d;
+}
 
-    position:absolute;
+.quest {
+    border-top: 1px solid rgba(255,255,255,.15);
 
-    inset:0;
+    padding: 10px 0;
+}
 
-    pointer-events:none;
+.questName {
+    font-size: 14px;
+    font-weight: bold;
+}
 
-    background:
-        radial-gradient(
-            circle,
-            transparent 45%,
-            rgba(255,255,255,.15)
-        );
+.questProgress {
+    font-size: 12px;
+    color: #cfcfcf;
+
+    margin-top: 4px;
+}
+
+.questReward {
+    font-size: 12px;
+    color: #ffd84d;
+
+    margin-top: 3px;
+}
+
+/* =====================================================
+   SHOP BUTTON
+===================================================== */
+
+#shopButton {
+    position: absolute;
+
+    right: 15px;
+    top: 150px;
+
+    z-index: 250;
+
+    width: 160px;
+    height: 55px;
+
+    border: none;
+    border-radius: 16px;
+
+    background: rgba(0,0,0,.86);
+
+    color: white;
+
+    font-size: 19px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#shopButton:hover {
+    transform: scale(1.04);
+}
+
+/* =====================================================
+   SHOP
+===================================================== */
+
+#shopOverlay {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    background: rgba(0,0,0,.75);
+}
+
+#shop {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width: 750px;
+    max-height: 800px;
+
+    overflow-y: auto;
+
+    background: #18201a;
+
+    color: white;
+
+    border-radius: 25px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.7);
+}
+
+#shopHeader {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+#shopHeader h1 {
+    margin: 0;
+
+    font-size: 36px;
+}
+
+#shopCoins {
+    color: #ffd84d;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#closeShop {
+    position: absolute;
+
+    right: 18px;
+    top: 15px;
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 28px;
+
+    cursor: pointer;
+}
+
+#shopItems {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 15px;
+}
+
+.shopItem {
+    background: #263329;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    text-align: center;
+
+    border: 2px solid transparent;
+}
+
+.shopItem.equipped {
+    border-color: #ffd84d;
+}
+
+.preview {
+    height: 95px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 55px;
+}
+
+.itemName {
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+.skillName {
+    color: #8fc5ff;
+
+    margin-top: 5px;
+}
+
+.price {
+    color: #ffd84d;
+
+    margin: 8px;
+}
+
+.shopAction {
+    width: 140px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background: #4d8cff;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+/* =====================================================
+   QUEST COMPLETE
+===================================================== */
+
+#questComplete {
+    display: none;
+
+    position: fixed;
+
+    left: 50%;
+    top: 18%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 1500;
+
+    padding: 18px 30px;
+
+    border-radius: 18px;
+
+    background: rgba(0,0,0,.93);
+
+    color: #ffd84d;
+
+    font-size: 24px;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.5);
 
     animation:
-        dashFlash .18s;
+        questPop .45s ease-out;
 }
 
-@keyframes dashFlash {
-
-    from {
-        opacity:1;
+@keyframes questPop {
+    0% {
+        transform:
+            translateX(-50%)
+            scale(.5);
     }
 
-    to {
-        opacity:0;
+    70% {
+        transform:
+            translateX(-50%)
+            scale(1.1);
     }
+
+    100% {
+        transform:
+            translateX(-50%)
+            scale(1);
+    }
+}
+
+/* =====================================================
+   SKILL FLASH
+===================================================== */
+
+#skillFlash {
+    display: none;
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index: 350;
+
+    color: white;
+
+    font-size: 35px;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 3px 10px black;
 }
 
 </style>
@@ -629,65 +803,44 @@ body {
 
 <body>
 
-<div id="container">
+<div id="page">
 
-    <!-- 나무 -->
+    <div id="topbar">
 
-    <div class="tree" style="left:-45px;top:-40px;"></div>
-    <div class="tree" style="left:110px;top:-50px;"></div>
-    <div class="tree" style="left:280px;top:-50px;"></div>
-    <div class="tree" style="left:470px;top:-50px;"></div>
-    <div class="tree" style="left:650px;top:-40px;"></div>
+        <div class="stat">
+            🏆 최고기록
+            <span id="highScore">0</span>
+        </div>
 
-    <div class="tree" style="left:-60px;top:170px;"></div>
-    <div class="tree" style="left:-60px;top:380px;"></div>
-    <div class="tree" style="left:-60px;top:570px;"></div>
+        <div class="stat" id="coinTop">
+            🪙
+            <span id="coins">0</span>
+        </div>
 
-    <div class="tree" style="right:-60px;top:170px;"></div>
-    <div class="tree" style="right:-60px;top:380px;"></div>
-    <div class="tree" style="right:-60px;top:570px;"></div>
-
-    <div class="tree" style="left:50px;bottom:-60px;"></div>
-    <div class="tree" style="left:240px;bottom:-60px;"></div>
-    <div class="tree" style="left:440px;bottom:-60px;"></div>
-    <div class="tree" style="left:620px;bottom:-60px;"></div>
-
-
-    <!-- 점수 -->
-
-    <div id="scoreBox">
-        🏆 점수:
-        <span id="score">0</span>
     </div>
 
 
-    <!-- 최고기록 -->
+    <div id="game" tabindex="0">
 
-    <div id="highScoreBox">
-        👑 최고기록:
-        <span id="highScore">0</span>
-    </div>
-
-
-    <!-- 질주 상태 -->
-
-    <div id="dashBox">
-        ⚡ 질주:
-        <span id="dashStatus">준비</span>
-    </div>
+        <div id="scoreBox">
+            점수:
+            <span id="score">0</span>
+        </div>
 
 
-    <div id="game">
+        <div id="skillBox">
+            ⚡
+            <span id="skillNameTop">질주</span>
+            <br>
+            <small id="skillStatus">준비</small>
+        </div>
 
-        <!-- 사과 -->
 
         <div id="food">🍎</div>
 
 
-        <svg
-            id="snakeSVG"
-            viewBox="0 0 648 648"
-        >
+        <svg id="snakeSVG"
+             viewBox="0 0 648 648">
 
             <path id="snakeShadow"></path>
 
@@ -695,40 +848,33 @@ body {
 
             <path id="snakeLight"></path>
 
-
-            <!-- 질주 잔상 -->
-
             <path id="dashTrail"></path>
 
-
-            <!-- 바람 -->
 
             <g id="windLayer">
 
                 <path
                     class="wind wind1"
-                    d="M 0 -12 Q -30 -20 -55 -12">
+                    d="M 0 -12 Q -30 -20 -60 -12">
                 </path>
 
                 <path
                     class="wind wind2"
-                    d="M 0 0 Q -38 -5 -68 5">
+                    d="M 0 0 Q -40 -6 -70 5">
                 </path>
 
                 <path
                     class="wind wind3"
-                    d="M 0 12 Q -30 20 -58 14">
+                    d="M 0 12 Q -30 20 -60 14">
                 </path>
 
                 <path
                     class="wind wind4"
-                    d="M -5 22 Q -35 28 -50 25">
+                    d="M -5 22 Q -35 30 -55 25">
                 </path>
 
             </g>
 
-
-            <!-- 머리 -->
 
             <g id="headGroup">
 
@@ -737,12 +883,13 @@ body {
                     cy="4"
                     rx="28"
                     ry="24"
-                    fill="#17336e"
+                    fill="#14274e"
                     opacity=".35">
                 </ellipse>
 
 
                 <path
+                    id="headShape"
                     d="
                     M -18 -21
                     Q 4 -28 21 -15
@@ -751,56 +898,50 @@ body {
                     Q -30 11 -30 0
                     Q -30 -11 -18 -21
                     "
-
-                    fill="#315fc9"
-                    stroke="#244a9f"
                     stroke-width="3">
                 </path>
 
 
                 <path
-                    d="M -17 -17 Q -2 -23 10 -15"
+                    id="headHighlight"
+                    d="
+                    M -17 -17
+                    Q -2 -23 10 -15
+                    "
                     fill="none"
-                    stroke="#6f98ff"
                     stroke-width="6"
                     stroke-linecap="round"
                     opacity=".5">
                 </path>
 
 
-                <!-- 눈 -->
-
                 <circle
                     cx="4"
                     cy="-18"
                     r="10"
-                    fill="#f8fbff"
-                    stroke="#31528e"
-                    stroke-width="2">
+                    fill="white">
                 </circle>
 
                 <circle
                     cx="4"
                     cy="18"
                     r="10"
-                    fill="#f8fbff"
-                    stroke="#31528e"
-                    stroke-width="2">
+                    fill="white">
                 </circle>
 
 
                 <circle
+                    id="eye1"
                     cx="7"
                     cy="-17"
-                    r="4.5"
-                    fill="#18234b">
+                    r="4.5">
                 </circle>
 
                 <circle
+                    id="eye2"
                     cx="7"
                     cy="17"
-                    r="4.5"
-                    fill="#18234b">
+                    r="4.5">
                 </circle>
 
 
@@ -819,15 +960,11 @@ body {
                 </circle>
 
 
-                <!-- 닫힌 입 -->
-
                 <path
                     id="mouthClosed"
                     d="M 16 -5 Q 23 0 16 5">
                 </path>
 
-
-                <!-- 벌어진 입 -->
 
                 <g id="mouthOpenGroup">
 
@@ -835,12 +972,11 @@ body {
                         id="openMouth"
                         d="
                         M 12 -8
-                        Q 25 -9 27 0
-                        Q 25 9 12 8
+                        Q 25 -10 28 0
+                        Q 25 10 12 8
                         Q 17 0 12 -8
                         ">
                     </path>
-
 
                     <path
                         id="tongue"
@@ -848,24 +984,22 @@ body {
                         M 16 3
                         Q 21 0 25 3
                         Q 21 10 16 6
-                        Z
-                        ">
-                    </path>
-
-
-                    <path
-                        class="tooth"
-                        d="M 16 -7 L 19 -2 L 22 -7 Z">
+                        Z">
                     </path>
 
                     <path
                         class="tooth"
-                        d="M 22 -7 L 25 -2 L 27 -6 Z">
+                        d="M16 -7 L19 -2 L22 -7 Z">
                     </path>
 
                     <path
                         class="tooth"
-                        d="M 17 7 L 20 3 L 22 8 Z">
+                        d="M22 -7 L25 -2 L27 -6 Z">
+                    </path>
+
+                    <path
+                        class="tooth"
+                        d="M17 7 L20 3 L22 8 Z">
                     </path>
 
                 </g>
@@ -875,150 +1009,514 @@ body {
         </svg>
 
 
-        <!-- 충돌 -->
-
         <div id="crash">💥</div>
 
+
+        <div id="skillFlash"></div>
+
+
+        <!-- QUEST -->
+
+        <div id="questPanel">
+
+            <div id="questTitle">
+                📜 QUEST
+            </div>
+
+            <div id="quest0" class="quest"></div>
+            <div id="quest1" class="quest"></div>
+            <div id="quest2" class="quest"></div>
+
+        </div>
+
+
+        <button id="shopButton">
+            🛒 상점
+        </button>
+
+
+        <!-- PAUSE -->
+
+        <div id="pauseOverlay"
+             class="overlay">
+
+            <h1>일시정지</h1>
+
+            <button
+                id="continueButton"
+                class="menuButton">
+                ▶️ 계속하기
+            </button>
+
+            <button
+                id="restartButton"
+                class="menuButton">
+                🔄 다시하기
+            </button>
+
+        </div>
+
+
+        <!-- GAME OVER -->
+
+        <div id="gameOver"
+             class="overlay">
+
+            <h1>YOU DIE</h1>
+
+            <h2>
+                점수:
+                <span id="finalScore">0</span>
+            </h2>
+
+            <h2>
+                🪙 획득 코인:
+                <span id="earnedCoins">0</span>
+            </h2>
+
+            <h2>
+                👑 최고기록:
+                <span id="gameOverHigh">0</span>
+            </h2>
+
+            <button
+                id="gameOverRestart"
+                class="menuButton">
+                🔄 다시하기
+            </button>
+
+            <p>
+                R 키를 눌러 다시 시작
+            </p>
+
+        </div>
+
     </div>
 
 
-    <!-- =====================
-         일시정지
-    ====================== -->
+    <!-- SHOP -->
 
-    <div
-        id="pauseOverlay"
-        class="overlay"
-    >
+    <div id="shopOverlay">
 
-        <h1>일시정지</h1>
+        <div id="shop">
 
-        <button
-            id="continueButton"
-            class="menuButton"
-        >
-            ▶️ 계속하기
-        </button>
+            <button id="closeShop">
+                ✕
+            </button>
 
-        <button
-            id="restartButton"
-            class="menuButton"
-        >
-            🔄 다시하기
-        </button>
+            <div id="shopHeader">
 
-    </div>
+                <h1>
+                    🛒 지렁이 상점
+                </h1>
 
+                <div id="shopCoins">
+                    🪙
+                    <span id="shopCoinValue">0</span>
+                </div>
 
-    <!-- =====================
-         게임오버
-    ====================== -->
+            </div>
 
-    <div
-        id="gameOver"
-        class="overlay"
-    >
+            <div id="shopItems"></div>
 
-        <h1>YOU DIE</h1>
-
-        <h2>
-            점수:
-            <span id="finalScore">0</span>
-        </h2>
-
-        <h2>
-            👑 최고기록:
-            <span id="gameOverHighScore">0</span>
-        </h2>
-
-        <button
-            id="gameOverRestart"
-            class="menuButton"
-        >
-            🔄 다시하기
-        </button>
-
-        <p>R 키를 눌러 다시 시작</p>
+        </div>
 
     </div>
 
 </div>
 
 
+<div id="questComplete">
+    🎉 QUEST COMPLETE!
+</div>
+
+
 <script>
 
-/* =========================
-   게임 설정
-========================= */
+/* =====================================================
+   기본 설정
+===================================================== */
 
 const GRID = 34;
-
 const COLS = 18;
-
 const ROWS = 18;
 
-
-/* 일반 속도 */
-
-const NORMAL_MOVE_TIME = 160;
+const NORMAL_SPEED = 160;
 
 
-/* 질주 속도 */
+/* =====================================================
+   지렁이 종류
+===================================================== */
 
-const DASH_MOVE_TIME = 65;
+const worms = {
+
+    basic: {
+
+        name: "기본 지렁이",
+
+        price: 0,
+
+        skill: "기본 질주",
+
+        color: "#315fc9",
+
+        light: "#739cff",
+
+        head: "#315fc9",
+
+        skillType: "dash",
+
+        duration: 2000,
+
+        cooldown: 10000,
+
+        speed: 65,
+
+        emoji: "🪱"
+    },
 
 
-/* 최대 질주 시간 */
+    fire: {
 
-const DASH_DURATION = 2000;
+        name: "🔥 화염 지렁이",
+
+        price: 500,
+
+        skill: "화염질주",
+
+        color: "#e34b32",
+
+        light: "#ff9d45",
+
+        head: "#e34b32",
+
+        skillType: "fire",
+
+        duration: 2500,
+
+        cooldown: 9000,
+
+        speed: 55,
+
+        emoji: "🔥"
+    },
 
 
-/* 쿨타임 */
+    lightning: {
 
-const DASH_COOLDOWN = 10000;
+        name: "⚡ 번개 지렁이",
+
+        price: 1000,
+
+        skill: "번개질주",
+
+        color: "#704ee8",
+
+        light: "#fff45a",
+
+        head: "#704ee8",
+
+        skillType: "lightning",
+
+        duration: 1300,
+
+        cooldown: 8000,
+
+        speed: 38,
+
+        emoji: "⚡"
+    },
 
 
-/* =========================
-   요소
-========================= */
+    ghost: {
+
+        name: "👻 유령 지렁이",
+
+        price: 2000,
+
+        skill: "유령화",
+
+        color: "#dce9ff",
+
+        light: "#ffffff",
+
+        head: "#b9d5ff",
+
+        skillType: "ghost",
+
+        duration: 3000,
+
+        cooldown: 12000,
+
+        speed: 72,
+
+        emoji: "👻"
+    },
+
+
+    rainbow: {
+
+        name: "🌈 무지개 지렁이",
+
+        price: 3000,
+
+        skill: "무지개질주",
+
+        color: "#ff55bb",
+
+        light: "#fff",
+
+        head: "#ff55bb",
+
+        skillType: "rainbow",
+
+        duration: 2200,
+
+        cooldown: 10000,
+
+        speed: 60,
+
+        emoji: "🌈"
+    }
+
+};
+
+
+/* =====================================================
+   퀘스트 종류
+===================================================== */
+
+const questPool = [
+
+    {
+        type: "apples",
+        name: "🍎 사과 먹기",
+        target: 5,
+        reward: 80
+    },
+
+    {
+        type: "apples",
+        name: "🍎 사과 많이 먹기",
+        target: 10,
+        reward: 150
+    },
+
+    {
+        type: "score",
+        name: "🏆 점수 달성",
+        target: 10,
+        reward: 100
+    },
+
+    {
+        type: "score",
+        name: "🏆 고득점 도전",
+        target: 20,
+        reward: 200
+    },
+
+    {
+        type: "dash",
+        name: "⚡ 스킬 사용",
+        target: 3,
+        reward: 80
+    },
+
+    {
+        type: "dash",
+        name: "⚡ 스킬 마스터",
+        target: 7,
+        reward: 180
+    },
+
+    {
+        type: "distance",
+        name: "🪱 이동하기",
+        target: 50,
+        reward: 70
+    },
+
+    {
+        type: "distance",
+        name: "🪱 장거리 이동",
+        target: 150,
+        reward: 160
+    }
+
+];
+
+
+/* =====================================================
+   저장 데이터
+===================================================== */
+
+let coins =
+    Number(
+        localStorage.getItem("wormCoins") || 0
+    );
+
+
+let highScore =
+    Number(
+        localStorage.getItem("wormHighScore") || 0
+    );
+
+
+let owned =
+    JSON.parse(
+        localStorage.getItem(
+            "wormOwned"
+        ) || '["basic"]'
+    );
+
+
+let equipped =
+    localStorage.getItem(
+        "wormEquipped"
+    ) || "basic";
+
+
+let questData =
+    JSON.parse(
+        localStorage.getItem(
+            "wormQuests"
+        ) || "null"
+    );
+
+
+/* =====================================================
+   퀘스트 생성
+===================================================== */
+
+function makeQuest() {
+
+    const available =
+        questPool.filter(
+            q =>
+                !questData.some(
+                    old =>
+                        old.type === q.type &&
+                        old.target === q.target
+                )
+        );
+
+
+    const source =
+        available.length
+        ? available
+        : questPool;
+
+
+    const q =
+        source[
+            Math.floor(
+                Math.random() *
+                source.length
+            )
+        ];
+
+
+    return {
+
+        type: q.type,
+
+        name: q.name,
+
+        target: q.target,
+
+        reward:
+            Math.min(
+                q.reward,
+                200
+            ),
+
+        progress: 0
+
+    };
+}
+
+
+if (
+    !questData ||
+    !Array.isArray(questData) ||
+    questData.length !== 3
+) {
+
+    questData = [
+        makeQuest(),
+        makeQuest(),
+        makeQuest()
+    ];
+
+    saveQuests();
+}
+
+
+/* =====================================================
+   저장
+===================================================== */
+
+function saveAll() {
+
+    localStorage.setItem(
+        "wormCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "wormHighScore",
+        highScore
+    );
+
+    localStorage.setItem(
+        "wormOwned",
+        JSON.stringify(owned)
+    );
+
+    localStorage.setItem(
+        "wormEquipped",
+        equipped
+    );
+
+    saveQuests();
+}
+
+
+function saveQuests() {
+
+    localStorage.setItem(
+        "wormQuests",
+        JSON.stringify(
+            questData
+        )
+    );
+}
+
+
+/* =====================================================
+   DOM
+===================================================== */
 
 const game =
     document.getElementById("game");
 
-const foodElement =
-    document.getElementById("food");
-
-const scoreElement =
+const scoreEl =
     document.getElementById("score");
 
-const highScoreElement =
+const highEl =
     document.getElementById("highScore");
 
-const dashStatus =
-    document.getElementById("dashStatus");
+const coinsEl =
+    document.getElementById("coins");
 
-const finalScoreElement =
-    document.getElementById("finalScore");
-
-const gameOverHighScoreElement =
+const shopCoinsEl =
     document.getElementById(
-        "gameOverHighScore"
+        "shopCoinValue"
     );
 
-const gameOverElement =
-    document.getElementById(
-        "gameOver"
-    );
-
-const pauseOverlay =
-    document.getElementById(
-        "pauseOverlay"
-    );
-
-const crashElement =
-    document.getElementById(
-        "crash"
-    );
+const foodEl =
+    document.getElementById("food");
 
 const snakeBody =
     document.getElementById(
@@ -1045,6 +1543,22 @@ const headGroup =
         "headGroup"
     );
 
+const headShape =
+    document.getElementById(
+        "headShape"
+    );
+
+const headHighlight =
+    document.getElementById(
+        "headHighlight"
+    );
+
+const eye1 =
+    document.getElementById("eye1");
+
+const eye2 =
+    document.getElementById("eye2");
+
 const mouthClosed =
     document.getElementById(
         "mouthClosed"
@@ -1055,43 +1569,71 @@ const mouthOpenGroup =
         "mouthOpenGroup"
     );
 
-const continueButton =
+const crash =
+    document.getElementById("crash");
+
+const pauseOverlay =
     document.getElementById(
-        "continueButton"
+        "pauseOverlay"
     );
 
-const restartButton =
+const gameOver =
     document.getElementById(
-        "restartButton"
+        "gameOver"
     );
 
-const gameOverRestart =
+const shopOverlay =
     document.getElementById(
-        "gameOverRestart"
+        "shopOverlay"
+    );
+
+const shopItems =
+    document.getElementById(
+        "shopItems"
+    );
+
+const questComplete =
+    document.getElementById(
+        "questComplete"
+    );
+
+const skillNameTop =
+    document.getElementById(
+        "skillNameTop"
+    );
+
+const skillStatus =
+    document.getElementById(
+        "skillStatus"
+    );
+
+const skillFlash =
+    document.getElementById(
+        "skillFlash"
     );
 
 
-/* =========================
+/* =====================================================
    게임 변수
-========================= */
+===================================================== */
 
 let snake = [];
 
 let previousSnake = [];
 
 let direction = {
-    x:1,
-    y:0
+    x: 1,
+    y: 0
 };
 
 let nextDirection = {
-    x:1,
-    y:0
+    x: 1,
+    y: 0
 };
 
 let food = {
-    x:10,
-    y:9
+    x: 10,
+    y: 9
 };
 
 let score = 0;
@@ -1100,99 +1642,119 @@ let dead = false;
 
 let paused = false;
 
-
-/* =========================
-   질주 변수
-========================= */
+let shiftHeld = false;
 
 let dashing = false;
 
+let dashEnd = 0;
 
-/*
-   질주가 끝나는 시간
-*/
+let lastSkill = -Infinity;
 
-let dashEndTime = 0;
-
-
-/*
-   마지막으로 질주를 시작한 시간
-*/
-
-let lastDashTime = -Infinity;
-
-
-/*
-   LShift가 현재 눌려 있는지
-*/
-
-let shiftHeld = false;
-
-
-/* =========================
-   이동 시간
-========================= */
-
-function getMoveTime() {
-
-    if (dashing) {
-        return DASH_MOVE_TIME;
-    }
-
-    return NORMAL_MOVE_TIME;
-}
-
-
-/* =========================
-   애니메이션
-========================= */
-
-let lastMoveTime =
-    performance.now();
+let lastMove = performance.now();
 
 let animationFrame = null;
 
+let distance = 0;
 
-/* =========================
-   최고기록
-========================= */
+let apples = 0;
 
-let highScore =
-    Number(
-        localStorage.getItem(
-            "wormHighScore"
-        ) || 0
+let skillUses = 0;
+
+
+/* =====================================================
+   현재 지렁이
+===================================================== */
+
+function worm() {
+    return worms[equipped];
+}
+
+
+/* =====================================================
+   외형 적용
+===================================================== */
+
+function applyWormAppearance() {
+
+    const w = worm();
+
+    snakeBody.style.stroke =
+        w.color;
+
+    snakeLight.style.stroke =
+        w.light;
+
+    snakeShadow.style.stroke =
+        "#172a60";
+
+    headShape.style.fill =
+        w.head;
+
+    headShape.style.stroke =
+        w.color;
+
+    headHighlight.style.stroke =
+        w.light;
+
+    eye1.setAttribute(
+        "fill",
+        "#17213d"
     );
 
-highScoreElement.textContent =
-    highScore;
+    eye2.setAttribute(
+        "fill",
+        "#17213d"
+    );
+
+    skillNameTop.textContent =
+        w.skill;
+
+    if (w.skillType === "ghost") {
+
+        snakeBody.style.opacity =
+            ".65";
+
+        snakeLight.style.opacity =
+            ".7";
+
+    } else {
+
+        snakeBody.style.opacity =
+            "1";
+
+        snakeLight.style.opacity =
+            ".45";
+    }
+}
 
 
-/* =========================
-   뱀 초기화
-========================= */
+/* =====================================================
+   초기화
+===================================================== */
 
 function resetSnake() {
 
     snake = [
-        {x:8,y:9},
-        {x:7,y:9},
-        {x:6,y:9},
-        {x:5,y:9},
-        {x:4,y:9}
+        {x: 8, y: 9},
+        {x: 7, y: 9},
+        {x: 6, y: 9},
+        {x: 5, y: 9},
+        {x: 4, y: 9}
     ];
 
     previousSnake =
-        snake.map(part => ({
-            x:part.x,
-            y:part.y
-        }));
+        snake.map(
+            p => ({
+                x: p.x,
+                y: p.y
+            })
+        );
 }
 
 
-/* =========================
+/* =====================================================
    사과 생성
-========================= */
+===================================================== */
 
 function createFood() {
 
@@ -1204,58 +1766,61 @@ function createFood() {
 
             x:
                 Math.floor(
-                    Math.random() * COLS
+                    Math.random() *
+                    COLS
                 ),
 
             y:
                 Math.floor(
-                    Math.random() * ROWS
+                    Math.random() *
+                    ROWS
                 )
+
         };
 
 
         valid =
-            !snake.some(part =>
-                part.x === food.x &&
-                part.y === food.y
+            !snake.some(
+                p =>
+                    p.x === food.x &&
+                    p.y === food.y
             );
     }
 }
 
 
-/* =========================
-   사과 거리
-========================= */
+/* =====================================================
+   거리
+===================================================== */
 
 function foodDistance() {
-
-    const head = snake[0];
 
     return Math.max(
 
         Math.abs(
-            head.x - food.x
+            snake[0].x -
+            food.x
         ),
 
         Math.abs(
-            head.y - food.y
+            snake[0].y -
+            food.y
         )
+
     );
 }
 
 
-/* =========================
+/* =====================================================
    입
-========================= */
+===================================================== */
 
 function updateMouth() {
 
-    if (dead) {
-        return;
-    }
-
-
-    if (foodDistance() <= 2) {
+    if (
+        !dead &&
+        foodDistance() <= 2
+    ) {
 
         mouthClosed.style.display =
             "none";
@@ -1274,37 +1839,37 @@ function updateMouth() {
 }
 
 
-/* =========================
+/* =====================================================
    보간
-========================= */
+===================================================== */
 
-function lerp(a,b,t) {
+function lerp(a, b, t) {
 
-    return a + (b-a) * t;
+    return a + (b - a) * t;
 }
 
 
-function getAnimatedSnake(progress) {
+function animatedSnake(progress) {
 
     return snake.map(
-        (part,index) => {
+        (part, i) => {
 
-            const oldPart =
-                previousSnake[index] ||
+            const old =
+                previousSnake[i] ||
                 part;
 
             return {
 
                 x:
                     lerp(
-                        oldPart.x,
+                        old.x,
                         part.x,
                         progress
                     ),
 
                 y:
                     lerp(
-                        oldPart.y,
+                        old.y,
                         part.y,
                         progress
                     )
@@ -1314,25 +1879,26 @@ function getAnimatedSnake(progress) {
 }
 
 
-/* =========================
-   몸통 경로
-========================= */
+/* =====================================================
+   부드러운 몸통
+===================================================== */
 
-function createPath(animatedSnake) {
+function makePath(parts) {
 
     const points =
-        [...animatedSnake]
+        [...parts]
         .reverse()
-        .map(part => ({
+        .map(
+            p => ({
+                x:
+                    p.x * GRID +
+                    GRID / 2,
 
-            x:
-                part.x * GRID +
-                GRID / 2,
-
-            y:
-                part.y * GRID +
-                GRID / 2
-        }));
+                y:
+                    p.y * GRID +
+                    GRID / 2
+            })
+        );
 
 
     if (points.length < 2) {
@@ -1345,32 +1911,29 @@ function createPath(animatedSnake) {
 
 
     for (
-        let i=1;
-        i<points.length-1;
+        let i = 1;
+        i < points.length - 1;
         i++
     ) {
 
-        const a =
-            points[i];
+        const a = points[i];
 
-        const b =
-            points[i+1];
+        const b = points[i + 1];
 
+        const mx =
+            (a.x + b.x) / 2;
 
-        const midX =
-            (a.x+b.x)/2;
-
-        const midY =
-            (a.y+b.y)/2;
+        const my =
+            (a.y + b.y) / 2;
 
 
         path +=
-            ` Q ${a.x} ${a.y} ${midX} ${midY}`;
+            ` Q ${a.x} ${a.y} ${mx} ${my}`;
     }
 
 
     const last =
-        points[points.length-1];
+        points[points.length - 1];
 
 
     path +=
@@ -1381,11 +1944,11 @@ function createPath(animatedSnake) {
 }
 
 
-/* =========================
-   머리 방향
-========================= */
+/* =====================================================
+   방향 각도
+===================================================== */
 
-function getAngle() {
+function angle() {
 
     if (direction.x === 1)
         return 0;
@@ -1396,27 +1959,23 @@ function getAngle() {
     if (direction.x === -1)
         return 180;
 
-    if (direction.y === -1)
-        return -90;
-
-    return 0;
+    return -90;
 }
 
 
-/* =========================
-   화면 그리기
-========================= */
+/* =====================================================
+   렌더
+===================================================== */
 
-function render(progress=1) {
+function render(progress = 1) {
 
-    const animatedSnake =
-        getAnimatedSnake(progress);
-
+    const parts =
+        animatedSnake(
+            progress
+        );
 
     const path =
-        createPath(
-            animatedSnake
-        );
+        makePath(parts);
 
 
     snakeBody.setAttribute(
@@ -1434,7 +1993,6 @@ function render(progress=1) {
         path
     );
 
-
     dashTrail.setAttribute(
         "d",
         path
@@ -1442,148 +2000,94 @@ function render(progress=1) {
 
 
     const head =
-        animatedSnake[0];
+        parts[0];
 
 
-    const x =
+    const hx =
         head.x * GRID +
         GRID / 2;
 
-    const y =
+    const hy =
         head.y * GRID +
         GRID / 2;
 
 
     headGroup.setAttribute(
         "transform",
-        `translate(${x} ${y}) rotate(${getAngle()})`
+        `translate(${hx} ${hy}) rotate(${angle()})`
     );
 
 
-    foodElement.style.left =
+    foodEl.style.left =
         food.x * GRID + "px";
 
-    foodElement.style.top =
+    foodEl.style.top =
         food.y * GRID + "px";
 
 
-    scoreElement.textContent =
+    scoreEl.textContent =
         score;
 
-    highScoreElement.textContent =
+    highEl.textContent =
         highScore;
+
+    coinsEl.textContent =
+        coins;
+
+    shopCoinsEl.textContent =
+        coins;
 
 
     updateMouth();
+
+    renderQuests();
 }
 
 
-/* =========================
-   질주 UI
-========================= */
+/* =====================================================
+   이동속도
+===================================================== */
 
-function updateDashUI() {
+function moveTime() {
 
-    const now =
-        performance.now();
-
-
-    if (dashing) {
-
-        const remaining =
-            Math.max(
-                0,
-                dashEndTime - now
-            );
-
-
-        dashStatus.textContent =
-            "🔥 질주 " +
-            (
-                remaining / 1000
-            ).toFixed(1) +
-            "초";
-
-
-        dashStatus.style.color =
-            "#ffcc4d";
-
-        return;
+    if (!dashing) {
+        return NORMAL_SPEED;
     }
 
-
-    const elapsed =
-        now - lastDashTime;
-
-
-    if (
-        lastDashTime === -Infinity ||
-        elapsed >= DASH_COOLDOWN
-    ) {
-
-        dashStatus.textContent =
-            "준비 ⚡";
-
-        dashStatus.style.color =
-            "#6eff91";
-
-    } else {
-
-        const remaining =
-            Math.ceil(
-                (
-                    DASH_COOLDOWN -
-                    elapsed
-                ) / 1000
-            );
-
-
-        dashStatus.textContent =
-            "쿨타임 " +
-            remaining +
-            "초";
-
-        dashStatus.style.color =
-            "#ff7777";
-    }
+    return worm().speed;
 }
 
 
-/* =========================
+/* =====================================================
    애니메이션
-========================= */
+===================================================== */
 
 function animate(time) {
 
-    if (dead || paused) {
+    if (
+        dead ||
+        paused
+    ) {
         return;
     }
 
 
-    /*
-       2초가 지나면
-       자동으로 질주 종료
-    */
-
     if (
         dashing &&
-        time >= dashEndTime
+        time >= dashEnd
     ) {
 
-        stopDash();
+        stopSkill();
     }
-
-
-    const moveTime =
-        getMoveTime();
 
 
     const progress =
         Math.min(
             (
                 time -
-                lastMoveTime
-            ) / moveTime,
+                lastMove
+            ) /
+            moveTime(),
             1
         );
 
@@ -1602,7 +2106,8 @@ function animate(time) {
 
     render(eased);
 
-    updateDashUI();
+
+    updateSkillUI();
 
 
     animationFrame =
@@ -1612,13 +2117,16 @@ function animate(time) {
 }
 
 
-/* =========================
+/* =====================================================
    이동
-========================= */
+===================================================== */
 
 function move() {
 
-    if (dead || paused) {
+    if (
+        dead ||
+        paused
+    ) {
         return;
     }
 
@@ -1640,49 +2148,82 @@ function move() {
         y:
             head.y +
             direction.y
+
     };
 
 
-    /* 벽 충돌 */
+    /* 유령 스킬은 벽 통과 */
 
     if (
-
-        newHead.x < 0 ||
-
-        newHead.x >= COLS ||
-
-        newHead.y < 0 ||
-
-        newHead.y >= ROWS
-
+        worm().skillType === "ghost" &&
+        dashing
     ) {
 
-        crash(head);
+        if (
+            newHead.x < 0
+        )
+            newHead.x =
+                COLS - 1;
 
-        return;
+        if (
+            newHead.x >= COLS
+        )
+            newHead.x = 0;
+
+        if (
+            newHead.y < 0
+        )
+            newHead.y =
+                ROWS - 1;
+
+        if (
+            newHead.y >= ROWS
+        )
+            newHead.y = 0;
+
+    } else {
+
+        if (
+            newHead.x < 0 ||
+            newHead.x >= COLS ||
+            newHead.y < 0 ||
+            newHead.y >= ROWS
+        ) {
+
+            crashGame(
+                newHead
+            );
+
+            return;
+        }
     }
 
 
     /* 몸 충돌 */
 
     if (
-        snake.some(part =>
-            part.x === newHead.x &&
-            part.y === newHead.y
+        snake.some(
+            p =>
+                p.x === newHead.x &&
+                p.y === newHead.y
         )
     ) {
 
-        crash(newHead);
+        crashGame(
+            newHead
+        );
 
         return;
     }
 
 
     previousSnake =
-        snake.map(part => ({
-            x:part.x,
-            y:part.y
-        }));
+        snake.map(
+            p => ({
+                x: p.x,
+                y: p.y
+            })
+        );
 
 
     snake.unshift(
@@ -1690,17 +2231,19 @@ function move() {
     );
 
 
-    /* 사과 */
+    distance++;
+
 
     if (
-
         newHead.x === food.x &&
-
         newHead.y === food.y
-
     ) {
 
         score++;
+
+        apples++;
+
+        coins += 10;
 
 
         if (score > highScore) {
@@ -1717,25 +2260,29 @@ function move() {
 
         createFood();
 
+        checkQuests();
+
     } else {
 
         snake.pop();
     }
 
 
-    lastMoveTime =
+    lastMove =
         performance.now();
 
+
+    saveAll();
 
     render(0);
 }
 
 
-/* =========================
-   질주 시작
-========================= */
+/* =====================================================
+   스킬 시작
+===================================================== */
 
-function startDash() {
+function startSkill() {
 
     if (
         dead ||
@@ -1749,29 +2296,28 @@ function startDash() {
     const now =
         performance.now();
 
+    const w =
+        worm();
 
-    /*
-       쿨타임 검사
-    */
 
     if (
-        now - lastDashTime <
-        DASH_COOLDOWN
+        now - lastSkill <
+        w.cooldown
     ) {
-
         return;
     }
 
 
     dashing = true;
 
+    shiftHeld = true;
 
-    lastDashTime =
-        now;
+    lastSkill = now;
 
+    dashEnd =
+        now + w.duration;
 
-    dashEndTime =
-        now + DASH_DURATION;
+    skillUses++;
 
 
     game.classList.add(
@@ -1782,38 +2328,25 @@ function startDash() {
         "dashActive"
     );
 
-    game.classList.add(
-        "dashFlash"
-    );
+
+    showSkillName();
 
 
-    setTimeout(() => {
-
-        game.classList.remove(
-            "dashFlash"
-        );
-
-    },180);
+    checkQuests();
 
 
-    lastMoveTime =
+    lastMove =
         now;
 
-
-    updateDashUI();
+    updateSkillUI();
 }
 
 
-/* =========================
-   질주 종료
-========================= */
+/* =====================================================
+   스킬 종료
+===================================================== */
 
-function stopDash() {
-
-    if (!dashing) {
-        return;
-    }
-
+function stopSkill() {
 
     dashing = false;
 
@@ -1827,109 +2360,186 @@ function stopDash() {
     );
 
 
-    lastMoveTime =
+    lastMove =
         performance.now();
 
 
-    updateDashUI();
+    updateSkillUI();
 }
 
 
-/* =========================
-   충돌
-========================= */
+/* =====================================================
+   스킬 이름
+===================================================== */
 
-function crash(position) {
+function showSkillName() {
 
-    dead = true;
+    const w =
+        worm();
 
+    skillFlash.textContent =
+        w.emoji + " " +
+        w.skill;
 
-    stopDash();
-
-
-    mouthClosed.style.display =
-        "block";
-
-    mouthOpenGroup.style.display =
-        "none";
-
-
-    crashElement.textContent =
-        "💥";
-
-
-    crashElement.style.left =
-        position.x * GRID +
-        GRID / 2 +
-        "px";
-
-
-    crashElement.style.top =
-        position.y * GRID +
-        GRID / 2 +
-        "px";
-
-
-    crashElement.style.display =
+    skillFlash.style.display =
         "block";
 
 
-    game.classList.add(
-        "shake"
+    setTimeout(
+        () => {
+
+            skillFlash.style.display =
+                "none";
+
+        },
+        500
     );
-
-
-    setTimeout(() => {
-
-        game.classList.remove(
-            "shake"
-        );
-
-
-        finalScoreElement.textContent =
-            score;
-
-
-        gameOverHighScoreElement.textContent =
-            highScore;
-
-
-        gameOverElement.style.display =
-            "block";
-
-    },500);
 }
 
 
-/* =========================
-   일시정지
-========================= */
+/* =====================================================
+   스킬 UI
+===================================================== */
 
-function pauseGame() {
+function updateSkillUI() {
 
-    if (dead || paused) {
-        return;
-    }
-
+    const w =
+        worm();
 
     const now =
         performance.now();
 
 
-    const progress =
-        Math.min(
+    if (dashing) {
 
+        const left =
+            Math.max(
+                0,
+                dashEnd - now
+            );
+
+
+        skillStatus.textContent =
+            "🔥 " +
             (
-                now -
-                lastMoveTime
+                left / 1000
+            ).toFixed(1) +
+            "초";
+
+        skillStatus.style.color =
+            "#ffcf4d";
+
+        return;
+    }
+
+
+    const left =
+        w.cooldown -
+        (now - lastSkill);
+
+
+    if (
+        lastSkill === -Infinity ||
+        left <= 0
+    ) {
+
+        skillStatus.textContent =
+            "READY ⚡";
+
+        skillStatus.style.color =
+            "#6cff91";
+
+    } else {
+
+        skillStatus.textContent =
+            "쿨타임 " +
+            Math.ceil(
+                left / 1000
+            ) +
+            "초";
+
+        skillStatus.style.color =
+            "#ff7272";
+    }
+}
+
+
+/* =====================================================
+   충돌
+===================================================== */
+
+function crashGame(pos) {
+
+    dead = true;
+
+    stopSkill();
+
+
+    crash.style.left =
+        pos.x * GRID +
+        GRID / 2 +
+        "px";
+
+    crash.style.top =
+        pos.y * GRID +
+        GRID / 2 +
+        "px";
+
+    crash.style.display =
+        "block";
+
+
+    setTimeout(
+        () => {
+
+            document.getElementById(
+                "finalScore"
+            ).textContent =
+                score;
+
+            document.getElementById(
+                "earnedCoins"
+            ).textContent =
+                apples * 10;
+
+            document.getElementById(
+                "gameOverHigh"
+            ).textContent =
+                highScore;
+
+            gameOver.style.display =
+                "block";
+
+        },
+        450
+    );
+}
+
+
+/* =====================================================
+   일시정지
+===================================================== */
+
+function pauseGame() {
+
+    if (
+        dead ||
+        paused
+    ) {
+        return;
+    }
+
+
+    render(
+        Math.min(
+            (
+                performance.now() -
+                lastMove
             ) /
-            getMoveTime(),
-
+            moveTime(),
             1
-        );
-
-
-    render(progress);
+        )
+    );
 
 
     paused = true;
@@ -1950,9 +2560,9 @@ function pauseGame() {
 }
 
 
-/* =========================
+/* =====================================================
    계속하기
-========================= */
+===================================================== */
 
 function resumeGame() {
 
@@ -1968,34 +2578,7 @@ function resumeGame() {
         "none";
 
 
-    /*
-       일시정지 중에는
-       질주 시간이 지나지 않도록
-       다시 기준점을 잡음
-    */
-
-    if (dashing) {
-
-        /*
-           일시정지 상태에서
-           Shift가 눌려 있었다면
-           남은 질주 시간을 유지
-        */
-
-        const remaining =
-            Math.max(
-                0,
-                dashEndTime -
-                performance.now()
-            );
-
-        dashEndTime =
-            performance.now() +
-            remaining;
-    }
-
-
-    lastMoveTime =
+    lastMove =
         performance.now();
 
 
@@ -2006,13 +2589,19 @@ function resumeGame() {
 }
 
 
-/* =========================
+/* =====================================================
    다시하기
-========================= */
+===================================================== */
 
 function restart() {
 
     score = 0;
+
+    apples = 0;
+
+    distance = 0;
+
+    skillUses = 0;
 
     dead = false;
 
@@ -2022,30 +2611,27 @@ function restart() {
 
     shiftHeld = false;
 
-    lastDashTime = -Infinity;
+    lastSkill = -Infinity;
 
 
     direction = {
-        x:1,
-        y:0
+        x: 1,
+        y: 0
     };
-
 
     nextDirection = {
-        x:1,
-        y:0
+        x: 1,
+        y: 0
     };
 
 
-    crashElement.style.display =
+    gameOver.style.display =
         "none";
-
-
-    gameOverElement.style.display =
-        "none";
-
 
     pauseOverlay.style.display =
+        "none";
+
+    crash.style.display =
         "none";
 
 
@@ -2062,14 +2648,14 @@ function restart() {
 
     createFood();
 
+    applyWormAppearance();
 
-    lastMoveTime =
+
+    lastMove =
         performance.now();
 
 
     render(1);
-
-    updateDashUI();
 
 
     if (animationFrame) {
@@ -2087,29 +2673,440 @@ function restart() {
 }
 
 
-/* =========================
-   버튼
-========================= */
+/* =====================================================
+   퀘스트 UI
+===================================================== */
 
-continueButton.addEventListener(
+function renderQuests() {
+
+    questData.forEach(
+        (q, i) => {
+
+            const el =
+                document.getElementById(
+                    "quest" + i
+                );
+
+
+            el.innerHTML = `
+
+                <div class="questName">
+                    ${q.name}
+                </div>
+
+                <div class="questProgress">
+                    ${Math.min(
+                        q.progress,
+                        q.target
+                    )}
+                    / ${q.target}
+                </div>
+
+                <div class="questReward">
+                    🪙 ${q.reward}
+                </div>
+
+            `;
+        }
+    );
+}
+
+
+/* =====================================================
+   퀘스트 진행
+===================================================== */
+
+function checkQuests() {
+
+    questData.forEach(
+        (q, i) => {
+
+            if (
+                q.type === "apples"
+            ) {
+
+                q.progress =
+                    apples;
+
+            }
+
+            else if (
+                q.type === "score"
+            ) {
+
+                q.progress =
+                    score;
+
+            }
+
+            else if (
+                q.type === "dash"
+            ) {
+
+                q.progress =
+                    skillUses;
+
+            }
+
+            else if (
+                q.type === "distance"
+            ) {
+
+                q.progress =
+                    distance;
+
+            }
+
+
+            if (
+                q.progress >=
+                q.target
+            ) {
+
+                completeQuest(i);
+            }
+
+        }
+    );
+
+
+    saveAll();
+
+    renderQuests();
+}
+
+
+/* =====================================================
+   퀘스트 완료
+===================================================== */
+
+function completeQuest(index) {
+
+    const completed =
+        questData[index];
+
+
+    coins +=
+        Math.min(
+            completed.reward,
+            200
+        );
+
+
+    questComplete.textContent =
+        "🎉 QUEST COMPLETE! +" +
+        completed.reward +
+        " 🪙";
+
+
+    questComplete.style.display =
+        "block";
+
+
+    setTimeout(
+        () => {
+
+            questComplete.style.display =
+                "none";
+
+        },
+        1600
+    );
+
+
+    /*
+       완료한 퀘스트를
+       새로운 퀘스트로 교체
+    */
+
+    questData[index] =
+        makeQuest();
+
+
+    saveAll();
+
+    renderQuests();
+}
+
+
+/* =====================================================
+   상점
+===================================================== */
+
+function openShop() {
+
+    paused = true;
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame = null;
+    }
+
+
+    renderShop();
+
+
+    shopOverlay.style.display =
+        "block";
+}
+
+
+function closeShop() {
+
+    shopOverlay.style.display =
+        "none";
+
+
+    if (!dead) {
+
+        paused = false;
+
+        lastMove =
+            performance.now();
+
+        animationFrame =
+            requestAnimationFrame(
+                animate
+            );
+    }
+}
+
+
+/* =====================================================
+   상점 렌더링
+===================================================== */
+
+function renderShop() {
+
+    shopItems.innerHTML = "";
+
+
+    Object.entries(worms)
+    .forEach(
+        ([id, w]) => {
+
+            const isOwned =
+                owned.includes(id);
+
+            const isEquipped =
+                equipped === id;
+
+
+            let buttonText;
+
+
+            if (isEquipped) {
+
+                buttonText =
+                    "✅ 장착 중";
+
+            }
+
+            else if (isOwned) {
+
+                buttonText =
+                    "⚡ 장착";
+
+            }
+
+            else {
+
+                buttonText =
+                    "🪙 " +
+                    w.price +
+                    " 구매";
+            }
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "shopItem" +
+                (
+                    isEquipped
+                    ? " equipped"
+                    : ""
+                );
+
+
+            card.innerHTML = `
+
+                <div class="preview">
+                    ${w.emoji}
+                </div>
+
+                <div class="itemName">
+                    ${w.name}
+                </div>
+
+                <div class="skillName">
+                    ⚡ ${w.skill}
+                </div>
+
+                <div class="price">
+                    ${
+                        w.price === 0
+                        ? "무료"
+                        : "🪙 " + w.price
+                    }
+                </div>
+
+                <button
+                    class="shopAction">
+                    ${buttonText}
+                </button>
+
+            `;
+
+
+            const button =
+                card.querySelector(
+                    ".shopAction"
+                );
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        isEquipped
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        isOwned
+                    ) {
+
+                        equipped =
+                            id;
+
+                        saveAll();
+
+                        applyWormAppearance();
+
+                        renderShop();
+
+                        return;
+                    }
+
+
+                    if (
+                        coins <
+                        w.price
+                    ) {
+
+                        button.textContent =
+                            "🪙 코인 부족!";
+
+                        setTimeout(
+                            () => {
+                                renderShop();
+                            },
+                            800
+                        );
+
+                        return;
+                    }
+
+
+                    coins -=
+                        w.price;
+
+                    owned.push(id);
+
+                    equipped =
+                        id;
+
+
+                    saveAll();
+
+                    applyWormAppearance();
+
+                    renderShop();
+
+                    render();
+
+                }
+            );
+
+
+            shopItems.appendChild(
+                card
+            );
+
+        }
+    );
+}
+
+
+/* =====================================================
+   버튼
+===================================================== */
+
+document
+.getElementById(
+    "continueButton"
+)
+.addEventListener(
     "click",
     resumeGame
 );
 
-restartButton.addEventListener(
+
+document
+.getElementById(
+    "restartButton"
+)
+.addEventListener(
     "click",
     restart
 );
 
-gameOverRestart.addEventListener(
+
+document
+.getElementById(
+    "gameOverRestart"
+)
+.addEventListener(
     "click",
     restart
 );
 
 
-/* =========================
+document
+.getElementById(
+    "shopButton"
+)
+.addEventListener(
+    "click",
+    openShop
+);
+
+
+document
+.getElementById(
+    "closeShop"
+)
+.addEventListener(
+    "click",
+    closeShop
+);
+
+
+/* =====================================================
    키보드
-========================= */
+===================================================== */
 
 document.addEventListener(
     "keydown",
@@ -2119,27 +3116,21 @@ document.addEventListener(
             e.key.toLowerCase();
 
 
-        /* =====================
-           LSHIFT 누름
-        ====================== */
+        /* LSHIFT */
 
         if (
-            e.code === "ShiftLeft"
+            e.code ===
+            "ShiftLeft"
         ) {
 
             e.preventDefault();
 
 
-            /*
-               이미 누르고 있다면
-               다시 발동하지 않음
-            */
-
             if (!shiftHeld) {
 
                 shiftHeld = true;
 
-                startDash();
+                startSkill();
             }
 
 
@@ -2147,13 +3138,25 @@ document.addEventListener(
         }
 
 
-        /* =====================
-           ESC
-        ====================== */
+        /* ESC */
 
-        if (key === "escape") {
+        if (
+            e.code ===
+            "Escape"
+        ) {
 
             e.preventDefault();
+
+
+            if (
+                shopOverlay.style.display ===
+                "block"
+            ) {
+
+                closeShop();
+
+                return;
+            }
 
 
             if (dead) {
@@ -2175,9 +3178,7 @@ document.addEventListener(
         }
 
 
-        /* =====================
-           R
-        ====================== */
+        /* R */
 
         if (
             key === "r" &&
@@ -2190,91 +3191,78 @@ document.addEventListener(
         }
 
 
-        if (paused) {
+        if (
+            paused ||
+            dead
+        ) {
             return;
         }
 
 
-        /* =====================
-           방향키
-        ====================== */
+        /* W / UP */
 
         if (
-
             (
                 key === "w" ||
                 key === "arrowup"
-            )
-
-            &&
-
+            ) &&
             direction.y !== 1
-
         ) {
 
             nextDirection = {
-                x:0,
-                y:-1
+                x: 0,
+                y: -1
             };
         }
 
 
-        if (
+        /* S / DOWN */
 
+        if (
             (
                 key === "s" ||
                 key === "arrowdown"
-            )
-
-            &&
-
+            ) &&
             direction.y !== -1
-
         ) {
 
             nextDirection = {
-                x:0,
-                y:1
+                x: 0,
+                y: 1
             };
         }
 
 
-        if (
+        /* A / LEFT */
 
+        if (
             (
                 key === "a" ||
                 key === "arrowleft"
-            )
-
-            &&
-
+            ) &&
             direction.x !== 1
-
         ) {
 
             nextDirection = {
-                x:-1,
-                y:0
+                x: -1,
+                y: 0
             };
         }
 
 
-        if (
+        /* D / RIGHT */
 
+        if (
             (
                 key === "d" ||
                 key === "arrowright"
-            )
-
-            &&
-
+            ) &&
             direction.x !== -1
-
         ) {
 
             nextDirection = {
-                x:1,
-                y:0
+                x: 1,
+                y: 0
             };
         }
 
@@ -2282,16 +3270,17 @@ document.addEventListener(
 );
 
 
-/* =========================
-   LShift 떼기
-========================= */
+/* =====================================================
+   SHIFT 떼기
+===================================================== */
 
 document.addEventListener(
     "keyup",
     function(e) {
 
         if (
-            e.code === "ShiftLeft"
+            e.code ===
+            "ShiftLeft"
         ) {
 
             shiftHeld = false;
@@ -2299,13 +3288,13 @@ document.addEventListener(
 
             /*
                핵심:
-               Shift를 떼는 순간
-               질주 즉시 종료
+               Shift를 떼는 즉시
+               스킬 종료
             */
 
             if (dashing) {
 
-                stopDash();
+                stopSkill();
             }
         }
 
@@ -2313,10 +3302,9 @@ document.addEventListener(
 );
 
 
-/* =========================
-   창을 벗어나도
-   Shift가 풀리도록 처리
-========================= */
+/* =====================================================
+   브라우저에서 포커스 잃었을 때
+===================================================== */
 
 window.addEventListener(
     "blur",
@@ -2327,15 +3315,50 @@ window.addEventListener(
 
         if (dashing) {
 
-            stopDash();
+            stopSkill();
         }
+
     }
 );
 
 
-/* =========================
+/* =====================================================
+   이동 루프
+===================================================== */
+
+setInterval(
+    () => {
+
+        if (
+            dead ||
+            paused
+        ) {
+            return;
+        }
+
+
+        const now =
+            performance.now();
+
+
+        if (
+            now - lastMove >=
+            moveTime()
+        ) {
+
+            move();
+        }
+
+    },
+    12
+);
+
+
+/* =====================================================
    시작
-========================= */
+===================================================== */
+
+applyWormAppearance();
 
 resetSnake();
 
@@ -2343,7 +3366,9 @@ createFood();
 
 render(1);
 
-updateDashUI();
+renderQuests();
+
+updateSkillUI();
 
 
 animationFrame =
@@ -2353,39 +3378,13 @@ animationFrame =
 
 
 /*
-   15ms마다 이동 체크
+   iframe에 키 입력을 확실히 전달
 */
 
-setInterval(
-    function() {
-
-        if (dead || paused) {
-            return;
-        }
-
-
-        const now =
-            performance.now();
-
-
-        const interval =
-            getMoveTime();
-
-
-        if (
-            now - lastMoveTime >=
-            interval
-        ) {
-
-            move();
-        }
-
-    },
-    15
-);
+game.focus();
 
 </script>
 
 </body>
 </html>
-""", height=820)
+""", height=950)
