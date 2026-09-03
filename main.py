@@ -2594,4 +2594,3 @@ components.html(
     height=870,
     scrolling=False
 )
-```
