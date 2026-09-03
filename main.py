@@ -1,5 +1,4 @@
-ㅇㅋ. **LShift를 꾹 누르는 동안에만 질주**하도록 바꾼 전체 Streamlit 코드야.
-기존 기능 전부 유지했어. 🪱⚡
+
 
 ```python
 import streamlit as st
